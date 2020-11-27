@@ -122,20 +122,18 @@ CREATE TABLE participaciones(
   entrevista TEXT[3][5],
   CONSTRAINT fk_vehiculo FOREIGN KEY (id_vehiculo) REFERENCES vehiculos(id_vehiculo) ON DELETE CASCADE,
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE,
-  
   CONSTRAINT pk_participaciones PRIMARY KEY(id_vehiculo,id_equipo,id_evento,id_event_pista)
 );
 
 
-CREATE TABLE plantillas(CONSTRAINT fk_evento FOREIGN KEY (id_evento,id_event_pista) REFERENCES eventos(id_evento,id_pista) ON DELETE CASCADE,
+CREATE TABLE plantillas(
   id_piloto SMALLINT,
   id_parti_vehiculo SMALLINT,
   id_parti_equipo SMALLINT,
   id_parti_evento SMALLINT,
   id_parti_evento_pista SMALLINT,
   CONSTRAINT fk_piloto FOREIGN KEY (id_piloto) REFERENCES pilotos(id_piloto) ON DELETE CASCADE,
-  CONSTRAINT fk_participaciones FOREIGN KEY (id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista) REFERENCES participaciones(id_vehiculo,
-  id_equipo, id_evento, id_event_pista) ON DELETE CASCADE,
+  CONSTRAINT fk_participaciones FOREIGN KEY (id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista) REFERENCES participaciones(id_vehiculo, id_equipo, id_evento, id_event_pista) ON DELETE CASCADE,
   CONSTRAINT pk_plantillas PRIMARY KEY(id_piloto,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
@@ -149,7 +147,7 @@ CREATE TABLE ensayos(
   estadistica estadistica_general NOT NULL,
   CONSTRAINT fk_participaciones FOREIGN KEY (id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista) REFERENCES participaciones(id_vehiculo,
   id_equipo, id_evento, id_event_pista) ON DELETE CASCADE,
-  CONSTRAINT pk_plantillas PRIMARY KEY(id_ensayo,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
+  CONSTRAINT pk_ensayo PRIMARY KEY(id_ensayo,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
 
@@ -164,7 +162,7 @@ CREATE TABLE carreras(
   CONSTRAINT check_estado CHECK(estado in ('a','c','d','np')),
   CONSTRAINT fk_participaciones FOREIGN KEY (id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista) REFERENCES participaciones(id_vehiculo,
   id_equipo, id_evento, id_event_pista) ON DELETE CASCADE,
-  CONSTRAINT pk_plantillas PRIMARY KEY(id_ensayo,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
+  CONSTRAINT pk_carrera PRIMARY KEY(id_carrera,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
 
@@ -212,10 +210,10 @@ CREATE TABLE fallas(
   id_car_pista SMALLINT,
   pieza CHAR(2) NOT NULL,
   tipo_falla CHAR(1) NOT NULL,
-  CONSTRAINT check_tipo_falla CHECK(tipo_estrategia in ('p','t')),
+  CONSTRAINT check_tipo_falla CHECK(tipo_falla in ('p','t')),
   CONSTRAINT fk_suceso FOREIGN KEY (id_suceso,id_suceso_evento,id_suceso_pista) REFERENCES sucesos(id_suceso,id_evento,id_event_pista) ON DELETE CASCADE,
   CONSTRAINT fk_carrera FOREIGN KEY (id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista) REFERENCES carreras(id_carrera, id_parti_vehiculo,id_parti_equipo, id_parti_evento, id_parti_evento_pista) ON DELETE CASCADE,
-  CONSTRAINT pk_resumen_datos PRIMARY KEY(id_falla,id_suceso,id_suceso_evento,id_suceso_pista,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista)
+  CONSTRAINT pk_falla PRIMARY KEY(id_falla,id_suceso,id_suceso_evento,id_suceso_pista,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista)
 );
 
 
@@ -252,14 +250,14 @@ CREATE TABLE parada_pits(
 
   CONSTRAINT fk_suceso FOREIGN KEY (id_suceso,id_suc_evento,id_suc_pista) REFERENCES sucesos(id_suceso,id_evento,id_event_pista) ON DELETE CASCADE,
 
-  CONSTRAINT pk_parada_pits PRIMARY KEY(id_parada,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista,id_suceso,id_suc_evento,id_suc_pista),
-
   CONSTRAINT fk_falla FOREIGN KEY (id_falla, id_falla_suceso, id_falla_s_evento,
   id_falla_s_pista, id_falla_carrera, id_falla_vehiculo, id_falla_equipo,
-  id_falla_evento, id_falla_pista) REFERENCES falla(id_falla, id_suceso,  id_suceso_evento, id_suceso_pista, id_carrera, id_car_vehiculo, id_car_equipo,
+  id_falla_evento, id_falla_pista) REFERENCES fallas(id_falla, id_suceso,  id_suceso_evento, id_suceso_pista, id_carrera, id_car_vehiculo, id_car_equipo,
   id_car_evento, id_car_pista) ON DELETE SET NULL,
 
   CONSTRAINT fk_piloto FOREIGN KEY (id_piloto) REFERENCES pilotos(id_piloto) ON DELETE SET NULL,
+
+  CONSTRAINT pk_parada_pits PRIMARY KEY(id_parada,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista,id_suceso,id_suc_evento,id_suc_pista)
 );
 
 
@@ -298,7 +296,7 @@ CREATE TABLE accidentes(
 
   CONSTRAINT fk_falla FOREIGN KEY (id_falla, id_falla_suceso, id_falla_evento,
   id_falla_pista, id_falla_carrera, id_falla_vehiculo, id_falla_equipo,
-  id_car_evento, id_car_pista) REFERENCES falla(id_falla, id_suceso,  id_suceso_evento, id_suceso_pista, id_carrera, id_car_vehiculo, id_car_equipo,
+  id_car_evento, id_car_pista) REFERENCES fallas(id_falla, id_suceso,  id_suceso_evento, id_suceso_pista, id_carrera, id_car_vehiculo, id_car_equipo,
   id_car_evento, id_car_pista) ON DELETE SET NULL,
   
   CONSTRAINT pk_accidentes PRIMARY KEY(id_accid, id_falla, id_falla_suceso,

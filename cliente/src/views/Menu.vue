@@ -3,6 +3,8 @@
         <b-row class="vh-100" align-v="center">
             <b-col col></b-col>
             <b-col col>
+                <h1 class="text-center text-white">Le Mans</h1>
+
                 <BtnMenu title="REPORTES" nameUrl="Reportes"></BtnMenu>
                 <BtnMenu title="SIMULACIÓN" nameUrl="Simulacion"></BtnMenu>
             </b-col>

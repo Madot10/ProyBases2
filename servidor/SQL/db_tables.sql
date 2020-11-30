@@ -22,37 +22,51 @@ CREATE TYPE motor AS(
 );
 
 CREATE TYPE estadistica_general AS(
-  velocidad_media NUMERIC(4,2),
+  velocidad_media NUMERIC(5,2),
   tiempo_mejor_vuelta TIME,
   puesto NUMERIC(3)
 );
 
 
 --Tablas
-
+DROP SEQUENCE IF EXISTS sec_paises;
+CREATE SEQUENCE sec_paises
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE paises(
-  id_pais SMALLINT PRIMARY KEY,
+  id_pais SMALLINT DEFAULT nextval('sec_paises') PRIMARY KEY,
   nombre VARCHAR(56) NOT NULL UNIQUE,
   img_bandera BYTEA NOT NULL,
   gentilicio VARCHAR(60) NOT NULL
 );
 
 
---Revisar FK
+DROP SEQUENCE IF EXISTS sec_equipos;
+CREATE SEQUENCE sec_equipos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
+
 CREATE TABLE equipos(
-  id_equipo SMALLINT PRIMARY KEY,
+  id_equipo SMALLINT DEFAULT nextval('sec_equipos') PRIMARY KEY,
   nombre VARCHAR(30) NOT NULL,
   id_pais SMALLINT,
   CONSTRAINT fk_pais FOREIGN KEY (id_pais) REFERENCES paises(id_pais) ON DELETE SET NULL
 );
 
+DROP SEQUENCE IF EXISTS sec_vehiculos;
+CREATE SEQUENCE sec_vehiculos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE vehiculos(
-  id_vehiculo SMALLINT PRIMARY KEY,
+  id_vehiculo SMALLINT DEFAULT nextval('sec_vehiculos') PRIMARY KEY,
   modelo VARCHAR(30) NOT NULL,
   categoria CHAR(7) NOT NULL,
-  img_vehiculo BYTEA NOT NULL,
+  img_vehiculo TEXT NOT NULL,
   tipo CHAR(2) NOT NULL,
   fabricante_auto VARCHAR(30) NOT NULL,
   fabricante_neumatico VARCHAR(30) NOT NULL,
@@ -62,9 +76,14 @@ CREATE TABLE vehiculos(
 );
 
 
---Revisar FK
+DROP SEQUENCE IF EXISTS sec_personal_tecnicos;
+CREATE SEQUENCE sec_personal_tecnicos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
+
 CREATE TABLE personal_tecnicos(
-  id_pers_tec SMALLINT PRIMARY KEY,
+  id_pers_tec SMALLINT DEFAULT nextval('sec_personal_tecnicos') PRIMARY KEY,
   identificacion datos_personales NOT NULL,
   cargo CHAR(3)[2] NOT NULL,
   id_equipo SMALLINT,
@@ -74,11 +93,16 @@ CREATE TABLE personal_tecnicos(
 );
 
 
---Revisar FK
+DROP SEQUENCE IF EXISTS sec_pilotos;
+CREATE SEQUENCE sec_pilotos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
+
 CREATE TABLE pilotos(
-  id_piloto SMALLINT PRIMARY KEY,
+  id_piloto SMALLINT  DEFAULT nextval('sec_pilotos') PRIMARY KEY,
   identificacion datos_personales NOT NULL,
-  img_piloto BYTEA NOT NULL,
+  img_piloto TEXT NOT NULL,
   fec_nacimiento DATE NOT NULL,
   id_pais SMALLINT,
   fec_fallecimiento DATE,
@@ -86,8 +110,14 @@ CREATE TABLE pilotos(
 );
 
 
+DROP SEQUENCE IF EXISTS sec_lotes_repuestos;
+CREATE SEQUENCE sec_lotes_repuestos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
+
 CREATE TABLE lotes_repuestos(
-  cod_lote SMALLINT,
+  cod_lote SMALLINT DEFAULT nextval('sec_lotes_repuestos'),
   id_equipo SMALLINT,
   tipo_pieza CHAR(2) NOT NULL,
   cant_disponible NUMERIC(2) NOT NULL,
@@ -95,16 +125,26 @@ CREATE TABLE lotes_repuestos(
   CONSTRAINT pk_lotes_rep PRIMARY KEY(cod_lote,id_equipo)
 );
 
+DROP SEQUENCE IF EXISTS sec_pistas;
+CREATE SEQUENCE sec_pistas
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE pistas(
-  id_pista SMALLINT PRIMARY KEY,
+  id_pista SMALLINT DEFAULT nextval('sec_pistas') PRIMARY KEY,
   total_km NUMERIC(5) NOT NULL,
   lugares VARCHAR(20)[26] NOT NULL
 );
 
+DROP SEQUENCE IF EXISTS sec_eventos;
+CREATE SEQUENCE sec_eventos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE eventos(
-  id_evento SMALLINT,
+  id_evento SMALLINT DEFAULT nextval('sec_eventos'),
   id_pista SMALLINT,
   fecha DATE NOT NULL,
   nota_prensa TEXT[24][10],
@@ -122,6 +162,7 @@ CREATE TABLE participaciones(
   entrevista TEXT[3][5],
   CONSTRAINT fk_vehiculo FOREIGN KEY (id_vehiculo) REFERENCES vehiculos(id_vehiculo) ON DELETE CASCADE,
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE,
+  CONSTRAINT fk_evento FOREIGN KEY (id_evento,id_event_pista) REFERENCES eventos(id_evento,id_pista) ON DELETE CASCADE,
   CONSTRAINT pk_participaciones PRIMARY KEY(id_vehiculo,id_equipo,id_evento,id_event_pista)
 );
 
@@ -137,9 +178,14 @@ CREATE TABLE plantillas(
   CONSTRAINT pk_plantillas PRIMARY KEY(id_piloto,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_ensayos;
+CREATE SEQUENCE sec_ensayos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE ensayos(
-  id_ensayo SMALLINT,
+  id_ensayo SMALLINT DEFAULT nextval('sec_ensayos'),
   id_parti_vehiculo SMALLINT,
   id_parti_equipo SMALLINT,
   id_parti_evento SMALLINT,
@@ -150,9 +196,14 @@ CREATE TABLE ensayos(
   CONSTRAINT pk_ensayo PRIMARY KEY(id_ensayo,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_carreras;
+CREATE SEQUENCE sec_carreras
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE carreras(
-  id_carrera SMALLINT,
+  id_carrera SMALLINT DEFAULT nextval('sec_carreras'),
   id_parti_vehiculo SMALLINT,
   id_parti_equipo SMALLINT,
   id_parti_evento SMALLINT,
@@ -165,9 +216,14 @@ CREATE TABLE carreras(
   CONSTRAINT pk_carrera PRIMARY KEY(id_carrera,id_parti_vehiculo,id_parti_equipo,id_parti_evento,id_parti_evento_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_sucesos;
+CREATE SEQUENCE sec_sucesos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE sucesos(
-  id_suceso SMALLINT,
+  id_suceso SMALLINT  DEFAULT nextval('sec_sucesos'),
   id_evento SMALLINT,
   id_event_pista SMALLINT,
   hora NUMERIC(2) NOT NULL,
@@ -176,9 +232,14 @@ CREATE TABLE sucesos(
   CONSTRAINT pk_sucesos PRIMARY KEY(id_suceso, id_evento, id_event_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_resumen_datos;
+CREATE SEQUENCE sec_resumen_datos
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE resumen_datos(
-  id_resumen SMALLINT,
+  id_resumen SMALLINT DEFAULT nextval('sec_resumen_datos'),
   id_suceso SMALLINT,
   id_suceso_evento SMALLINT,
   id_suceso_pista SMALLINT,
@@ -197,9 +258,14 @@ CREATE TABLE resumen_datos(
   CONSTRAINT pk_resumen_datos PRIMARY KEY(id_resumen,id_suceso,id_suceso_evento,id_suceso_pista,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_fallas;
+CREATE SEQUENCE sec_fallas
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE fallas(
-  id_falla SMALLINT,
+  id_falla SMALLINT DEFAULT nextval('sec_fallas'),
   id_suceso SMALLINT,
   id_suceso_evento SMALLINT,
   id_suceso_pista SMALLINT,
@@ -216,9 +282,14 @@ CREATE TABLE fallas(
   CONSTRAINT pk_falla PRIMARY KEY(id_falla,id_suceso,id_suceso_evento,id_suceso_pista,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_parada_pits;
+CREATE SEQUENCE sec_parada_pits
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE parada_pits(
-  id_parada SMALLINT,
+  id_parada SMALLINT DEFAULT nextval('sec_parada_pits'),
   --ids de la carrera
   id_carrera SMALLINT,
   id_car_vehiculo SMALLINT,
@@ -260,9 +331,14 @@ CREATE TABLE parada_pits(
   CONSTRAINT pk_parada_pits PRIMARY KEY(id_parada,id_carrera,id_car_vehiculo,id_car_equipo,id_car_evento,id_car_pista,id_suceso,id_suc_evento,id_suc_pista)
 );
 
+DROP SEQUENCE IF EXISTS sec_accidentes;
+CREATE SEQUENCE sec_accidentes
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
 CREATE TABLE accidentes(
-  id_accid SMALLINT,
+  id_accid SMALLINT DEFAULT nextval('sec_accidentes') ,
   --id de la falla
   id_falla SMALLINT,
   id_falla_suceso SMALLINT,

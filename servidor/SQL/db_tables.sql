@@ -12,7 +12,7 @@ CREATE TYPE datos_personales AS(
 
 CREATE TYPE metereologia AS(
   temp_pista NUMERIC(3),
-  clima CHAR(2)
+  clima CHAR(2) -- D,N,LL
 );
 
 CREATE TYPE motor AS(

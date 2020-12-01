@@ -228,5 +228,26 @@ CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id
     end;
 $$;
 
+-- (5)Generar lotes de inventario para cada equipo
+--Ej: call generar_lotes_inv(2)
+-- FALTA PROBAR
+CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+        -- 1 Obtener equipos participantes
+        cur_equipos CURSOR FOR SELECT p.id_equipo, p.nro_equipo FROM participaciones AS p WHERE p.id_evento = generar_lotes_inv.id_evento;
+    begin
+        for equipo IN cur_equipos loop
+            -- 2 Generar lotes por cada equipo de cada item
+            INSERT INTO lotes_repuestos(id_equipo, tipo_pieza, cant_disponible) VALUES (equipo.id_equipo, 'ne', 26);
+            INSERT INTO lotes_repuestos(id_equipo, tipo_pieza, cant_disponible) VALUES (equipo.id_equipo, 'fr', 30);
+            INSERT INTO lotes_repuestos(id_equipo, tipo_pieza, cant_disponible) VALUES (equipo.id_equipo, 'ac', 30);
+            INSERT INTO lotes_repuestos(id_equipo, tipo_pieza, cant_disponible) VALUES (equipo.id_equipo, 'tr', 15);
+            commit;
+        end loop;
+    end;
+$$;
+
+
 
 

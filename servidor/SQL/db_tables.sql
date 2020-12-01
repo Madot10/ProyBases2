@@ -121,6 +121,7 @@ CREATE TABLE lotes_repuestos(
   id_equipo SMALLINT,
   tipo_pieza CHAR(2) NOT NULL,
   cant_disponible NUMERIC(2) NOT NULL,
+  CONSTRAINT check_tipo_pieza CHECK(tipo_pieza in ('ne','fr', 'ac', 'tr')),
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE,
   CONSTRAINT pk_lotes_rep PRIMARY KEY(cod_lote,id_equipo)
 );

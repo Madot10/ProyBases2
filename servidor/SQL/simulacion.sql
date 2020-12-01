@@ -12,13 +12,13 @@ CREATE OR REPLACE  FUNCTION gen_random(min INT DEFAULT 0, max INT DEFAULT 10)
 $$;
 
 -- OBTENER EVENTO ID SEGUN FECHA
--- Ej: select obt_evento_id('2020-12-18 16:00:00'); => 2
-CREATE OR REPLACE FUNCTION obt_evento_id(fecha DATE)
+-- Ej: select obt_evento_id(2020); => 2
+CREATE OR REPLACE FUNCTION obt_evento_id(fecha SMALLINT)
     RETURNS SMALLINT LANGUAGE plpgsql AS $$
     declare
         id_obt SMALLINT;
     begin
-        SELECT e.id_evento INTO id_obt FROM eventos AS e WHERE e.fecha = obt_evento_id.fecha;
+        SELECT e.id_evento INTO id_obt FROM eventos AS e WHERE EXTRACT(YEAR FROM e.fecha)::SMALLINT = obt_evento_id.fecha;
         RETURN id_obt;
     end;
 $$;
@@ -201,4 +201,32 @@ CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
         end loop;
     end;
 $$;
+
+-- (4) GENERAR PARTICIPACIONES SEGUN ANNO DE REFERENCIA
+-- EJ: call generar_participaciones(1::smallint, 1::smallint, 2005::smallint)
+-- FALTA PROBAR
+CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+        -- 1 Obtener evento id de referencia
+        cur_parti_ref CURSOR FOR SELECT * FROM participaciones AS p WHERE p.id_evento = obt_evento_id(ano_ref);
+        cur_plan_ref CURSOR FOR SELECT * FROM plantillas AS p WHERE p.id_parti_evento = obt_evento_id(ano_ref);
+    begin
+        -- 2 Obtener participaciones de evento old
+        for parti_ref IN cur_parti_ref LOOP
+            -- 2.1 Crear participaciones nuevas
+            INSERT INTO participaciones VALUES (parti_ref.id_vehiculo, parti_ref.id_equipo, id_evento_nuevo, id_pista_nuevo, parti_ref.nro_equipo);
+            commit;
+        end loop;
+
+        -- 3 Obtener plantilla de evento old
+        for plan_ref IN cur_plan_ref LOOP
+            -- 3.1 Crear plantilla nueva
+            INSERT INTO plantillas VALUES (plan_ref.id_piloto, plan_ref.id_parti_vehiculo, plan_ref.id_parti_equipo, id_evento_nuevo, id_pista_nuevo);
+            commit;
+        end loop;
+    end;
+$$;
+
+
 

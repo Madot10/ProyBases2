@@ -74,6 +74,54 @@ CREATE OR REPLACE FUNCTION predecir_clima(clima_ant CHAR(2) DEFAULT 'd')
     end;
 $$;
 
+-- OBTENER LUZ SEGUN HORA DEL DIA
+-- Ej: SELECT obt_nivel_luz(2::smallint, 12::SMALLINT) => D (medio dia)
+CREATE OR REPLACE FUNCTION obt_nivel_luz(id_evento SMALLINT, hora_act SMALLINT)
+    RETURNS CHAR(2) LANGUAGE plpgsql AS $$
+    declare
+        hora_inicial SMALLINT;
+        hora_abs SMALLINT;
+    begin
+        SELECT EXTRACT(HOUR FROM e.fecha)::SMALLINT INTO hora_inicial FROM eventos AS e WHERE e.id_evento = obt_nivel_luz.id_evento;
+        --Calculamos la hora absoluta actual: inicial+horas_pasadas
+        hora_abs := (hora_inicial + hora_act) % 24;
+        --Segun formato 24h
+        if hora_abs >= 17 AND hora_abs <= 19 then
+            -- Atardecer
+            RETURN 'at';
+        elsif (hora_abs >= 20 AND hora_abs <= 24) OR (hora_abs >= 0 AND hora_abs <= 4) then
+            -- noche
+            RETURN 'n';
+        elsif hora_abs >= 5 AND hora_abs <= 7 then
+            -- Amanecer
+            RETURN 'am';
+        else
+            --Dia
+            RETURN 'd';
+        end if;
+    end;
+$$;
+
+-- ESTIMAR TEMPERATURA PROMEDIO DE LA PISTA
+-- Ej: SELECT estimar_temp_promedio_hora('n', 'll')
+CREATE OR REPLACE FUNCTION estimar_temp_promedio_hora(luz CHAR(2), clima CHAR(2))
+    RETURNS SMALLINT LANGUAGE plpgsql AS $$
+    declare
+    begin
+        if (luz = 'n' AND clima = 'll') OR (luz = 'n' AND clima = 'n') OR (luz = 'n' AND clima = 'd') OR (luz = 'am' AND clima = 'll') OR (luz = 'am' AND clima = 'n') then
+            -- 8°C - 17°C
+            RETURN gen_random(8, 17);
+        elsif (luz = 'd' AND clima = 'll') OR (luz = 'at' AND clima = 'd') OR (luz ='am' AND clima = 'd') OR (luz='at' AND clima='n') OR (luz = 'd' AND clima ='n') then
+            -- 11°C - 22°C
+            RETURN gen_random(11, 22);
+        else
+            -- 22°C - 33°C
+             RETURN gen_random(22, 33);
+        end if;
+    end;
+$$;
+
+
 --SIMULACION
 --Se  especificará la pista a utilizar. (ID)
 --Clima inicial en la hora 1. (D,N,LL)
@@ -82,7 +130,7 @@ $$;
 
 -- (0) Crear evento
 -- Ej call crear_evento(1::smallint, '18/12/2020 16:00:00'::date)
-CREATE OR REPLACE PROCEDURE crear_evento(id_pista SMALLINT, fecha_evento DATE)
+CREATE OR REPLACE PROCEDURE crear_evento(id_pista SMALLINT, fecha_evento TIMESTAMP)
     LANGUAGE plpgsql AS $$
     declare
         id_event SMALLINT;
@@ -127,3 +175,30 @@ CREATE OR REPLACE PROCEDURE generar_clima(id_evento SMALLINT, clima_inicial CHAR
         end loop;
     end;
 $$;
+
+-- (3) GENERAR TEMP PISTA POR HORA
+-- EJ: call generar_temp_pista_hora(2::smallint);
+CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+        aux_metereologia RECORD;
+        clima_act metereologia;
+        luz_act CHAR(2);
+        temp_prom SMALLINT;
+    begin
+        for horas IN 1..24 loop
+            --Obtenemos luz de la hora
+            SELECT obt_nivel_luz(id_evento, horas::smallint) INTO luz_act;
+            --Obtenemos clima de la hora (anteriormente generada)
+            SELECT metereologia INTO aux_metereologia FROM sucesos AS s WHERE s.id_evento = generar_temp_pista_hora.id_evento AND s.hora = horas;
+            clima_act := aux_metereologia.metereologia;
+
+             -- Actualizamos/Guardamos temperatura generada
+            temp_prom := estimar_temp_promedio_hora(luz_act, clima_act.clima);
+             UPDATE sucesos AS s SET metereologia.temp_pista = temp_prom
+                    WHERE s.id_evento = generar_temp_pista_hora.id_evento AND s.hora = horas;
+             commit;
+        end loop;
+    end;
+$$;
+

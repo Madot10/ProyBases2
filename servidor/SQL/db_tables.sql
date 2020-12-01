@@ -146,7 +146,7 @@ CREATE SEQUENCE sec_eventos
 CREATE TABLE eventos(
   id_evento SMALLINT DEFAULT nextval('sec_eventos'),
   id_pista SMALLINT,
-  fecha DATE NOT NULL,
+  fecha TIMESTAMP NOT NULL,
   nota_prensa TEXT[24][10],
   CONSTRAINT fk_pista FOREIGN KEY (id_pista) REFERENCES pistas(id_pista) ON DELETE CASCADE,
   CONSTRAINT pk_eventos PRIMARY KEY(id_evento,id_pista)

@@ -11,6 +11,7 @@ CREATE OR REPLACE  FUNCTION gen_random(min INT DEFAULT 0, max INT DEFAULT 10)
     END;
 $$;
 
+
 -- OBTENER EVENTO ID SEGUN FECHA
 -- Ej: select obt_evento_id(2020); => 2
 CREATE OR REPLACE FUNCTION obt_evento_id(fecha SMALLINT)
@@ -22,6 +23,7 @@ CREATE OR REPLACE FUNCTION obt_evento_id(fecha SMALLINT)
         RETURN id_obt;
     end;
 $$;
+
 
 -- PREDECIR CLIMA SEGUN CLIMA ANTERIOR
 --EJ: SELECT gen_clima()
@@ -74,6 +76,7 @@ CREATE OR REPLACE FUNCTION predecir_clima(clima_ant CHAR(2) DEFAULT 'd')
     end;
 $$;
 
+
 -- OBTENER LUZ SEGUN HORA DEL DIA
 -- Ej: SELECT obt_nivel_luz(2::smallint, 12::SMALLINT) => D (medio dia)
 CREATE OR REPLACE FUNCTION obt_nivel_luz(id_evento SMALLINT, hora_act SMALLINT)
@@ -102,6 +105,7 @@ CREATE OR REPLACE FUNCTION obt_nivel_luz(id_evento SMALLINT, hora_act SMALLINT)
     end;
 $$;
 
+
 -- ESTIMAR TEMPERATURA PROMEDIO DE LA PISTA
 -- Ej: SELECT estimar_temp_promedio_hora('n', 'll')
 CREATE OR REPLACE FUNCTION estimar_temp_promedio_hora(luz CHAR(2), clima CHAR(2))
@@ -129,7 +133,7 @@ $$;
 --Año de referencia (Num ####)
 
 -- (0) Crear evento
--- Ej call crear_evento(1::smallint, '18/12/2020 16:00:00'::date)
+-- Ej call crear_evento(1::smallint, '18/12/2020 16:00:00'::timestamp)
 CREATE OR REPLACE PROCEDURE crear_evento(id_pista SMALLINT, fecha_evento TIMESTAMP)
     LANGUAGE plpgsql AS $$
     declare
@@ -147,6 +151,7 @@ CREATE OR REPLACE PROCEDURE crear_evento(id_pista SMALLINT, fecha_evento TIMESTA
         end loop;
     end;
 $$;
+
 
 -- (1) Generar clima por hora
 -- Ej: call generar_clima(2::smallint, 'n');
@@ -176,6 +181,7 @@ CREATE OR REPLACE PROCEDURE generar_clima(id_evento SMALLINT, clima_inicial CHAR
     end;
 $$;
 
+
 -- (3) GENERAR TEMP PISTA POR HORA
 -- EJ: call generar_temp_pista_hora(2::smallint);
 CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
@@ -202,10 +208,11 @@ CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
     end;
 $$;
 
+
 -- (4) GENERAR PARTICIPACIONES SEGUN ANNO DE REFERENCIA
 -- EJ: call generar_participaciones(1::smallint, 1::smallint, 2005::smallint)
 -- FALTA PROBAR
-CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref SMALLINT)
+CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref smallint)
     LANGUAGE plpgsql AS $$
     declare
         -- 1 Obtener evento id de referencia
@@ -215,18 +222,22 @@ CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id
         -- 2 Obtener participaciones de evento old
         for parti_ref IN cur_parti_ref LOOP
             -- 2.1 Crear participaciones nuevas
-            INSERT INTO participaciones VALUES (parti_ref.id_vehiculo, parti_ref.id_equipo, id_evento_nuevo, id_pista_nuevo, parti_ref.nro_equipo);
+            INSERT INTO participaciones VALUES (parti_ref.nro_equipo, parti_ref.id_vehiculo, parti_ref.id_equipo, id_evento_nuevo, id_pista_nuevo);
             commit;
         end loop;
 
         -- 3 Obtener plantilla de evento old
         for plan_ref IN cur_plan_ref LOOP
             -- 3.1 Crear plantilla nueva
-            INSERT INTO plantillas VALUES (plan_ref.id_piloto, plan_ref.id_parti_vehiculo, plan_ref.id_parti_equipo, id_evento_nuevo, id_pista_nuevo);
+            INSERT INTO plantillas VALUES (plan_ref.id_piloto, plan_ref.parti_nro_equipo, plan_ref.id_parti_vehiculo, plan_ref.id_parti_equipo, id_evento_nuevo, id_pista_nuevo);
             commit;
         end loop;
     end;
 $$;
+
+
+call generar_participaciones(1::smallint, 1::smallint, 2005::smallint);
+
 
 -- (5)Generar lotes de inventario para cada equipo
 --Ej: call generar_lotes_inv(2)
@@ -247,7 +258,4 @@ CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
         end loop;
     end;
 $$;
-
-
-
 

@@ -125,6 +125,38 @@ CREATE OR REPLACE FUNCTION estimar_temp_promedio_hora(luz CHAR(2), clima CHAR(2)
     end;
 $$;
 
+--Generar estrategia
+CREATE OR REPLACE PROCEDURE generar_estrategia (id_equipo SMALLINT, hora_act SMALLINT) LANGUAGE plpgsql AS $$
+DECLARE ESTRATEGIA int;
+        cur_resumen CURSOR FOR SELECT rd.id_equipo, rd.nro_equipo FROM resumen_datos AS rd WHERE rd.id_car_equipo = generar_estrategia.id_equipo;
+    BEGIN
+        estrategia := gen_random(1,10);
+        if (hora_act == 1) THEN
+            for resumen_datos IN cur_resumen loop
+            --  Generar estrategia por cada equipo
+                INSERT INTO resumen_datos(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, nro_vueltas, estadistica, tipo_estrategia) VALUES (resumen_datos.id_suceso, resumen_datos.id_suceso_evento, resumen_datos.equipo.id_suceso_pista, resumen_datos.equipo.id_carrera, resumen_datos.equipo.car_nro_equipo, resumen_datos.id_car_vehiculo, resumen_datos.id_car_equipo, resumen_datos.id_car_evento, resumen_datos.id_car_pista, resumen_datos.nro_vueltas, resumen_datos.estadistica, 'a');
+                commit;
+            end loop;
+        
+        
+        ELSE
+            for resumen_datos IN cur_resumen loop
+                estrategia := gen_random(1,10);
+                if(estrategia >= 1 and estrategia <= 4 and rd.id_car_equipo = generar_estrategia.id_equipo) THEN
+                --  Generar estrategia tipo agresivo por cada equipo
+                    INSERT INTO resumen_datos(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, nro_vueltas, estadistica, tipo_estrategia) VALUES (resumen_datos.id_suceso, resumen_datos.id_suceso_evento, resumen_datos.equipo.id_suceso_pista, resumen_datos.equipo.id_carrera, resumen_datos.equipo.car_nro_equipo, resumen_datos.id_car_vehiculo, resumen_datos.id_car_equipo, resumen_datos.id_car_evento, resumen_datos.id_car_pista, resumen_datos.nro_vueltas, resumen_datos.estadistica, 'a');
+                    commit;
+                 elseif (estrategia >=5 and estrategia <=7 and rd.id_car_equipo = generar_estrategia.id_equipo) THEN
+                --  Generar estrategia tipo intermedio por cada equipo
+                    INSERT INTO resumen_datos(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, nro_vueltas, estadistica, tipo_estrategia) VALUES (resumen_datos.id_suceso, resumen_datos.id_suceso_evento, resumen_datos.equipo.id_suceso_pista, resumen_datos.equipo.id_carrera, resumen_datos.equipo.car_nro_equipo, resumen_datos.id_car_vehiculo, resumen_datos.id_car_equipo, resumen_datos.id_car_evento, resumen_datos.id_car_pista, resumen_datos.nro_vueltas, resumen_datos.estadistica, 'i');
+                    commit;
+                elseif (estrategia >=8 and estrategia<=10 and rd.id_car_equipo = generar_estrategia.id_equipo) THEN
+                --  Generar estrategia tipo conservador por cada equipo
+                    INSERT INTO resumen_datos(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, nro_vueltas, estadistica, tipo_estrategia) VALUES (resumen_datos.id_suceso, resumen_datos.id_suceso_evento, resumen_datos.equipo.id_suceso_pista, resumen_datos.equipo.id_carrera, resumen_datos.equipo.car_nro_equipo, resumen_datos.id_car_vehiculo, resumen_datos.id_car_equipo, resumen_datos.id_car_evento, resumen_datos.id_car_pista, resumen_datos.nro_vueltas, resumen_datos.estadistica, 'c');            
+                    commit;
+            end loop;
+   END;
+$$; 
 
 --SIMULACION
 --Se  especificará la pista a utilizar. (ID)

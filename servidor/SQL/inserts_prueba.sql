@@ -1,9 +1,12 @@
 
---Probando el select de un type
+--Probando el select de un type (TDA)
 
 SELECT (modelo_motor).cc FROM vehiculos WHERE id_vehiculo = 1;
 
 --Inserts de prueba
+
+--Para crear un ensayo, primero hay que crear un nuevo evento
+insert into eventos(id_pista, fecha) VALUES (1,'18-09-2020');
 
 INSERT INTO pistas(total_km,lugares) VALUES(555,ARRAY['lugar 1','lugar 2', 'lugar 3']);
 

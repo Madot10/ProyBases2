@@ -259,3 +259,35 @@ CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
     end;
 $$;
 
+
+-- (7) Generar ensayo
+--Ej: call generar_ensayo(2005::smallint,2030::smallint);
+CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+        -- 1 Obtener evento id de referencia
+        cur_ensayos CURSOR FOR SELECT * FROM ensayos AS e WHERE e.id_parti_evento = obt_evento_id(anno_viejo);
+    begin
+        -- 2 Guardar la información del ensayo
+        for e IN cur_ensayos LOOP
+            -- 2.1 Crear registros del ensayo
+            INSERT INTO ensayos(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estadistica) VALUES (e.parti_nro_equipo,e.id_parti_vehiculo,e.id_parti_equipo,obt_evento_id(anno_nuevo),e.id_parti_evento_pista, ROW(e.estadistica.velocidad_media,e.estadistica.tiempo_mejor_vuelta,e.estadistica.puesto));
+            commit;
+        end loop;
+    end;
+$$;
+
+
+
+
+
+--Procedimiento para borrar los datos de la simulación
+CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+
+    begin
+        --drop table lotes_repuestos;
+        delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
+    end;
+$$;

@@ -52,7 +52,7 @@ CREATE SEQUENCE sec_equipos
 
 CREATE TABLE equipos(
   id_equipo SMALLINT DEFAULT nextval('sec_equipos') PRIMARY KEY,
-  nombre VARCHAR(30) NOT NULL,
+  nombre VARCHAR(35) NOT NULL,
   id_pais SMALLINT,
   CONSTRAINT fk_pais FOREIGN KEY (id_pais) REFERENCES paises(id_pais) ON DELETE SET NULL
 );
@@ -73,7 +73,7 @@ CREATE TABLE vehiculos(
   fabricante_auto VARCHAR(30) NOT NULL,
   fabricante_neumatico VARCHAR(30) NOT NULL,
   modelo_motor motor NOT NULL,
-  CONSTRAINT check_categoria CHECK(categoria in ('LMP 900', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
+  CONSTRAINT check_categoria CHECK(categoria in ('LMP 900', 'LM GTP', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
   CONSTRAINT check_tipo CHECK(tipo in ('h', 'nh'))
 );
 

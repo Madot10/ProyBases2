@@ -287,7 +287,7 @@ CREATE TABLE fallas(
   id_car_equipo SMALLINT,
   id_car_evento SMALLINT,
   id_car_pista SMALLINT,
-  pieza CHAR(2) NOT NULL,
+  pieza CHAR(2) NOT NULL, --Parcial: ne,fr,pa,tr,fa,cn Total: cc,tg,mt,fg,fe,sc Lote repuesto: ac,fr,tr,ne
   tipo_falla CHAR(1) NOT NULL,
   CONSTRAINT check_tipo_falla CHECK(tipo_falla in ('p','t')),
   CONSTRAINT fk_suceso FOREIGN KEY (id_suceso,id_suceso_evento,id_suceso_pista) REFERENCES sucesos(id_suceso,id_evento,id_event_pista) ON DELETE CASCADE,

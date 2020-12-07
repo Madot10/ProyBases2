@@ -554,6 +554,90 @@ CREATE OR REPLACE PROCEDURE generar_mejor_tiempo_hora (id_event SMALLINT, id_equ
     END;
 $$ LANGUAGE plpgsql;
 
+--VERIFICAR DISPONIIBLIDAD DE PIEZA
+--EJ: select  verificar_disp_pieza(1::smallint, 'ne', 1)
+CREATE OR REPLACE FUNCTION verificar_disp_pieza (id_equipo SMALLINT, pieza CHAR(2), cant_pz NUMERIC(1)) RETURNS BOOLEAN AS $$
+  DECLARE
+  	aux_disp INT;
+  BEGIN
+  	  SELECT COUNT(lr.cod_lote) INTO aux_disp FROM lotes_repuestos AS lr WHERE lr.id_equipo = verificar_disp_pieza.id_equipo AND lr.cant_disponible >= cant_pz AND lr.tipo_pieza = pieza;
+      IF (aux_disp <> 0) THEN
+      	--hay disponibilidad
+        RETURN TRUE;
+      else
+      	--no hay
+      	RETURN FALSE;
+      END IF;
+  END;
+$$ LANGUAGE plpgsql;
+
+--CAMBIAR STATUS DE CORREDOR
+CREATE OR REPLACE PROCEDURE cambiar_status_equipo (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), nuevo_estado CHAR(2))
+    LANGUAGE plpgsql AS $$
+    begin
+        UPDATE carreras SET estado = nuevo_estado WHERE id_parti_evento = id_event AND id_parti_equipo = id_equipo AND parti_nro_equipo = nro_equipo;
+        commit;
+    end;
+$$;
+
+--GENERAR INDICE DE ACCIDENTE
+CREATE OR REPLACE FUNCTION generar_indice_accidente(id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2))
+    RETURNS NUMERIC(2) LANGUAGE plpgsql AS $$
+    DECLARE
+        indice_accidente NUMERIC(2) := 0;
+        aux_est CHAR(1);
+        aux_clima CHAR(2);
+        aux_luz_dia CHAR(2);
+    BEGIN
+        --Estrategia del equipo
+        aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+        WHEN 'a' THEN
+            indice_accidente := indice_accidente + 5;
+        WHEN 'i' THEN
+            indice_accidente := indice_accidente + 2;
+        WHEN 'c' THEN
+            indice_accidente := indice_accidente;
+        END CASE;
+
+        --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            indice_accidente := indice_accidente;
+        WHEN 'll' THEN
+            indice_accidente := indice_accidente + 5;
+        WHEN 'n' THEN
+            indice_accidente := indice_accidente + 1;
+        END CASE;
+
+        --Luz
+         aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
+        CASE aux_luz_dia
+        WHEN 'at' THEN
+        WHEN 'am' THEN
+                indice_accidente := indice_accidente + 2;
+        WHEN 'n' THEN
+                indice_accidente := indice_accidente + 3;
+        WHEN 'd' THEN
+                indice_accidente := indice_accidente;
+        END CASE;
+
+       return indice_accidente;
+    END;
+$$;
+
+--Procedimiento para borrar los datos de la simulación
+CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+
+    begin
+        --drop table lotes_repuestos;
+        delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
+    end;
+$$;
+
 
 --Procedimiento para borrar los datos de la simulación
 CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)

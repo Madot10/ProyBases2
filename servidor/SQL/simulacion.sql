@@ -392,84 +392,165 @@ $$;
 --GENERAR VELOCIDAD MEDIA A EQUIPO EN UNA HORA
 --EJ: call generar_veloc_media(11::smallint, 1::smallint, 7, 1);
 CREATE OR REPLACE PROCEDURE generar_veloc_media (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
-DECLARE
-	vel_gen NUMERIC(5,2) := 175.00;
-  aux_clima CHAR(2);
-  aux_temp NUMERIC(3);
-  aux_est CHAR(1);
-  aux_cat CHAR(7); 
-  aux_luz_dia CHAR(2);
-  aux_id_suc SMALLINT;
-BEGIN
-		
-		--Estrategia en la hora
-    aux_est := obtener_estrategia_equipo_hora(id_event, id_equipo, nro_equipo, hora);
-    CASE aux_est
-        WHEN 'a' THEN
-        	vel_gen := vel_gen + 20;
-        WHEN 'i' THEN
-        	vel_gen := vel_gen + 10;
-    END CASE;
-    
-    --Clima en la hora
-    aux_clima := obtener_clima_hora(id_event, hora);
-    CASE aux_clima
-    		WHEN 'd' THEN
-        	vel_gen := vel_gen + 15;
-        WHEN 'll' THEN
-        	vel_gen := vel_gen - 10;
+    DECLARE
+        vel_gen NUMERIC(5,2) := 175.00;
+    aux_clima CHAR(2);
+    aux_temp NUMERIC(3);
+    aux_est CHAR(1);
+    aux_cat CHAR(7); 
+    aux_luz_dia CHAR(2);
+    aux_id_suc SMALLINT;
+    BEGIN
+            
+            --Estrategia en la hora
+        aux_est := obtener_estrategia_equipo_hora(id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+            WHEN 'a' THEN
+                vel_gen := vel_gen + 20;
+            WHEN 'i' THEN
+                vel_gen := vel_gen + 10;
+        END CASE;
+        
+        --Clima en la hora
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+                WHEN 'd' THEN
+                vel_gen := vel_gen + 15;
+            WHEN 'll' THEN
+                vel_gen := vel_gen - 10;
+            WHEN 'n' THEN
+                vel_gen := vel_gen + 8;
+        END CASE;  
+        
+        --Nivel de luz
+        aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
+        CASE aux_luz_dia
+        WHEN 'at' THEN
+        WHEN 'am' THEN
+            vel_gen := vel_gen - 5;
+            
         WHEN 'n' THEN
-        	vel_gen := vel_gen + 8;
-  	END CASE;  
-    
-    --Nivel de luz
-    aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
-    CASE aux_luz_dia
-    	WHEN 'at' THEN
-      WHEN 'am' THEN
-      	vel_gen := vel_gen - 5;
+            vel_gen := vel_gen + 5;
+            
+        WHEN 'd' THEN
+            vel_gen := vel_gen + 8;
+        END CASE;
         
-      WHEN 'n' THEN
-      	vel_gen := vel_gen + 5;
+        --Temperatura promedio de pista
+        aux_temp := obtener_temp_pista_hora (id_event, hora);
+        IF (aux_temp >=8 and aux_temp <=17) THEN
+            vel_gen := vel_gen + 4;
+        ELSIF (aux_temp >= 11 and aux_temp < 22) THEN
+            vel_gen := vel_gen + 2;
+        END IF;
+        --Categoría de vehículo
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+        WHEN 'LM P675' THEN
+            vel_gen := vel_gen + 5;
+            
+        WHEN 'LM GTP' THEN
+        WHEN 'LM GTS' THEN
+        WHEN 'LM GT' THEN
+        WHEN 'LM GT1' THEN
+        WHEN 'LM GT2' THEN
+                vel_gen := vel_gen + 3;
+            
+        WHEN 'LM P1' THEN
+        WHEN 'LM P2' THEN
+            vel_gen := vel_gen + 1;
+        END CASE;
         
-      WHEN 'd' THEN
-      	vel_gen := vel_gen + 8;
-    END CASE;
-    
-    --Temperatura promedio de pista
-    aux_temp := obtener_temp_pista_hora (id_event, hora);
-    IF (aux_temp >=8 and aux_temp <=17) THEN
-    	vel_gen := vel_gen + 4;
-    ELSIF (aux_temp >= 11 and aux_temp < 22) THEN
-    	vel_gen := vel_gen + 2;
-    END IF;
-    --Categoría de vehículo
-    aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
-    CASE aux_cat
-    	WHEN 'LMP 900' THEN
-      WHEN 'LM P675' THEN
-       	vel_gen := vel_gen + 5;
+        --Guardamos velocidad media generada
+        aux_id_suc := obtener_suceso_id(id_event, hora);
         
-      WHEN 'LM GTP' THEN
-      WHEN 'LM GTS' THEN
-      WHEN 'LM GT' THEN
-      WHEN 'LM GT1' THEN
-      WHEN 'LM GT2' THEN
-     		vel_gen := vel_gen + 3;
-        
-      WHEN 'LM P1' THEN
-      WHEN 'LM P2' THEN
-      	vel_gen := vel_gen + 1;
-    END CASE;
-    
-    --Guardamos velocidad media generada
-    aux_id_suc := obtener_suceso_id(id_event, hora);
-    
-    UPDATE resumen_datos AS rd SET estadistica.velocidad_media = vel_gen WHERE rd.id_suceso = aux_id_suc AND rd.id_suceso_evento = id_event AND rd.id_car_equipo = id_equipo AND rd.car_nro_equipo = nro_equipo;
-    commit;
-END;
+        UPDATE resumen_datos AS rd SET estadistica.velocidad_media = vel_gen WHERE rd.id_suceso = aux_id_suc AND rd.id_suceso_evento = id_event AND rd.id_car_equipo = id_equipo AND rd.car_nro_equipo = nro_equipo;
+        commit;
+    END;
 $$ LANGUAGE plpgsql;
 
+--Generar mejor tiempo  en la hora 
+--SELECT '04:00.0'::TIME + INTERVAL '2 seconds' => 00:04:02
+--EJ: call generar_mejor_tiempo_hora(11::smallint, 1::smallint, 7, 1);
+CREATE OR REPLACE PROCEDURE generar_mejor_tiempo_hora (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+    DECLARE
+        time_gen TIME := '04:00.0';
+    aux_clima CHAR(2);
+    aux_temp NUMERIC(3);
+    aux_est CHAR(1);
+    aux_cat CHAR(7); 
+    aux_luz_dia CHAR(2);
+    aux_id_suc SMALLINT;
+    BEGIN
+            --Estrategia del equipo
+        aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+        WHEN 'a' THEN
+            time_gen := time_gen - INTERVAL '40 seconds';
+        WHEN 'i' THEN
+            time_gen := time_gen - INTERVAL '20 seconds';
+        WHEN 'c' THEN
+            time_gen := time_gen - INTERVAL '5 seconds';
+        END CASE;
+        
+        --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            time_gen := time_gen - INTERVAL '5 seconds';
+        WHEN 'll' THEN
+            time_gen := time_gen + INTERVAL '10 seconds';
+        WHEN 'n' THEN
+            time_gen := time_gen + INTERVAL '0 seconds';
+        END CASE;
+        
+        --Nivel de luz
+        aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
+        CASE aux_luz_dia
+        WHEN 'at' THEN
+        WHEN 'am' THEN
+                time_gen := time_gen + INTERVAL '6 seconds';
+        WHEN 'n' THEN
+                time_gen := time_gen + INTERVAL '1 seconds';
+        WHEN 'd' THEN
+                    time_gen := time_gen - INTERVAL '2 seconds';
+        END CASE;
+        
+        --Temperatura promedio de pista
+        aux_temp := obtener_temp_pista_hora (id_event, hora);
+        IF (aux_temp >= 8 AND aux_temp <=17) THEN
+                time_gen := time_gen - INTERVAL '2 seconds';
+        ELSIF (aux_temp > 17 AND aux_temp <= 22) THEN
+                time_gen := time_gen + INTERVAL '1 seconds';
+        ELSIF (aux_temp > 22 AND aux_temp <= 33) THEN
+                time_gen := time_gen + INTERVAL '3 seconds';
+        END IF;
+        --Categoría de carro
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+            WHEN 'LM P675' THEN
+                time_gen := time_gen - INTERVAL '4 seconds';
+                
+            WHEN 'LM GTP' THEN
+            WHEN 'LM GTS' THEN
+            WHEN 'LM GT' THEN
+            WHEN 'LM GT1' THEN
+            WHEN 'LM GT2' THEN
+                time_gen := time_gen + INTERVAL '2 seconds';
+                
+            WHEN 'LM P1' THEN
+            WHEN 'LM P2' THEN
+            time_gen := time_gen - INTERVAL '1 seconds';
+        END CASE;
+        
+        --Guardar tiempo generado
+        aux_id_suc := obtener_suceso_id(id_event, hora);  
+        UPDATE resumen_datos AS rd SET estadistica.tiempo_mejor_vuelta = time_gen WHERE rd.id_suceso = aux_id_suc AND rd.id_suceso_evento = id_event AND rd.id_car_equipo = id_equipo AND rd.car_nro_equipo = nro_equipo;
+        commit;
+    END;
+$$ LANGUAGE plpgsql;
 
 
 --Procedimiento para borrar los datos de la simulación
@@ -482,3 +563,4 @@ CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
         delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
     end;
 $$;
+

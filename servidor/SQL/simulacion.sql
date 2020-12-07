@@ -409,6 +409,8 @@ CREATE OR REPLACE PROCEDURE generar_veloc_media (id_event SMALLINT, id_equipo SM
                 vel_gen := vel_gen + 20;
             WHEN 'i' THEN
                 vel_gen := vel_gen + 10;
+            WHEN 'c' THEN
+                vel_gen := vel_gen + 0;
         END CASE;
         
         --Clima en la hora

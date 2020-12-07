@@ -24,6 +24,19 @@ CREATE OR REPLACE FUNCTION obt_evento_id(fecha SMALLINT)
     end;
 $$;
 
+-- OBTENER SUCESO EVENTO
+--ENTRADA: Evento y hora
+--SAlida: suceso id
+--EJ: SELECT obtener_suceso_id(1::smallint, 1);
+CREATE OR REPLACE FUNCTION obtener_suceso_id(id_event SMALLINT, hora NUMERIC(2)) RETURNS SMALLINT LANGUAGE plpgsql AS $$
+	DECLARE
+  	id_obtenido SMALLINT;
+	BEGIN
+  		SELECT s.id_suceso INTO id_obtenido FROM sucesos AS s WHERE s.id_evento = id_event AND s.hora = obtener_suceso_id.hora;
+      RETURN id_obtenido;
+  END;
+$$;
+
 
 -- PREDECIR CLIMA SEGUN CLIMA ANTERIOR
 --EJ: SELECT gen_clima()
@@ -125,6 +138,65 @@ CREATE OR REPLACE FUNCTION estimar_temp_promedio_hora(luz CHAR(2), clima CHAR(2)
     end;
 $$;
 
+--FUNC obtener_estrategia_equipo_hora()
+--Entrada: Equipo y Hora
+--Salida: estrategia
+--EJ: SELECT obtener_estrategia_equipo_hora(11::smallint, 1::smallint, 7::smallint,4)
+CREATE OR REPLACE FUNCTION obtener_estrategia_equipo_hora (id_event SMALLINT, id_equipo_est SMALLINT, nro_equipo_est NUMERIC(3) ,hora_est NUMERIC(2)) 
+RETURNS CHAR(1) AS $$
+    DECLARE
+        estrategia CHAR(1);
+    BEGIN
+            SELECT resumen_datos.tipo_estrategia INTO estrategia FROM resumen_datos 
+                INNER JOIN sucesos s on resumen_datos.id_suceso = s.id_suceso and resumen_datos.id_suceso_evento = s.id_evento and resumen_datos.id_suceso_pista = s.id_event_pista
+            WHERE resumen_datos.id_car_equipo = id_equipo_est AND s.hora = hora_est AND resumen_datos.car_nro_equipo = nro_equipo_est AND resumen_datos.id_suceso_evento = id_event;
+
+        RETURN estrategia;
+    END;
+$$ LANGUAGE plpgsql;
+
+--OBTENER Categoria vehiculo
+--Entrada: Equipo(id y nro) y evento
+--EJ: SELECT obtener_categoria_veh(1::smallint, 1::smallint, 9)
+CREATE OR REPLACE FUNCTION obtener_categoria_veh(id_event SMALLINT, id_equipo_cat SMALLINT, nro_equipo_cat NUMERIC(3))
+RETURNS CHAR(7) LANGUAGE plpgsql AS $$
+    declare
+        categoria CHAR(7);
+    begin
+        SELECT v.categoria INTO categoria FROM participaciones AS parti
+            INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+        WHERE parti.id_evento = id_event AND parti.nro_equipo = nro_equipo_cat AND parti.id_equipo = id_equipo_cat;
+
+        RETURN categoria;
+    end;
+$$;
+
+-- FUNC obtener_clima_hora
+--Entrada: Hora
+--Salida: Clima
+--Ej: SELECT obtener_clima_hora(11::smallint, 1)
+CREATE OR REPLACE FUNCTION obtener_clima_hora (id_event SMALLINT, hora_suc NUMERIC(2)) RETURNS CHAR(2) AS $$
+    DECLARE
+                clima CHAR(2);
+    BEGIN
+            SELECT (s.metereologia).clima INTO clima FROM sucesos AS s WHERE s.id_evento = id_event AND s.hora = hora_suc;
+        RETURN clima;
+    END;
+$$ LANGUAGE plpgsql;
+
+-- FUNC obtener_temp_pista_hora
+--Entrada: Hora
+--Salida: Temperatura
+--Ej: SELECT obtener_temp_pista_hora(11::smallint, 5)
+CREATE OR REPLACE FUNCTION obtener_temp_pista_hora (id_event SMALLINT, hora_suc NUMERIC(2)) RETURNS NUMERIC(3) AS $$
+    DECLARE
+        temp NUMERIC(3);
+    BEGIN
+        SELECT (s.metereologia).temp_pista INTO temp FROM sucesos AS s WHERE s.id_evento = id_event AND s.hora = hora_suc;
+        RETURN temp;
+    END;
+$$ LANGUAGE plpgsql;
+
 --SIMULACION
 --Se  especificará la pista a utilizar. (ID)
 --Clima inicial en la hora 1. (D,N,LL)
@@ -210,7 +282,7 @@ $$;
 
 -- (4) GENERAR PARTICIPACIONES SEGUN ANNO DE REFERENCIA
 -- EJ: call generar_participaciones(1::smallint, 1::smallint, 2005::smallint)
--- FALTA PROBAR
+-- call generar_participaciones(1::smallint, 1::smallint, 2005::smallint);
 CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref smallint)
     LANGUAGE plpgsql AS $$
     declare
@@ -234,13 +306,8 @@ CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id
     end;
 $$;
 
-
-call generar_participaciones(1::smallint, 1::smallint, 2005::smallint);
-
-
 -- (5)Generar lotes de inventario para cada equipo
 --Ej: call generar_lotes_inv(2)
--- FALTA PROBAR
 CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
     LANGUAGE plpgsql AS $$
     declare
@@ -257,7 +324,6 @@ CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
         end loop;
     end;
 $$;
-
 
 -- (7) Generar ensayo
 --Ej: call generar_ensayo(2005::smallint,2030::smallint);

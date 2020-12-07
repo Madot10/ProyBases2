@@ -639,14 +639,161 @@ CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
 $$;
 
 
---Procedimiento para borrar los datos de la simulación
-CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
+-- GENERAR POSIBILE FALLA
+--FALTA PROBAR
+CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2))
     LANGUAGE plpgsql AS $$
-    declare
+    DECLARE
+        indice_falla NUMERIC(2) := 0;
+        aux_clima CHAR(2);
+        aux_temp NUMERIC(3);
+        aux_est CHAR(1);
+        aux_cat CHAR(7);
+        aux_luz_dia CHAR(2);
+        aux_id_suc SMALLINT;
+        aux_falla INT;
+        disp BOOLEAN;
+        aux_cant_pz;
+        aux_pz CHAR(2);
+        aux_ind_accidente NUMERIC(2);
+        aux_tp_accidente CHAR(1);
+    BEGIN
+        --Temperatura de pista
+        aux_temp := obtener_temp_pista_hora (id_event, hora);
+        IF (aux_temp > 17 AND aux_temp <= 22) THEN
+                indice_falla := indice_falla + 1;
+        ELSIF (aux_temp > 22 AND aux_temp <= 33) THEN
+                indice_falla := indice_falla + 5;
+        END IF;
 
-    begin
-        --drop table lotes_repuestos;
-        delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
-    end;
+        --Estrategia del equipo
+        aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+        WHEN 'a' THEN
+            indice_falla := indice_falla + 5;
+        WHEN 'i' THEN
+            indice_falla := indice_falla + 2;
+        WHEN 'c' THEN
+            indice_falla := indice_falla;
+        END CASE;
+
+        --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            indice_falla := indice_falla;
+        WHEN 'll' THEN
+            indice_falla := indice_falla + 5;
+        WHEN 'n' THEN
+            indice_falla := indice_falla + 1;
+        END CASE;
+
+        --Categoría del vehículo del equipo
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+            WHEN 'LM P675' THEN
+                indice_falla := indice_falla + 3;
+
+            WHEN 'LM GTP' THEN
+            WHEN 'LM GTS' THEN
+            WHEN 'LM GT' THEN
+            WHEN 'LM GT1' THEN
+            WHEN 'LM GT2' THEN
+                indice_falla := indice_falla + 4;
+
+            WHEN 'LM P1' THEN
+            WHEN 'LM P2' THEN
+                indice_falla := indice_falla + 1;
+        END CASE;
+				
+        
+        --Analisis del indice
+        if (indice_falla >= 12 and indice_falla <= 17) then
+        		aux_falla:= gen_random(1,6);
+            --falla parcial
+            --Registrar falla
+            
+           IF (aux_falla = 1) THEN 
+                --Falla de neumáticos
+                aux_pz := 'ne';
+                aux_cant_pz := 4;
+            ELSIF (aux_falla = 2) THEN 
+                --Falla frenos
+                aux_pz := 'fr';
+                aux_cant_pz := 1;
+            ELSIF (aux_falla = 3) THEN 
+             --Falla presión aceite
+             		aux_pz := 'pa';
+            ELSIF (aux_falla = 4) THEN 
+             --Falla transmisión
+             		aux_pz := 'tr';
+               	aux_cant_pz := 1;
+           ELSIF (aux_falla = 5) THEN 
+             --Falla fuga aceite
+             		aux_pz := 'fa';
+                aux_cant_pz := 1;
+            ELSIF (aux_falla = 6) THEN 
+             --Falla calibración neumáticos
+                aux_pz := 'cn';
+            END IF; 
+            
+             INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla) 
+                                  VALUES (id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, aux_pz, 'p');
+           
+           --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
+           if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
+           			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);  
+                 if(disp) then
+                 		--hay disponibilidad => descontar
+                    call usar_pieza_inventario(id_equipo, aux_pz, aux_cant_pz);
+                 else 
+                 		--no hay disponibilidad => cambiar status = abandono
+                    call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
+                 end if;
+           end if;
+                   
+        else
+        		aux_falla:= gen_random(1,6);
+            --falla total
+            --Abandona carrera
+            call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
+            
+            --Registrar pieza
+            IF (aux_falla = 1) THEN 
+                --Insertar falla de neumáticos
+                aux_pz := 'cc';
+            ELSIF (aux_falla = 2) THEN 
+                --Insertar falla frenos
+                aux_pz := 'tg';
+            ELSIF (aux_falla = 3) THEN 
+             --Insertar falla presión aceite
+                aux_pz := 'mt';
+            ELSIF (aux_falla = 4) THEN 
+             --Insertar falla transmisión
+                aux_pz := 'fg';
+            ELSIF (aux_falla = 5) THEN 
+             --Insertar falla fuga aceite
+                aux_pz := 'fe';
+            ELSIF(aux_falla = 6) THEN
+             --Insertar falla calibración neumáticos
+             	aux_pz := 'sc';
+             END IF;
+                INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla) 
+                                  VALUES (id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, aux_pz, 't');
+                                  
+            --Obtener prob de accidente indv o colectivo
+           	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
+            if (aux_ind_accidente >= 0 AND aux_ind_accidente <= 9) then
+          		--accidente individual
+              aux_tp_accidente := 'i';
+            else
+            	--accidente colectivo
+              aux_tp_accidente := 'c';
+            end if;
+           --Reportamos incidente (accidente)
+           		INSERT INTO accidentes (id_falla, id_falla_suceso, id_falla_evento, id_falla_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_car_evento, id_falla_car_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, tipo)
+           								VALUES (id_falla, id_falla_suceso, id_falla_evento, id_falla_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_car_evento, id_falla_car_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, aux_tp_accidente);
+        end if;
+    END;
 $$;
-

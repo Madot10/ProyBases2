@@ -126,21 +126,21 @@ CREATE OR REPLACE FUNCTION estimar_temp_promedio_hora(luz CHAR(2), clima CHAR(2)
 $$;
 
 --Generar estrategia
-CREATE OR REPLACE PROCEDURE generar_estrategia (id_equipo SMALLINT, hora_act SMALLINT) LANGUAGE plpgsql AS $$
-DECLARE ESTRATEGIA int;
-        cur_resumen CURSOR FOR SELECT rd.id_equipo, rd.nro_equipo FROM resumen_datos AS rd WHERE rd.id_car_equipo = generar_estrategia.id_equipo;
+CREATE OR REPLACE PROCEDURE generar_estrategia (id_evento SMALLINT, id_equipo SMALLINT, hora_act SMALLINT) LANGUAGE plpgsql AS $$
+DECLARE 
+				ESTRATEGIA INTEGER;
+        cur_resumen CURSOR FOR SELECT rd.id_car_equipo, rd.car_nro_equipo FROM resumen_datos AS rd WHERE rd.id_car_equipo = generar_estrategia.id_equipo AND rd.id_car_evento = generar_estrategia.id_evento;
     BEGIN
-        estrategia := gen_random(1,10);
+        ---estrategia := gen_random(1,10);
         if (hora_act == 1) THEN
             for resumen_datos IN cur_resumen loop
-            --  Generar estrategia por cada equipo
+            --  Establecer 'A' estrategia por cada equipo en hora 1
                 INSERT INTO resumen_datos(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, nro_vueltas, estadistica, tipo_estrategia) VALUES (resumen_datos.id_suceso, resumen_datos.id_suceso_evento, resumen_datos.equipo.id_suceso_pista, resumen_datos.equipo.id_carrera, resumen_datos.equipo.car_nro_equipo, resumen_datos.id_car_vehiculo, resumen_datos.id_car_equipo, resumen_datos.id_car_evento, resumen_datos.id_car_pista, resumen_datos.nro_vueltas, resumen_datos.estadistica, 'a');
                 commit;
             end loop;
-        
-        
         ELSE
             for resumen_datos IN cur_resumen loop
+                --Generar prob de estrategia
                 estrategia := gen_random(1,10);
                 if(estrategia >= 1 and estrategia <= 4 and rd.id_car_equipo = generar_estrategia.id_equipo) THEN
                 --  Generar estrategia tipo agresivo por cada equipo
@@ -156,7 +156,7 @@ DECLARE ESTRATEGIA int;
                     commit;
             end loop;
    END;
-$$; 
+$$;  
 
 --SIMULACION
 --Se  especificará la pista a utilizar. (ID)
@@ -243,7 +243,6 @@ $$;
 
 -- (4) GENERAR PARTICIPACIONES SEGUN ANNO DE REFERENCIA
 -- EJ: call generar_participaciones(1::smallint, 1::smallint, 2005::smallint)
--- FALTA PROBAR
 CREATE OR REPLACE PROCEDURE generar_participaciones(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref smallint)
     LANGUAGE plpgsql AS $$
     declare
@@ -272,8 +271,7 @@ call generar_participaciones(1::smallint, 1::smallint, 2005::smallint);
 
 
 -- (5)Generar lotes de inventario para cada equipo
---Ej: call generar_lotes_inv(2)
--- FALTA PROBAR
+--Ej: call generar_lotes_inv(2::smallint)
 CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
     LANGUAGE plpgsql AS $$
     declare
@@ -291,8 +289,7 @@ CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
     end;
 $$;
 
-
--- (7) Generar ensayo
+-- (6) Generar ensayo
 --Ej: call generar_ensayo(2005::smallint,2030::smallint);
 CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALLINT)
     LANGUAGE plpgsql AS $$
@@ -303,13 +300,26 @@ CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALL
         -- 2 Guardar la información del ensayo
         for e IN cur_ensayos LOOP
             -- 2.1 Crear registros del ensayo
-            INSERT INTO ensayos(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estadistica) VALUES (e.parti_nro_equipo,e.id_parti_vehiculo,e.id_parti_equipo,obt_evento_id(anno_nuevo),e.id_parti_evento_pista, ROW(e.estadistica.velocidad_media,e.estadistica.tiempo_mejor_vuelta,e.estadistica.puesto));
+            INSERT INTO ensayos(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estadistica) VALUES (e.parti_nro_equipo,e.id_parti_vehiculo,e.id_parti_equipo,obt_evento_id(anno_nuevo),e.id_parti_evento_pista, ROW((e.estadistica).velocidad_media,(e.estadistica).tiempo_mejor_vuelta,(e.estadistica).puesto));
             commit;
         end loop;
     end;
 $$;
 
 
+--(7) Generar clasificacion de carrera a los equipos participantes
+--Ej: call generar_clasificacion_carrera(11::smallint, 1::smallint, 2020::smallint)
+CREATE OR REPLACE PROCEDURE generar_clasificacion_carrera(id_evento_nuevo SMALLINT, id_pista_nuevo SMALLINT, ano_ref SMALLINT) AS $$
+DECLARE
+		--1 Obtener clasificados segun criterio en ensayo
+		cur_ensayo CURSOR FOR SELECT * FROM ensayos AS eny WHERE eny.id_parti_evento = obt_evento_id(ano_ref) ORDER BY  (eny.estadistica).puesto LIMIT 45;
+BEGIN
+    --2 Crear "carrera" para clasificado (estado en curso)
+    FOR eny_ref IN cur_ensayo LOOP
+    	INSERT INTO carreras(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estado) VALUES (eny_ref.parti_nro_equipo, eny_ref.id_parti_vehiculo, eny_ref.id_parti_equipo, id_evento_nuevo, id_pista_nuevo, 'c');
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 
 

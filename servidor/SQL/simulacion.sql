@@ -1,3 +1,15 @@
+--Procedimiento para borrar los datos de la simulación
+-- FALTA COMPLETAR
+CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
+    LANGUAGE plpgsql AS $$
+    declare
+
+    begin
+        --drop table lotes_repuestos;
+        delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
+    end;
+$$;
+
 --FUNCIONES AUXILIARES
 
 --GENERADOR DE NUMEROS RANDOM EN UN RANGO
@@ -580,6 +592,15 @@ CREATE OR REPLACE PROCEDURE cambiar_status_equipo (id_event SMALLINT, id_equipo 
     end;
 $$;
 
+--USAR PIEZA DE INVENTARIO
+CREATE OR REPLACE PROCEDURE usar_pieza_inventario (id_equipo SMALLINT, pieza CHAR(2), cant_pz NUMERIC(1))
+    LANGUAGE plpgsql AS $$
+    begin
+        UPDATE lotes_repuestos  SET cant_disponible = cant_disponible - cant_pz WHERE lotes_repuestos.id_equipo = usar_pieza_inventario.id_equipo AND lotes_repuestos.tipo_pieza = pieza;
+        commit;
+    end;
+$$;
+
 --GENERAR INDICE DE ACCIDENTE
 CREATE OR REPLACE FUNCTION generar_indice_accidente(id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2))
     RETURNS NUMERIC(2) LANGUAGE plpgsql AS $$
@@ -627,21 +648,10 @@ CREATE OR REPLACE FUNCTION generar_indice_accidente(id_event SMALLINT, id_equipo
     END;
 $$;
 
---Procedimiento para borrar los datos de la simulación
-CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
-    LANGUAGE plpgsql AS $$
-    declare
-
-    begin
-        --drop table lotes_repuestos;
-        delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
-    end;
-$$;
-
 
 -- GENERAR POSIBILE FALLA
 --FALTA PROBAR
-CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2))
+CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_pista SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), id_equipo_carrera SMALLINT, id_equipo_veh SMALLINT,  hora NUMERIC(2))
     LANGUAGE plpgsql AS $$
     DECLARE
         indice_falla NUMERIC(2) := 0;
@@ -653,10 +663,11 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo 
         aux_id_suc SMALLINT;
         aux_falla INT;
         disp BOOLEAN;
-        aux_cant_pz;
+        aux_cant_pz NUMERIC(2) := 0;
         aux_pz CHAR(2);
         aux_ind_accidente NUMERIC(2);
         aux_tp_accidente CHAR(1);
+        aux_id_falla SMALLINT;
     BEGIN
         --Temperatura de pista
         aux_temp := obtener_temp_pista_hora (id_event, hora);
@@ -737,9 +748,10 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo 
              --Falla calibración neumáticos
                 aux_pz := 'cn';
             END IF; 
-            
+
+        	aux_id_suc := obtener_suceso_id(id_event, hora);
              INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla) 
-                                  VALUES (id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, aux_pz, 'p');
+                        VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 'p');
            
            --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
            if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
@@ -779,8 +791,9 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo 
              --Insertar falla calibración neumáticos
              	aux_pz := 'sc';
              END IF;
-                INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla) 
-                                  VALUES (id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, aux_pz, 't');
+                aux_id_suc := obtener_suceso_id(id_event, hora);
+        	INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
+                        VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 't') RETURNING id_falla INTO aux_id_falla;
                                   
             --Obtener prob de accidente indv o colectivo
            	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
@@ -791,9 +804,12 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_equipo 
             	--accidente colectivo
               aux_tp_accidente := 'c';
             end if;
-           --Reportamos incidente (accidente)
-           		INSERT INTO accidentes (id_falla, id_falla_suceso, id_falla_evento, id_falla_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_car_evento, id_falla_car_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, tipo)
-           								VALUES (id_falla, id_falla_suceso, id_falla_evento, id_falla_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_car_evento, id_falla_car_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, aux_tp_accidente);
+
+        	--Reportamos incidente (accidente)
+           	aux_id_suc := obtener_suceso_id(id_event, hora);
+        	INSERT INTO accidentes (id_falla, id_falla_suceso, id_falla_evento, id_falla_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_car_evento, id_falla_car_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, tipo)
+           								VALUES (aux_id_falla, aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_id_suc, id_event, id_event_pista, aux_tp_accidente);
         end if;
     END;
 $$;
+

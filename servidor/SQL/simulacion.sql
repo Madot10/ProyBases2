@@ -975,6 +975,84 @@ CREATE OR REPLACE PROCEDURE generar_paradas_gasolina(id_event SMALLINT, id_equip
   END;
 $$ LANGUAGE plpgsql;
 
+-- Generar paradas en pits por motivo neumatico
+--Ej: call generar_paradas_neumatico(11::smallint, 1::smallint, 9, 2);
+CREATE OR REPLACE PROCEDURE generar_paradas_neumatico(id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+  DECLARE
+      aux_clima CHAR(2);
+      aux_est CHAR(1);
+      aux_temp NUMERIC(3);
+      aux_cat CHAR(7);
+      aux_ind_neumatico NUMERIC(2) := 0;
+  BEGIN
+  		--Estrategia del equipo
+  		 aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+          CASE aux_est
+            WHEN 'a' THEN
+                aux_ind_neumatico := aux_ind_neumatico + 3;
+            WHEN 'i' THEN
+                aux_ind_neumatico := aux_ind_neumatico + 2;
+            WHEN 'c' THEN
+                aux_ind_neumatico := aux_ind_neumatico + 1;
+          END CASE;
+
+      --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            aux_ind_neumatico := aux_ind_neumatico + 2;
+        WHEN 'll' THEN
+            aux_ind_neumatico := aux_ind_neumatico + 1;
+        WHEN 'n' THEN
+            aux_ind_neumatico := aux_ind_neumatico + 1;
+        END CASE;
+
+			--Temperatura promedio de pista
+      aux_temp := obtener_temp_pista_hora (id_event, hora);
+        IF (aux_temp >= 8 and aux_temp <= 17) THEN
+            aux_ind_neumatico := aux_ind_neumatico + 1;
+        ELSIF (aux_temp >= 11 and aux_temp < 22) THEN
+            aux_ind_neumatico := aux_ind_neumatico + 2;
+        else
+        		aux_ind_neumatico := aux_ind_neumatico + 3;
+        END IF;
+
+      --Categoría de carro
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+            WHEN 'LM P675' THEN
+                aux_ind_neumatico := aux_ind_neumatico + 2;
+
+            WHEN 'LM GTP' THEN
+            WHEN 'LM GTS' THEN
+            WHEN 'LM GT' THEN
+            WHEN 'LM GT1' THEN
+            WHEN 'LM GT2' THEN
+                aux_ind_neumatico := aux_ind_neumatico + 3;
+
+            WHEN 'LM P1' THEN
+            WHEN 'LM P2' THEN
+            		aux_ind_neumatico := aux_ind_neumatico + 1;
+        END CASE;
+
+        --Generar paradas
+        if (aux_ind_neumatico >= 0 and aux_ind_neumatico <= 5) then
+        		--1 parada
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+        elsif (aux_ind_neumatico >= 6 and aux_ind_neumatico <= 8) then
+        		--2 paradas
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+        else
+        		--3 paradas
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ne');
+        end if;
+  END;
+$$ LANGUAGE plpgsql;
+
 
 
 

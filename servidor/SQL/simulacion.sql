@@ -850,7 +850,7 @@ $$ LANGUAGE plpgsql;
 
 --VERIFICAR ACCIDENTE COLECTIVO
 --Ej: SELECT verificar_accidente_colectivo(11::smallint, 1, 1::smallint, 8);
-CREATE OR REPLACE FUNCTION verificar_accidente_colectivo (id_event SMALLINT, hora NUMERIC(2), id_equipo SMALLINT, nro_equipo NUMERIC(3)) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE PROCEDURE verificar_accidente_colectivo (id_event SMALLINT, hora NUMERIC(2), id_equipo SMALLINT, nro_equipo NUMERIC(3))  AS $$
   DECLARE
         aux_cant_acc NUMERIC(2) := 0;
         aux_clima CHAR(2);
@@ -861,8 +861,8 @@ CREATE OR REPLACE FUNCTION verificar_accidente_colectivo (id_event SMALLINT, hor
   		SELECT COUNT(*) INTO aux_cant_acc FROM accidentes AS acc WHERE acc.car_nro_equipo <> nro_equipo AND acc.id_car_evento = id_event AND acc.tipo = 'c';
 
         if(aux_cant_acc <> 0) then
-        	--hay accidentes colectivos
-					--Estrategia del equipo
+        --hay accidentes colectivos
+		--Estrategia del equipo
           aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
           CASE aux_est
             WHEN 'a' THEN
@@ -901,10 +901,8 @@ CREATE OR REPLACE FUNCTION verificar_accidente_colectivo (id_event SMALLINT, hor
           		--Si se involucra
           	    call cambiar_status_equipo (id_event, id_equipo, nro_equipo, 'a');
                 call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ad');
-          	    RETURN TRUE;
           end if;
         end if;
-  		RETURN FALSE;
   END;
 $$ LANGUAGE plpgsql;
 

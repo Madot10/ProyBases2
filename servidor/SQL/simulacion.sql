@@ -1069,6 +1069,86 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Generar Nro Vueltas por equipo en esa hora
+--Ej: call generar_nro_vueltas(11::smallint, 1::smallint, 7, 3);
+CREATE OR REPLACE PROCEDURE generar_nro_vueltas (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+  DECLARE
+  			aux_clima CHAR(2);
+      	aux_est CHAR(1);
+        aux_cant_paradas NUMERIC(2) :=0;
+        aux_cat CHAR(7);
+        aux_nro_vueltas SMALLINT := 5;
+        aux_suc SMALLINT;
+        aux_is_acc NUMERIC(2) := 0;
+  BEGIN
+  		--Categoría del vehículo del equipo
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+            WHEN 'LM P675' THEN
+                aux_nro_vueltas := aux_nro_vueltas + 2;
+
+            WHEN 'LM GTP' THEN
+            WHEN 'LM GTS' THEN
+            WHEN 'LM GT' THEN
+            WHEN 'LM GT1' THEN
+            WHEN 'LM GT2' THEN
+                aux_nro_vueltas := aux_nro_vueltas + 3;
+
+            WHEN 'LM P1' THEN
+            WHEN 'LM P2' THEN
+                aux_nro_vueltas := aux_nro_vueltas + 1;
+        END CASE;
+        
+        --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            aux_nro_vueltas := aux_nro_vueltas + 4;
+        WHEN 'll' THEN
+            aux_nro_vueltas := aux_nro_vueltas - 2;
+        WHEN 'n' THEN
+            aux_nro_vueltas := aux_nro_vueltas + 2;
+        END CASE;
+        
+        --Estrategia del equipo
+        aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+          WHEN 'a' THEN
+              aux_nro_vueltas := aux_nro_vueltas + 3;
+          WHEN 'i' THEN
+              aux_nro_vueltas := aux_nro_vueltas + 2;
+          WHEN 'c' THEN
+              aux_nro_vueltas := aux_nro_vueltas - 2;
+        END CASE;
+        
+        --Cantidad de paradas en pits
+        aux_suc := obtener_suceso_id(id_event, hora);
+        SELECT COUNT(pp.motivo) INTO aux_cant_paradas FROM parada_pits pp WHERE pp.car_nro_equipo = nro_equipo AND pp.id_car_evento = id_event AND pp.id_suceso = aux_suc;
+        if(aux_cant_paradas <= 2) then
+        		aux_nro_vueltas := aux_nro_vueltas - 1;
+        elsif (aux_cant_paradas <= 4) then
+        		aux_nro_vueltas := aux_nro_vueltas - 2;
+        else
+        		aux_nro_vueltas := aux_nro_vueltas - 3;
+        end if;
+        
+        --Accidente individual del equipo
+        SELECT COUNT(acc.id_suceso) INTO aux_is_acc FROM accidentes acc WHERE acc.id_suceso = aux_suc AND acc.car_nro_equipo = nro_equipo AND acc.id_car_evento = id_event AND acc.tipo = 'i';
+        if(aux_is_acc <> 0) then
+        		aux_nro_vueltas := aux_nro_vueltas - 4;
+        end if;
+        
+        --Actualizamos
+        --Validamos que no sea negativo
+        if(aux_nro_vueltas < 0) then
+        	aux_nro_vueltas := 0;
+        end if;
+        UPDATE resumen_datos SET nro_vueltas = aux_nro_vueltas WHERE id_car_evento = id_event AND id_suceso = aux_suc AND id_car_equipo = id_equipo AND car_nro_equipo = nro_equipo;
+  END;
+$$ LANGUAGE plpgsql;
+
+
 
 
 

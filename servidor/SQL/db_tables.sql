@@ -330,7 +330,7 @@ CREATE TABLE parada_pits(
   id_piloto SMALLINT,
 
   --Motivo de la parada
-  motivo CHAR(2) NOT NULL, --ad: accidente
+  motivo CHAR(2) NOT NULL, --ad: accidente, fa: falla
 
   --Constraints
   CONSTRAINT fk_carrera FOREIGN KEY (id_carrera, car_nro_equipo, id_car_vehiculo,id_car_equipo, id_car_evento, id_car_pista) REFERENCES carreras(id_carrera, parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista) ON DELETE CASCADE,

@@ -125,7 +125,7 @@ CREATE OR REPLACE FUNCTION reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMAL
             INNER JOIN resumen_datos ant_resumen ON ant_resumen.id_suceso = sucesos.id_suceso and ant_resumen.id_carrera = ant_car.id_carrera  and  ant_resumen.car_nro_equipo= ant_car.parti_nro_equipo and ant_resumen.id_car_vehiculo = ant_car.id_parti_vehiculo  and ant_resumen.id_car_equipo = ant_car.id_parti_equipo and ant_resumen.id_car_evento = ant_car.id_parti_evento  and ant_resumen.id_car_pista = ant_car.id_parti_evento_pista
             --
             INNER JOIN pistas ON pistas.id_pista = parti.id_event_pista
-        WHERE parti.id_evento = 1 AND sucesos.hora = hora_ref AND v.categoria = cat_v AND car.puesto_final <> 0 ORDER BY sucesos.hora;
+        WHERE parti.id_evento = id_evnt AND sucesos.hora = hora_ref AND v.categoria = cat_v AND car.puesto_final <> 0 ORDER BY sucesos.hora;
     end;
 $$;
 

@@ -908,6 +908,73 @@ CREATE OR REPLACE FUNCTION verificar_accidente_colectivo (id_event SMALLINT, hor
   END;
 $$ LANGUAGE plpgsql;
 
+-- Generar paradas en pits por motivo gasolina
+--Ej: call generar_paradas_gasolina(11::smallint, 1::smallint, 9::smallint, 5);
+CREATE OR REPLACE PROCEDURE generar_paradas_gasolina(id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+  DECLARE
+      aux_clima CHAR(2);
+      aux_est CHAR(1);
+      aux_cat CHAR(7);
+      aux_ind_gas NUMERIC(2) := 0;
+  BEGIN
+  		--Estrategia del equipo
+  		 aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+          CASE aux_est
+            WHEN 'a' THEN
+                aux_ind_gas := aux_ind_gas + 3;
+            WHEN 'i' THEN
+                aux_ind_gas := aux_ind_gas + 2;
+            WHEN 'c' THEN
+                aux_ind_gas := aux_ind_gas + 1;
+          END CASE;
+
+      --Clima
+        aux_clima := obtener_clima_hora(id_event, hora);
+        CASE aux_clima
+        WHEN 'd' THEN
+            aux_ind_gas := aux_ind_gas + 2;
+        WHEN 'll' THEN
+            aux_ind_gas := aux_ind_gas;
+        WHEN 'n' THEN
+            aux_ind_gas := aux_ind_gas + 1;
+        END CASE;
+
+      --Categoría de carro
+        aux_cat := obtener_categoria_veh(id_event, id_equipo, nro_equipo);
+        CASE aux_cat
+            WHEN 'LMP 900' THEN
+            WHEN 'LM P675' THEN
+                aux_ind_gas := aux_ind_gas + 1;
+
+            WHEN 'LM GTP' THEN
+            WHEN 'LM GTS' THEN
+            WHEN 'LM GT' THEN
+            WHEN 'LM GT1' THEN
+            WHEN 'LM GT2' THEN
+                aux_ind_gas := aux_ind_gas + 3;
+
+            WHEN 'LM P1' THEN
+            WHEN 'LM P2' THEN
+            		aux_ind_gas := aux_ind_gas + 2;
+        END CASE;
+
+        --Generar paradas
+        if (aux_ind_gas >= 0 and aux_ind_gas <= 5) then
+        		--1 parada
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+        elsif (aux_ind_gas >= 6 and aux_ind_gas <= 8) then
+        		--2 paradas
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+        else
+        		--3 paradas
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'ga');
+        end if;
+  END;
+$$ LANGUAGE plpgsql;
+
 
 
 

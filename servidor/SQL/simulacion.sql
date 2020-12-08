@@ -1053,6 +1053,21 @@ CREATE OR REPLACE PROCEDURE generar_paradas_neumatico(id_event SMALLINT, id_equi
   END;
 $$ LANGUAGE plpgsql;
 
+--Generar paradas en pits por motivo de cambio de conductor 
+--Ej: call generar_paradas_conductor(1::smallint, 1::smallint, 7,2);
+CREATE OR REPLACE PROCEDURE generar_paradas_conductor (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+DECLARE
+		rec_piloto record;
+BEGIN
+	--Obtenemos el piloto con menos cambios en pits
+  	SELECT plant.id_piloto id_pilot, COUNT(plant.id_piloto) cant INTO rec_piloto FROM plantillas AS plant
+    		LEFT JOIN parada_pits pp on plant.id_piloto = pp.id_piloto
+	WHERE plant.id_parti_evento = id_event AND plant.parti_nro_equipo = nro_equipo GROUP BY plant.id_piloto ORDER BY cant LIMIT 1;
+    
+    --Registramos cambio
+    call generar_parada_pits(id_event, hora, id_equipo, nro_equipo, 'cp'::char(2), 0::smallint, rec_piloto.id_pilot);
+END;
+$$ LANGUAGE plpgsql;
 
 
 

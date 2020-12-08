@@ -813,3 +813,37 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
     END;
 $$;
 
+--GENERAR PARADA EN PITS general
+--Ej: call generar_parada_pits(11::smallint, 2, 1::smallint, 7, 'cp',0::smallint ,1::smallint);
+CREATE OR REPLACE PROCEDURE generar_parada_pits (id_event SMALLINT, hora NUMERIC(2), id_equipo SMALLINT, nro_equipo NUMERIC(3), motivo_parada CHAR(2), id_falla_parada SMALLINT DEFAULT 0, id_piloto_parada SMALLINT DEFAULT 0) AS $$
+  DECLARE
+  		aux_car_datos carreras%Rowtype;
+      aux_id_suces SMALLINT;
+      
+  BEGIN
+  		--Nos traemos los datos de la carrera
+      SELECT * INTO aux_car_datos FROM carreras AS car WHERE car.id_parti_evento = id_event AND car.id_parti_equipo = id_equipo AND car.parti_nro_equipo = nro_equipo;
+      --Solicitamos id suceso
+      aux_id_suces := obtener_suceso_id(id_event, hora);
+      
+  		if(id_falla_parada = 0 and id_piloto_parada = 0) then
+      	--Generar una parada CARRERA, SUCESOS sin falla ni piloto cambia
+          INSERT INTO parada_pits ( id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, motivo) 
+          												VALUES (aux_car_datos.id_carrera, nro_equipo, aux_car_datos.id_parti_vehiculo, id_equipo, id_event, aux_car_datos.id_parti_evento_pista, aux_id_suces, id_event, aux_car_datos.id_parti_evento_pista, motivo_parada);
+      		commit;
+      elsif(id_piloto_parada = 0)  then
+      	 --Generar una parada CARRERA, SUCESOS con falla	
+         INSERT INTO parada_pits ( id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, id_falla, id_falla_suceso, id_falla_s_evento, id_falla_s_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_evento, id_falla_pista, motivo) 
+         													VALUES (aux_car_datos.id_carrera, nro_equipo, aux_car_datos.id_parti_vehiculo, id_equipo, id_event, aux_car_datos.id_parti_evento_pista, aux_id_suces, id_event, aux_car_datos.id_parti_evento_pista, id_falla_parada, aux_id_suces, id_event,  aux_car_datos.id_parti_evento_pista, aux_car_datos.id_carrera, nro_equipo, aux_car_datos.id_parti_vehiculo, id_equipo, id_event,  aux_car_datos.id_parti_evento_pista, motivo_parada);
+      		commit;
+      else
+      	--Generar una parada CARRERA, SUCESOS con piloto
+        INSERT INTO parada_pits ( id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, id_piloto ,motivo) 
+          												VALUES (aux_car_datos.id_carrera, nro_equipo, aux_car_datos.id_parti_vehiculo, id_equipo, id_event, aux_car_datos.id_parti_evento_pista, aux_id_suces, id_event, aux_car_datos.id_parti_evento_pista, id_piloto_parada, motivo_parada);
+        commit;
+      end if;
+  END;
+$$ LANGUAGE plpgsql;
+
+
+

@@ -1056,17 +1056,17 @@ $$ LANGUAGE plpgsql;
 --Generar paradas en pits por motivo de cambio de conductor 
 --Ej: call generar_paradas_conductor(1::smallint, 1::smallint, 7,2);
 CREATE OR REPLACE PROCEDURE generar_paradas_conductor (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
-DECLARE
-		rec_piloto record;
-BEGIN
-	--Obtenemos el piloto con menos cambios en pits
-  	SELECT plant.id_piloto id_pilot, COUNT(plant.id_piloto) cant INTO rec_piloto FROM plantillas AS plant
-    		LEFT JOIN parada_pits pp on plant.id_piloto = pp.id_piloto
-	WHERE plant.id_parti_evento = id_event AND plant.parti_nro_equipo = nro_equipo GROUP BY plant.id_piloto ORDER BY cant LIMIT 1;
-    
-    --Registramos cambio
-    call generar_parada_pits(id_event, hora, id_equipo, nro_equipo, 'cp'::char(2), 0::smallint, rec_piloto.id_pilot);
-END;
+    DECLARE
+            rec_piloto record;
+    BEGIN
+        --Obtenemos el piloto con menos cambios en pits
+        SELECT plant.id_piloto id_pilot, COUNT(plant.id_piloto) cant INTO rec_piloto FROM plantillas AS plant
+                LEFT JOIN parada_pits pp on plant.id_piloto = pp.id_piloto
+        WHERE plant.id_parti_evento = id_event AND plant.parti_nro_equipo = nro_equipo GROUP BY plant.id_piloto ORDER BY cant LIMIT 1;
+        
+        --Registramos cambio
+        call generar_parada_pits(id_event, hora, id_equipo, nro_equipo, 'cp'::char(2), 0::smallint, rec_piloto.id_pilot);
+    END;
 $$ LANGUAGE plpgsql;
 
 -- Generar Nro Vueltas por equipo en esa hora
@@ -1145,8 +1145,61 @@ CREATE OR REPLACE PROCEDURE generar_nro_vueltas (id_event SMALLINT, id_equipo SM
         	aux_nro_vueltas := 0;
         end if;
         UPDATE resumen_datos SET nro_vueltas = aux_nro_vueltas WHERE id_car_evento = id_event AND id_suceso = aux_suc AND id_car_equipo = id_equipo AND car_nro_equipo = nro_equipo;
+        commit;
   END;
 $$ LANGUAGE plpgsql;
+
+--Genera promedio temperatura del cockpit en esa hora
+--Ej: call generar_temp_prom_cockpit(11::smallint, 1::smallint, 7, 5); 
+CREATE OR REPLACE PROCEDURE generar_temp_prom_cockpit (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
+  DECLARE
+  			aux_est CHAR(1);
+        aux_luz_dia CHAR(2);
+        aux_nro_vueltas NUMERIC(2) := 0;
+        aux_clima CHAR(2);
+        aux_temp_cock NUMERIC(2) := 18;
+        aux_suc SMALLINT;
+  BEGIN
+  	 --Estrategia del equipo
+        aux_est := obtener_estrategia_equipo_hora (id_event, id_equipo, nro_equipo, hora);
+        CASE aux_est
+        WHEN 'a' THEN
+            aux_temp_cock := aux_temp_cock + 4;
+        WHEN 'i' THEN
+            aux_temp_cock := aux_temp_cock + 2;
+        WHEN 'c' THEN
+            aux_temp_cock := aux_temp_cock - 1; 
+        END CASE;
+        
+        --Nivel de luz
+           aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
+          CASE aux_luz_dia
+            WHEN 'at' THEN
+            WHEN 'am' THEN
+                    aux_ind_involucramiento := aux_ind_involucramiento + 1;
+            WHEN 'n' THEN
+                    aux_ind_involucramiento := aux_ind_involucramiento - 4;
+            WHEN 'd' THEN
+                    aux_temp_cock := aux_temp_cock + 3;
+          END CASE;
+          
+          --Nro vueltas realizadas
+          aux_suc := obtener_suceso_id(id_event, hora);
+          SELECT rd.nro_vueltas INTO aux_nro_vueltas FROM resumen_datos AS rd WHERE rd.id_car_evento = id_event AND rd.car_nro_equipo = nro_equipo AND rd.id_car_equipo = id_equipo AND rd.id_suceso = aux_suc;
+          if (aux_nro_vueltas <= 10) then
+          		aux_temp_cock := aux_temp_cock + 2;
+          elsif (aux_temp_cock >= 11 and aux_temp_cock <= 16) then
+          		aux_temp_cock := aux_temp_cock + 3;
+          else
+          		aux_temp_cock := aux_temp_cock + 4;
+          end if;
+          
+          --Actualizamos temp
+          UPDATE resumen_datos SET temp_cockpit = aux_temp_cock WHERE id_car_evento = id_event AND id_suceso = aux_suc AND id_car_equipo = id_equipo AND car_nro_equipo = nro_equipo;
+          commit;
+  END;
+$$ LANGUAGE plpgsql;
+
 
 
 

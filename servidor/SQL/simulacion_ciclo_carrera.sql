@@ -9,8 +9,8 @@ CREATE OR REPLACE FUNCTION simulacion_ciclo_carrera (id_event SMALLINT) AS $$
     		FOR hora IN 1..24 LOOP
         		--Loop de equipos: estado <> 'a', 'np' y 'd'
             FOR clasif_car IN cur_carrera LOOP
-            		--(a) Generar velocidad media en la hora
-            		call generar_veloc_media (id_event, clasif_car.id_parti_equipo, clasif_car.parti_nro_equipo, hora);
+            	--(a) Generar velocidad media en la hora
+            	call generar_veloc_media (id_event, clasif_car.id_parti_equipo, clasif_car.parti_nro_equipo, hora);
                 
                 --(b) Generar mejor tiempo  en la hora,
                 call generar_mejor_tiempo_hora (id_event, clasif_car.id_parti_equipo, clasif_car.parti_nro_equipo, hora);

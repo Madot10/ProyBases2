@@ -2,10 +2,8 @@
 -- FALTA COMPLETAR
 CREATE OR REPLACE PROCEDURE borrar_simulacion(ano_evento SMALLINT)
     LANGUAGE plpgsql AS $$
-    declare
-
     begin
-        --drop table lotes_repuestos;
+        truncate table lotes_repuestos;
         delete from eventos AS e where e.id_evento = obt_evento_id(ano_evento);
     end;
 $$;
@@ -1141,8 +1139,9 @@ CREATE OR REPLACE PROCEDURE generar_nro_vueltas (id_event SMALLINT, id_equipo SM
   END;
 $$ LANGUAGE plpgsql;
 
+
 --Genera promedio temperatura del cockpit en esa hora
---Ej: call generar_temp_prom_cockpit(11::smallint, 1::smallint, 7, 5); 
+--Ej: call generar_temp_prom_cockpit(11::smallint, 1::smallint, 7, 5);
 CREATE OR REPLACE PROCEDURE generar_temp_prom_cockpit (id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2)) AS $$
   DECLARE
   			aux_est CHAR(1);
@@ -1160,21 +1159,21 @@ CREATE OR REPLACE PROCEDURE generar_temp_prom_cockpit (id_event SMALLINT, id_equ
         WHEN 'i' THEN
             aux_temp_cock := aux_temp_cock + 2;
         WHEN 'c' THEN
-            aux_temp_cock := aux_temp_cock - 1; 
+            aux_temp_cock := aux_temp_cock - 1;
         END CASE;
-        
+
         --Nivel de luz
            aux_luz_dia := obt_nivel_luz(id_event, hora::smallint);
           CASE aux_luz_dia
             WHEN 'at' THEN
             WHEN 'am' THEN
-                    aux_ind_involucramiento := aux_ind_involucramiento + 1;
+                    aux_temp_cock := aux_temp_cock + 1;
             WHEN 'n' THEN
-                    aux_ind_involucramiento := aux_ind_involucramiento - 4;
+                    aux_temp_cock := aux_temp_cock - 4;
             WHEN 'd' THEN
                     aux_temp_cock := aux_temp_cock + 3;
           END CASE;
-          
+
           --Nro vueltas realizadas
           aux_suc := obtener_suceso_id(id_event, hora);
           SELECT rd.nro_vueltas INTO aux_nro_vueltas FROM resumen_datos AS rd WHERE rd.id_car_evento = id_event AND rd.car_nro_equipo = nro_equipo AND rd.id_car_equipo = id_equipo AND rd.id_suceso = aux_suc;
@@ -1185,12 +1184,24 @@ CREATE OR REPLACE PROCEDURE generar_temp_prom_cockpit (id_event SMALLINT, id_equ
           else
           		aux_temp_cock := aux_temp_cock + 4;
           end if;
-          
+
+        --Clima
+            aux_clima := obtener_clima_hora(id_event, hora);
+            CASE aux_clima
+            WHEN 'd' THEN
+                aux_temp_cock := aux_temp_cock + 2;
+            WHEN 'll' THEN
+                aux_temp_cock := aux_temp_cock - 3;
+            WHEN 'n' THEN
+                aux_temp_cock := aux_temp_cock - 1;
+            END CASE;
+
           --Actualizamos temp
           UPDATE resumen_datos SET temp_cockpit = aux_temp_cock WHERE id_car_evento = id_event AND id_suceso = aux_suc AND id_car_equipo = id_equipo AND car_nro_equipo = nro_equipo;
           commit;
   END;
 $$ LANGUAGE plpgsql;
+
 
 --(10) Generar clasificación de los participantes
 --Generar clasificación de los participantes

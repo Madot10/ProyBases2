@@ -43,7 +43,16 @@ CREATE OR REPLACE FUNCTION simulacion_ciclo_carrera (id_event SMALLINT) AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-
+--Generar clasificación de los participantes
+--SELECT rd.car_nro_equipo, SUM(rd.nro_vueltas) total_vueltas FROM resumen_datos AS rd WHERE rd.id_suceso_evento = 11 GROUP BY rd.car_nro_equipo ORDER BY total_vueltas DESC;
+CREATE OR REPLACE PROCEDURE clasificacion_final_car (id_event SMALLINT) AS $$
+  DECLARE
+  			cur_clasificacion CURSOR FOR SELECT rd.car_nro_equipo, SUM(rd.nro_vueltas) total_vueltas FROM resumen_datos AS rd WHERE rd.id_suceso_evento = id_event 
+        																		GROUP BY rd.car_nro_equipo ORDER BY total_vueltas DESC;
+  BEGIN
+  		
+  END;
+$$ LANGUAGE plpgsql;
 
 
 

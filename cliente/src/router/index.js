@@ -5,21 +5,30 @@ import Menu from "../views/Menu.vue";
 Vue.use(VueRouter);
 
 const routes = [
+    //Menu principal
     {
         path: "/",
         name: "Home",
         component: Menu,
     },
+    //Menu reportes
     {
         path: "/reportes",
         name: "Reportes",
         component: () => import("../views/MenuReportes.vue"),
     },
-    /*{
-        path: "/about",
-        name: "About",
-        component: () => import("../views/Home.vue"),
-    },*/
+    //Reporte 1
+    {
+        path: "/ranking-anno/:anno_sel/:cat_sel/:event_sel",
+        name: "Reporte 1",
+        component: Menu,
+    },
+
+    /* 404 => REDIRECT  */
+    {
+        path: "*",
+        redirect: { name: "Home" },
+    },
 ];
 
 const router = new VueRouter({

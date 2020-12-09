@@ -23,7 +23,6 @@ CREATE OR REPLACE  FUNCTION gen_random(min INT DEFAULT 0, max INT DEFAULT 10)
     END;
 $$;
 
-
 -- OBTENER EVENTO ID SEGUN FECHA
 -- Ej: select obt_evento_id(2020); => 2
 CREATE OR REPLACE FUNCTION obt_evento_id(fecha SMALLINT)
@@ -48,7 +47,6 @@ CREATE OR REPLACE FUNCTION obtener_suceso_id(id_event SMALLINT, hora NUMERIC(2))
       RETURN id_obtenido;
   END;
 $$;
-
 
 -- PREDECIR CLIMA SEGUN CLIMA ANTERIOR
 --EJ: SELECT gen_clima()
@@ -235,7 +233,6 @@ CREATE OR REPLACE PROCEDURE crear_evento(id_pista SMALLINT, fecha_evento TIMESTA
     end;
 $$;
 
-
 -- (1) Generar clima por hora
 -- Ej: call generar_clima(2::smallint, 'n');
 CREATE OR REPLACE PROCEDURE generar_clima(id_evento SMALLINT, clima_inicial CHAR(2))
@@ -264,7 +261,6 @@ CREATE OR REPLACE PROCEDURE generar_clima(id_evento SMALLINT, clima_inicial CHAR
     end;
 $$;
 
-
 -- (3) GENERAR TEMP PISTA POR HORA
 -- EJ: call generar_temp_pista_hora(2::smallint);
 CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
@@ -290,7 +286,6 @@ CREATE OR REPLACE PROCEDURE generar_temp_pista_hora(id_evento SMALLINT)
         end loop;
     end;
 $$;
-
 
 -- (4) GENERAR PARTICIPACIONES SEGUN ANNO DE REFERENCIA
 -- EJ: call generar_participaciones(1::smallint, 1::smallint, 2005::smallint)
@@ -647,7 +642,6 @@ CREATE OR REPLACE FUNCTION generar_indice_accidente(id_event SMALLINT, id_equipo
        return indice_accidente;
     END;
 $$;
-
 
 -- GENERAR POSIBILE FALLA
 --Ej: call generar_posible_falla(11::smallint, 1::smallint, 1::smallint, 9::smallint, 508::smallint, 1::smallint, 1);
@@ -1196,6 +1190,28 @@ CREATE OR REPLACE PROCEDURE generar_temp_prom_cockpit (id_event SMALLINT, id_equ
           UPDATE resumen_datos SET temp_cockpit = aux_temp_cock WHERE id_car_evento = id_event AND id_suceso = aux_suc AND id_car_equipo = id_equipo AND car_nro_equipo = nro_equipo;
           commit;
   END;
+$$ LANGUAGE plpgsql;
+
+--(10) Generar clasificación de los participantes
+--Generar clasificación de los participantes
+--Ej: call clasificacion_final_car(11::smallint);
+CREATE OR REPLACE PROCEDURE clasificacion_final_car (id_event SMALLINT) AS $$
+    DECLARE
+        cur_clasificacion CURSOR FOR SELECT rd.car_nro_equipo, SUM(rd.nro_vueltas) total_vueltas, AVG((rd.estadistica).tiempo_mejor_vuelta) avg_tiempo FROM resumen_datos AS rd WHERE rd.id_suceso_evento = id_event GROUP BY rd.car_nro_equipo ORDER BY total_vueltas DESC, avg_tiempo ASC;
+        aux_puesto NUMERIC(2) := 1;
+        aux_suc SMALLINT;
+    BEGIN
+  		FOR clas_equipo IN cur_clasificacion LOOP
+  		    aux_suc := obtener_suceso_id(id_event,24);
+
+  		    --Actualizamos posiciones en hora 24 y puesto_final
+            UPDATE resumen_datos SET estadistica.puesto = aux_puesto WHERE id_car_evento = id_event AND id_suceso = aux_suc  AND car_nro_equipo = clas_equipo.car_nro_equipo;
+            UPDATE carreras SET puesto_final = aux_puesto WHERE id_parti_evento = id_event AND parti_nro_equipo = clas_equipo.car_nro_equipo;
+
+            --Incrementamos contador
+  		    aux_puesto := aux_puesto + 1;
+        END LOOP;
+    END;
 $$ LANGUAGE plpgsql;
 
 

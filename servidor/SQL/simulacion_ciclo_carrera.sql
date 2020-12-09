@@ -1,12 +1,12 @@
 -- (SIM) Ciclo carrera
 --Por cada hora de la carrera se ejecutarán acciones para todos los equipos participantes
 --Falta probar
-CREATE OR REPLACE FUNCTION simulacion_ciclo_carrera (id_event SMALLINT) AS $$
+CREATE OR REPLACE PROCEDURE simulacion_ciclo_carrera (id_event SMALLINT) AS $$
     DECLARE
     			cur_carrera CURSOR FOR SELECT * FROM carreras AS car WHERE car.id_parti_evento = id_event AND car.estado <> 'a' AND car.estado <> 'np' AND car.estado <> 'd';
     BEGIN
-    		--24hrs
-    		FOR hora IN 1..24 LOOP
+    	--24hrs
+    	FOR hora IN 1..24 LOOP
         		--Loop de equipos: estado <> 'a', 'np' y 'd'
             FOR clasif_car IN cur_carrera LOOP
             	--(a) Generar velocidad media en la hora
@@ -43,16 +43,6 @@ CREATE OR REPLACE FUNCTION simulacion_ciclo_carrera (id_event SMALLINT) AS $$
     END;
 $$ LANGUAGE plpgsql;
 
---Generar clasificación de los participantes
---SELECT rd.car_nro_equipo, SUM(rd.nro_vueltas) total_vueltas FROM resumen_datos AS rd WHERE rd.id_suceso_evento = 11 GROUP BY rd.car_nro_equipo ORDER BY total_vueltas DESC;
-CREATE OR REPLACE PROCEDURE clasificacion_final_car (id_event SMALLINT) AS $$
-  DECLARE
-  			cur_clasificacion CURSOR FOR SELECT rd.car_nro_equipo, SUM(rd.nro_vueltas) total_vueltas FROM resumen_datos AS rd WHERE rd.id_suceso_evento = id_event 
-        																		GROUP BY rd.car_nro_equipo ORDER BY total_vueltas DESC;
-  BEGIN
-  		
-  END;
-$$ LANGUAGE plpgsql;
 
 
 

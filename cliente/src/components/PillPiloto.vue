@@ -7,7 +7,7 @@
             </b-col>
             <b-col class="text-center">
                 <!-- Nombre y nac -->
-                <h4>Jorge Mancha</h4>
+                <h4>{{ datos.nombrepiloto }}</h4>
                 <b-img rounded src="https://picsum.photos/25/25/"></b-img>
             </b-col>
         </b-row>
@@ -15,7 +15,9 @@
 </template>
 
 <script>
-export default {};
+export default {
+    props: ["datos"],
+};
 </script>
 
 <style></style>

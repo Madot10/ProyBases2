@@ -198,6 +198,16 @@ export default {
                             },
                         });
                         break;
+                    case 2:
+                        this.$router.push({
+                            name: "Reporte 2",
+                            params: {
+                                anno_sel: this.aux_anno_selected,
+                                cat_sel: this.aux_cat_selected,
+                                hora_sel: this.aux_hora_selected,
+                            },
+                        });
+                        break;
 
                     default:
                         alert("¡Ha ocurrido un error! Francia se ha rendido en la guerra");

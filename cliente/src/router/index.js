@@ -23,6 +23,12 @@ const routes = [
         name: "Reporte 1",
         component: () => import("../views/Reporte1.vue"),
     },
+    //Reporte 2
+    {
+        path: "/ranking-hora/:anno_sel/:cat_sel/:hora_sel",
+        name: "Reporte 2",
+        component: () => import("../views/Reporte2.vue"),
+    },
 
     /* 404 => REDIRECT  */
     {

@@ -93,12 +93,16 @@ CREATE OR REPLACE FUNCTION reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMAL
         NombreEquipo VARCHAR(35),
         NroEquipo NUMERIC(3),
         PaisEquipo VARCHAR(56),
-         NombrePiloto TEXT,
+        NombrePiloto TEXT,
+        imgPiloto TEXT,
         Gentilicio VARCHAR(60),
+        imgBanderaEquipo TEXT,
         NombreVehiculo VARCHAR(30),
         ModeloMotor VARCHAR(30),
         cc NUMERIC(4),
         cilindros VARCHAR(3),
+        categoria CHAR(7),
+        imgVehiculo TEXT,
         PuestoCarrera NUMERIC(3),
         NroVueltasCarrera NUMERIC(3),
         DistRecorrida NUMERIC(8),
@@ -110,7 +114,7 @@ CREATE OR REPLACE FUNCTION reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMAL
         id_evnt SMALLINT;
     begin
        id_evnt := obt_evento_id(anno_ref);
-        RETURN QUERY SELECT sucesos.hora Hora,e.nombre NombreEquipo, parti.nro_equipo NroEquipo, p_eq.nombre PaisEquipo, (pilot.identificacion).primer_nombre || ' ' || (pilot.identificacion).primer_apellido AS NombrePiloto, p_pilot.gentilicio, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
+        RETURN QUERY SELECT sucesos.hora Hora,e.nombre NombreEquipo, parti.nro_equipo NroEquipo, p_eq.nombre PaisEquipo, (pilot.identificacion).primer_nombre || ' ' || (pilot.identificacion).primer_apellido AS NombrePiloto, pilot.img_piloto, p_pilot.gentilicio, p_pilot.img_bandera, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, v.categoria, v.img_vehiculo, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
         FROM participaciones AS parti
             --EQUIPO
             INNER JOIN equipos e on parti.id_equipo = e.id_equipo

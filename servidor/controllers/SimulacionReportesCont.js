@@ -37,7 +37,10 @@ class SimulacionReportesCont {
 
     //Ranking por hora
     getRankingHora(req, res) {
-        const { anno, hora, categoria } = req.body;
+        //const { anno, hora, categoria } = req.body;
+        const anno = req.params.anno;
+        const categoria = req.params.cat;
+        const hora = req.params.hora;
 
         database
             .query(`SELECT * FROM reporte_ranking_hora($1::smallint, $2::smallint, $3)`, [
@@ -46,19 +49,20 @@ class SimulacionReportesCont {
                 categoria,
             ])
             .then(function (data) {
-                res.status(200).json(data);
+                res.status(200).json(data.rows);
             })
             .catch((e) => console.error(e.stack));
     }
 
     //Ganadores de Le Mans
     getGanadores(req, res) {
-        const { anno } = req.body;
+        //const { anno } = req.body;
+        const anno = req.params.anno;
 
         database
             .query("SELECT * FROM reporte_ganadores_le_mans($1::smallint)", [anno])
             .then(function (data) {
-                res.status(200).json(data);
+                res.status(200).json(data.rows);
             })
             .catch((e) => console.error(e.stack));
     }

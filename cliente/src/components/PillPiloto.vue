@@ -3,7 +3,7 @@
         <b-row>
             <b-col>
                 <!-- FOTO PILOTO -->
-                <b-img rounded="circle" src="https://picsum.photos/100/100/" fluid-grow></b-img>
+                <b-img rounded="circle" :src="datos.imgpiloto" fluid-grow></b-img>
             </b-col>
             <b-col class="text-center">
                 <!-- Nombre y nac -->

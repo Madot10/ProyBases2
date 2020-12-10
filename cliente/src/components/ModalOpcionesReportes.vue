@@ -54,9 +54,24 @@
             </b-form-group>
         </transition>
 
+        <p
+            class="text-danger"
+            v-show="
+                (reporte == 1 &&
+                    (aux_anno_selected == null ||
+                        aux_cat_selected == null ||
+                        aux_tipo_selected == null)) ||
+                    (reporte == 2 &&
+                        (aux_anno_selected == null ||
+                            aux_hora_selected == null ||
+                            aux_cat_selected == null)) ||
+                    (reporte == 3 && (aux_anno_selected == null || aux_cat_selected == null))
+            "
+        >
+            *Debes seleccionar los parámetros
+        </p>
         <!-- FOOTER  -->
-
-        <b-button block pill variant="outline-primary">
+        <b-button block pill variant="outline-primary" @click="enviar_parametros()">
             GENERAR REPORTE
         </b-button>
     </b-modal>
@@ -146,20 +161,24 @@ export default {
         //Comprobar condiciones campos obligatorios
         comprobar_selecciones() {
             if (
-                reporte == 1 &&
-                aux_anno_selected != null &&
-                aux_cat_selected != null &&
-                aux_tipo_selected != null
+                this.reporte == 1 &&
+                this.aux_anno_selected != null &&
+                this.aux_cat_selected != null &&
+                this.aux_tipo_selected != null
             ) {
                 return true;
             } else if (
-                reporte == 2 &&
-                aux_anno_selected != null &&
-                aux_hora_selected != null &&
-                aux_cat_selected != null
+                this.reporte == 2 &&
+                this.aux_anno_selected != null &&
+                this.aux_hora_selected != null &&
+                this.aux_cat_selected != null
             ) {
                 return true;
-            } else if (reporte == 3 && aux_anno_selected != null && aux_cat_selected != null) {
+            } else if (
+                this.reporte == 3 &&
+                this.aux_anno_selected != null &&
+                this.aux_cat_selected != null
+            ) {
                 return true;
             } else {
                 return false;
@@ -170,9 +189,13 @@ export default {
                 //Todo bien
                 switch (this.reporte) {
                     case 1:
-                        router.push({
+                        this.$router.push({
                             name: "Reporte 1",
-                            params: { anno_sel: "123", cat_sel: "", event_sel: "" },
+                            params: {
+                                anno_sel: this.aux_anno_selected,
+                                cat_sel: this.aux_cat_selected,
+                                event_sel: this.aux_tipo_selected,
+                            },
                         });
                         break;
 

@@ -21,7 +21,7 @@ const routes = [
     {
         path: "/ranking-anno/:anno_sel/:cat_sel/:event_sel",
         name: "Reporte 1",
-        component: Menu,
+        component: () => import("../views/Reporte1.vue"),
     },
 
     /* 404 => REDIRECT  */

@@ -18,6 +18,7 @@
 
         <div class="content">
             <slot></slot>
+            <br />
         </div>
     </div>
 </template>
@@ -67,7 +68,7 @@ export default {};
 
 /* "Window" Content */
 .content {
-    height: calc(100vh - 40px - 60px);
+    /*height: calc(100vh - 40px - 60px);*/
     background-color: white;
 }
 </style>

@@ -213,6 +213,7 @@ export default {
                             name: "Reporte 3",
                             params: {
                                 anno_sel: this.aux_anno_selected,
+                                cat_sel: this.aux_cat_selected,
                             },
                         });
                         break;
@@ -227,7 +228,7 @@ export default {
     watch: {
         //Segun año, devolvemos categorias existentes
         aux_anno_selected(anno_sel) {
-            if (anno_sel != "d") {
+            if (anno_sel != 0) {
                 this.aux_cat_selected = null;
                 this.cats_filtered = this.cats.filter((cat) => {
                     return cat.anno.includes(anno_sel);

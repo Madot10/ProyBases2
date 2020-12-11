@@ -12,6 +12,10 @@
                     {{ datos.nroequipo }} - {{ datos.nombreequipo }}
                     <b-img rounded :src="'data:image/png;base64,' + datos.imgbanderaequipo"></b-img>
                 </h3>
+                <!-- ANO DE PARTICIPACION -->
+                <p v-if="fecha">
+                    <b>{{ new Date(fecha).getFullYear() }}</b>
+                </p>
                 <!--CATEGORIA Veh-->
                 <p>{{ datos.categoria }}</p>
                 <!--Modelo Veh-->
@@ -84,7 +88,7 @@ import PillPiloto from "./PillPiloto.vue";
 
 export default {
     components: { PillPiloto },
-    props: ["datos", "tipo_event", "limites", "hora"],
+    props: ["datos", "tipo_event", "limites", "hora", "fecha"],
     data() {
         return {
             data_nro_v: [{ value: 1, color: "#1589CB" }],

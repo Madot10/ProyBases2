@@ -2,7 +2,9 @@
     <ScreenWindow>
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
-                <h2>Ranking por año - {{ $route.params.anno_sel }}</h2>
+                <h3 class="text-center mb-2 w-100">
+                    Ranking por año - {{ $route.params.anno_sel }}
+                </h3>
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking
                         :datos="parti"
@@ -12,9 +14,10 @@
                     <br />
                 </div>
                 <!-- MENSAJE - DATOS VACIOS -->
+
                 <div
                     v-show="datos_rank.length == 0 && is_loading == false"
-                    class="mt-2 text-center mx-auto"
+                    class="mt-2 text-center  mx-auto"
                 >
                     <h2>¡No hemos encontrado información!</h2>
                     <b-icon class="h1" icon="emoji-frown"></b-icon>

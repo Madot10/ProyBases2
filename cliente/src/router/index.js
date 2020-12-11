@@ -31,7 +31,7 @@ const routes = [
     },
     //Reporte 3
     {
-        path: "/ganadores-le-mans/:anno_sel",
+        path: "/ganadores-le-mans/:anno_sel/:cat_sel",
         name: "Reporte 3",
         component: () => import("../views/Reporte3.vue"),
     },

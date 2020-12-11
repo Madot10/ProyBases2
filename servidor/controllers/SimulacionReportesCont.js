@@ -58,9 +58,13 @@ class SimulacionReportesCont {
     getGanadores(req, res) {
         //const { anno } = req.body;
         const anno = req.params.anno;
+        const categoria = req.params.cat;
 
         database
-            .query("SELECT * FROM reporte_ganadores_le_mans($1::smallint)", [anno])
+            .query(`SELECT * FROM reporte_ganadores_le_mans($1::CHAR(7) ,$2::smallint)`, [
+                categoria,
+                anno,
+            ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })

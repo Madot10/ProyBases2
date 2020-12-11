@@ -15,6 +15,6 @@ router.get("/ranking_anno/:anno/:cat/:tipo", rep.getRankingAnno);
 //Reporte 2 - Ranking por hora
 router.get("/ranking_hora/:anno/:cat/:hora", rep.getRankingHora);
 //Reporte 3 - Ganadores de las 24 Horas de Lemans
-router.get("/ganadores/:anno", rep.getGanadores);
+router.get("/ganadores/:anno/:cat", rep.getGanadores);
 
 module.exports = router;

@@ -2,7 +2,10 @@
     <ScreenWindow>
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
-                <h3>Ranking hora - {{ $route.params.anno_sel }} - {{ $route.params.hora_sel }}h</h3>
+                <h3 class="text-center mb-2 w-100">
+                    Ganadores - {{ $route.params.cat_sel }} -
+                    {{ $route.params.anno_sel == 0 ? "Década" : $route.params.anno_sel }}
+                </h3>
 
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking
@@ -10,6 +13,7 @@
                         :hora="$route.params.hora_sel"
                         :limites="limites"
                         tipo_event="car"
+                        :fecha="parti.fechaevento"
                     ></CardRaking>
                     <br />
                 </div>
@@ -66,9 +70,11 @@ export default {
             //Agrupemos por pilotos
             datos.forEach((c, i) => {
                 //Si no existe registro de equipo
-                if (aux_rank[c.nroequipo] == null) {
+                let c_anno = new Date(c.fechaevento);
+                //console.log(c);
+                if (aux_rank[c.nroequipo + c_anno.getFullYear()] == null) {
                     //Guardamos index de array original
-                    aux_rank[c.nroequipo] = i;
+                    aux_rank[c.nroequipo + c_anno.getFullYear()] = i;
 
                     c.pilotos = [];
 
@@ -88,7 +94,7 @@ export default {
                     aux_arr.push(c);
                 } else {
                     //Tenemos registro, guardamos
-                    datos[aux_rank[c.nroequipo]].pilotos.push({
+                    datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.push({
                         gentilicio: c.gentilicio,
                         imgbanderapiloto: c.imgbanderapiloto,
                         imgpiloto: c.imgpiloto,
@@ -102,7 +108,7 @@ export default {
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000//ganadores/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}`;
+            let urlApi = `http://localhost:3000/ganadores/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)

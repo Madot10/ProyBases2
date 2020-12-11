@@ -2,7 +2,9 @@
     <ScreenWindow>
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
-                <h3>Ranking hora - {{ $route.params.anno_sel }} - {{ $route.params.hora_sel }}h</h3>
+                <h3 class="text-center mb-2 w-100">
+                    >Ranking hora - {{ $route.params.anno_sel }} - {{ $route.params.hora_sel }}h
+                </h3>
 
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking

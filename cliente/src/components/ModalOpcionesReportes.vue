@@ -85,7 +85,7 @@ export default {
         return {
             annos: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009],
             annos_null: [
-                { text: "Década", value: "d" },
+                { text: "Década", value: 0 },
                 2000,
                 2001,
                 2002,
@@ -176,7 +176,7 @@ export default {
                 return true;
             } else if (
                 this.reporte == 3 &&
-                this.aux_anno_selected != null 
+                this.aux_anno_selected != null
                 //&& this.aux_cat_selected != null
             ) {
                 return true;
@@ -212,7 +212,7 @@ export default {
                         this.$router.push({
                             name: "Reporte 3",
                             params: {
-                                anno_sel: this.aux_anno_selected
+                                anno_sel: this.aux_anno_selected,
                             },
                         });
                         break;

@@ -2,20 +2,29 @@
     <ScreenWindow>
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
+                <h3>Ranking hora - {{ $route.params.anno_sel }} - {{ $route.params.hora_sel }}h</h3>
+
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking
                         :datos="parti"
-                        :tipo_event="$route.params.event_sel"
+                        :hora="$route.params.hora_sel"
                         :limites="limites"
+                        tipo_event="car"
                     ></CardRaking>
                     <br />
                 </div>
-                <div v-show="datos_rank.length == 0" class="mt-2 text-center mx-auto">
-                    <h2>Estamos solicitando la información al servidor, por favor espere</h2>
-                    <b-icon icon="circle-fill" animation="throb" font-scale="4"></b-icon>
-                    <!--
+                <!-- MENSAJE - DATOS VACIOS -->
+                <div
+                    v-show="datos_rank.length == 0 && is_loading == false"
+                    class="mt-2 text-center mx-auto"
+                >
+                    <h2>¡No hemos encontrado información!</h2>
                     <b-icon class="h1" icon="emoji-frown"></b-icon>
-                    -->
+                </div>
+                <!-- MENSAJE - CARGA -->
+                <div v-show="is_loading == true" class="mt-2 text-center mx-auto">
+                    <h3>Estamos solicitando la información al servidor, por favor espere</h3>
+                    <b-icon icon="circle-fill" animation="throb" font-scale="4"></b-icon>
                 </div>
             </b-row>
         </b-container>
@@ -37,6 +46,7 @@ export default {
                 vel_media: 0,
                 dif_v: 0,
             },
+            is_loading: true,
         };
     },
     methods: {
@@ -88,10 +98,11 @@ export default {
             });
             //Guardamos
             this.datos_rank = aux_arr;
+            this.is_loading = false;
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000//ganadores/${this.$route.params.anno_sel}`;
+            let urlApi = `http://localhost:3000//ganadores/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)

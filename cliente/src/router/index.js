@@ -35,6 +35,11 @@ const routes = [
         name: "Reporte 3",
         component: () => import("../views/Reporte3.vue"),
     },
+    {
+        path: "/simulacion/:anno_ref/:pista/:clima",
+        name: "Simulacion",
+        component: () => import("../views/Sim.vue"),
+    },
     /* 404 => REDIRECT  */
     {
         path: "*",

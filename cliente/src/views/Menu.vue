@@ -6,7 +6,8 @@
                 <h1 class="text-center text-white">Le Mans</h1>
 
                 <BtnMenu title="REPORTES" nameUrl="Reportes"></BtnMenu>
-                <BtnMenu title="SIMULACIÓN" nameUrl="Simulacion"></BtnMenu>
+                <BtnMenu title="SIMULACIÓN" @click="abrir_modal_sim()"></BtnMenu>
+                <ModalOpcionesSim></ModalOpcionesSim>
             </b-col>
             <b-col col></b-col>
         </b-row>
@@ -15,11 +16,19 @@
 
 <script>
 import BtnMenu from "../components/BtnMenu.vue";
+import ModalOpcionesSim from "../components/ModalOpcionesSim.vue";
 
 export default {
-    components: { BtnMenu },
+    components: { BtnMenu, ModalOpcionesSim },
     data() {
         return {};
+
+        ModalOpcionesSim;
+    },
+    methods: {
+        abrir_modal_sim() {
+            this.$bvModal.show("modal-sim");
+        },
     },
 };
 </script>

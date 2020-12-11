@@ -87,16 +87,18 @@ $$;
 -- DROP FUNCTION  reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMALLINT, cat_v CHAR);
 -- EJ: SELECT * FROM reporte_ranking_hora(2000::smallint, 2::smallint, 'LMP 900');
 
+
 CREATE OR REPLACE FUNCTION reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMALLINT, cat_v CHAR(7))
     RETURNS TABLE(
         Hora NUMERIC(2),
         NombreEquipo VARCHAR(35),
         NroEquipo NUMERIC(3),
         PaisEquipo VARCHAR(56),
+        imgBanderaEquipo TEXT,
         NombrePiloto TEXT,
         imgPiloto TEXT,
         Gentilicio VARCHAR(60),
-        imgBanderaEquipo TEXT,
+        imgBanderaPiloto TEXT,
         NombreVehiculo VARCHAR(30),
         ModeloMotor VARCHAR(30),
         cc NUMERIC(4),
@@ -114,7 +116,7 @@ CREATE OR REPLACE FUNCTION reporte_ranking_hora(anno_ref SMALLINT, hora_ref SMAL
         id_evnt SMALLINT;
     begin
        id_evnt := obt_evento_id(anno_ref);
-        RETURN QUERY SELECT sucesos.hora Hora,e.nombre NombreEquipo, parti.nro_equipo NroEquipo, p_eq.nombre PaisEquipo, (pilot.identificacion).primer_nombre || ' ' || (pilot.identificacion).primer_apellido AS NombrePiloto, pilot.img_piloto, p_pilot.gentilicio, p_pilot.img_bandera, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, v.categoria, v.img_vehiculo, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
+        RETURN QUERY SELECT sucesos.hora Hora,e.nombre NombreEquipo, parti.nro_equipo NroEquipo, p_eq.nombre PaisEquipo, p_eq.img_bandera, (pilot.identificacion).primer_nombre || ' ' || (pilot.identificacion).primer_apellido AS NombrePiloto, pilot.img_piloto, p_pilot.gentilicio, p_pilot.img_bandera, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, v.categoria, v.img_vehiculo, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
         FROM participaciones AS parti
             --EQUIPO
             INNER JOIN equipos e on parti.id_equipo = e.id_equipo
@@ -152,13 +154,17 @@ CREATE OR REPLACE FUNCTION reporte_ganadores_le_mans(anno_ref SMALLINT DEFAULT 0
         NombreEquipo VARCHAR(35),
         NroEquipo NUMERIC(3),
         PaisEquipo VARCHAR(56),
+        imgBanderaEquipo TEXT,
         NombrePiloto TEXT,
+        imgPiloto TEXT,
         Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT,
         NombreVehiculo VARCHAR(30),
         ModeloMotor VARCHAR(30),
         cc NUMERIC(4),
         cilindros VARCHAR(3),
         categoria CHAR(7),
+        imgVehiculo TEXT,
         PuestoEnsayo NUMERIC(3),
         MejorVueltaEnsayo TIME,
         VelMediaEnsayo NUMERIC(5,2),
@@ -175,7 +181,7 @@ CREATE OR REPLACE FUNCTION reporte_ganadores_le_mans(anno_ref SMALLINT DEFAULT 0
         if anno_ref <> 0 then
             --usar anno de referencia
              id_evnt := obt_evento_id(anno_ref);
-             RETURN QUERY SELECT e.nombre NombreEquipo, p.parti_nro_equipo NroEquipo, p_eq.nombre PaisEquipo,  ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, p_pilot.gentilicio, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, v.categoria, (eny.estadistica).puesto PuestoEnsayo, (eny.estadistica).tiempo_mejor_vuelta MejorVueltaEnsayo, (eny.estadistica).velocidad_media VelMediaEnsayo, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
+             RETURN QUERY SELECT e.nombre NombreEquipo, p.parti_nro_equipo NroEquipo, p_eq.nombre PaisEquipo, p_eq.img_bandera, (pilot.identificacion).primer_nombre || ' ' || (pilot.identificacion).primer_apellido AS NombrePiloto, pilot.img_piloto, p_pilot.gentilicio, p_pilot.img_bandera, v.modelo NombreVehiculo, (v.modelo_motor).modelo ModeloMotor, (v.modelo_motor).cc, (v.modelo_motor).cilindros, v.categoria, v.img_vehiculo, (eny.estadistica).puesto PuestoEnsayo, (eny.estadistica).tiempo_mejor_vuelta MejorVueltaEnsayo, (eny.estadistica).velocidad_media VelMediaEnsayo, (resumen_datos.estadistica).puesto PuestoCarrera, resumen_datos.nro_vueltas NroVueltasCarrera, (resumen_datos.nro_vueltas * pistas.total_km) DistRecorrida, (resumen_datos.estadistica).velocidad_media VelMediaCarrera, (resumen_datos.estadistica).tiempo_mejor_vuelta MejorVueltaCarrera, CASE WHEN (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas)=0 THEN 1 ELSE (resumen_datos.nro_vueltas  - ant_resumen.nro_vueltas) END DifVueltas
             FROM participaciones AS parti
                 INNER JOIN ensayos eny ON parti.nro_equipo = eny.parti_nro_equipo and parti.id_vehiculo = eny.id_parti_vehiculo and parti.id_equipo = eny.id_parti_equipo and parti.id_evento = eny.id_parti_evento and parti.id_event_pista = eny.id_parti_evento_pista
                 INNER JOIN carreras car ON parti.nro_equipo = car.parti_nro_equipo and parti.id_vehiculo = car.id_parti_vehiculo and parti.id_equipo = car.id_parti_equipo and parti.id_evento = car.id_parti_evento and parti.id_event_pista = car.id_parti_evento_pista

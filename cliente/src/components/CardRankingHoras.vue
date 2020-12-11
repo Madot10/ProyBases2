@@ -19,7 +19,10 @@
                 <p>{{ datos.nombrevehiculo }}</p>
                 <!--Motor Motor-->
                 <p>{{ datos.modelomotor }} {{ datos.cilindros }} {{ datos.cc }}cc</p>
-
+            </b-col>
+            <b-col cols="1">
+                <!-- Puesto -->
+                <h1>{{ datos.puestocarrera }}°</h1>
             </b-col>
         </b-row>
         <br />

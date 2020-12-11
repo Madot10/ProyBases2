@@ -176,8 +176,8 @@ export default {
                 return true;
             } else if (
                 this.reporte == 3 &&
-                this.aux_anno_selected != null &&
-                this.aux_cat_selected != null
+                this.aux_anno_selected != null 
+                //&& this.aux_cat_selected != null
             ) {
                 return true;
             } else {
@@ -208,9 +208,17 @@ export default {
                             },
                         });
                         break;
+                    case 3:
+                        this.$router.push({
+                            name: "Reporte 3",
+                            params: {
+                                anno_sel: this.aux_anno_selected
+                            },
+                        });
+                        break;
 
                     default:
-                        alert("¡Ha ocurrido un error! Francia se ha rendido en la guerra");
+                        alert("¡Ups! Ha ocurrido un error");
                         break;
                 }
             }

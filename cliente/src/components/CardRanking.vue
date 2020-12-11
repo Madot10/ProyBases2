@@ -4,7 +4,7 @@
         <b-row>
             <b-col cols="5">
                 <!-- IMG VEHICULO -->
-                <b-img rounded src="https://picsum.photos/300/200/" fluid-grow></b-img>
+                <b-img rounded :src="datos.imgvehiculo" fluid-grow></b-img>
             </b-col>
             <b-col cols="6">
                 <!-- Nro equipo, Nombre y bandera de nac -->

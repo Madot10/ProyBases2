@@ -29,7 +29,12 @@ const routes = [
         name: "Reporte 2",
         component: () => import("../views/Reporte2.vue"),
     },
-
+    //Reporte 3
+    {
+        path: "/ganadores-le-mans/:anno_sel",
+        name: "Reporte 2",
+        component: () => import("../views/Reporte3.vue"),
+    },
     /* 404 => REDIRECT  */
     {
         path: "*",

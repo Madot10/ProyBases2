@@ -11,8 +11,11 @@
                     <br />
                 </div>
                 <div v-show="datos_rank.length == 0" class="mt-2 text-center mx-auto">
-                    <h2>¡No hemos encontrado datos!</h2>
+                    <h2>Estamos solicitando la información al servidor, por favor espere</h2>
+                    <b-icon icon="circle-fill" animation="throb" font-scale="4"></b-icon>
+                    <!--
                     <b-icon class="h1" icon="emoji-frown"></b-icon>
+                    -->
                 </div>
             </b-row>
         </b-container>

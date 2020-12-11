@@ -91,7 +91,7 @@ export default {
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000/ranking_anno/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}/${this.$route.params.event_sel}`;
+            let urlApi = `http://localhost:3000//ganadores/${this.$route.params.anno_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)

@@ -20,12 +20,14 @@
                 <p>{{ datos.modelomotor }} {{ datos.cilindros }} {{ datos.cc }}cc</p>
 
                 <!-- ENSAYO -->
-                <h5>ENSAYO</h5>
-                <p>
-                    Puesto: {{ datos.puestoensayo }} <br />
-                    Mejor tiempo: {{ datos.mejorvueltaensayo }} <br />
-                    Velocidad media: {{ datos.velmediaensayo }} Km/h
-                </p>
+                <div v-if="hora == null">
+                    <h5>ENSAYO</h5>
+                    <p>
+                        Puesto: {{ datos.puestoensayo }} <br />
+                        Mejor tiempo: {{ datos.mejorvueltaensayo }} <br />
+                        Velocidad media: {{ datos.velmediaensayo }} Km/h
+                    </p>
+                </div>
             </b-col>
             <b-col cols="1">
                 <!-- Puesto -->
@@ -82,7 +84,7 @@ import PillPiloto from "./PillPiloto.vue";
 
 export default {
     components: { PillPiloto },
-    props: ["datos", "tipo_event", "limites"],
+    props: ["datos", "tipo_event", "limites", "hora"],
     data() {
         return {
             data_nro_v: [{ value: 1, color: "#1589CB" }],

@@ -4,6 +4,8 @@ CREATE OR REPLACE PROCEDURE simulacion_le_mans(id_pista SMALLINT, f_evento TIMES
         aux_anno_nuevo SMALLINT;
     BEGIN
         aux_anno_nuevo := EXTRACT(YEAR FROM f_evento)::SMALLINT;
+        -- Borramos todo dato anterior
+        call borrar_simulacion(aux_anno_nuevo);
 
         -- (0) Crear evento
         call crear_evento(id_pista, f_evento);
@@ -21,8 +23,11 @@ CREATE OR REPLACE PROCEDURE simulacion_le_mans(id_pista SMALLINT, f_evento TIMES
         -- (5) Generar lotes de inventario para cada equipo
         call generar_lotes_inv(aux_id_evento);
 
-        -- (7) Generar ensayo
-        call  generar_ensayo(ano_ref, aux_anno_nuevo);
+        -- (6) Generar ensayo
+        call  generar_ensayo(ano_ref, aux_anno_nuevo, id_pista);
+
+        -- (7) Generar participacion en carrera a los clasificados
+        call generar_clasificacion_carrera(aux_id_evento);
 
         --(8) Generar estrategia
         call generar_estrategia (aux_id_evento);

@@ -330,9 +330,7 @@ CREATE OR REPLACE PROCEDURE generar_lotes_inv(id_evento SMALLINT)
     end;
 $$;
 
--- (7) Generar ensayo
---Ej: call generar_ensayo(2005::smallint,2030::smallint);
-CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALLINT)
+CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALLINT, id_pista SMALLINT)
     LANGUAGE plpgsql AS $$
     declare
         -- 1 Obtener evento id de referencia
@@ -341,11 +339,27 @@ CREATE OR REPLACE PROCEDURE generar_ensayo(anno_viejo SMALLINT, anno_nuevo SMALL
         -- 2 Guardar la información del ensayo
         for e IN cur_ensayos LOOP
             -- 2.1 Crear registros del ensayo
-            INSERT INTO ensayos(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estadistica) VALUES (e.parti_nro_equipo,e.id_parti_vehiculo,e.id_parti_equipo,obt_evento_id(anno_nuevo),e.id_parti_evento_pista, ROW(e.estadistica.velocidad_media,e.estadistica.tiempo_mejor_vuelta,e.estadistica.puesto));
+            INSERT INTO ensayos(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estadistica) VALUES (e.parti_nro_equipo,e.id_parti_vehiculo,e.id_parti_equipo,obt_evento_id(anno_nuevo),id_pista, ROW((e.estadistica).velocidad_media,(e.estadistica).tiempo_mejor_vuelta,(e.estadistica).puesto));
             commit;
         end loop;
     end;
 $$;
+
+-- (7) Generar participacion en carrera a los clasificados
+--Ej: call  generar_clasificacion_carrera(15::smallint);
+CREATE OR REPLACE PROCEDURE  generar_clasificacion_carrera(id_event SMALLINT) LANGUAGE plpgsql AS $$
+    DECLARE
+        --Seleccionamos los mejores 45
+        cur_ensayo CURSOR FOR SELECT * FROM ensayos eny WHERE eny.id_parti_evento = id_event ORDER BY (eny.estadistica).puesto LIMIT 45;
+    BEGIN
+        for corredores IN cur_ensayo LOOP
+            INSERT INTO carreras(parti_nro_equipo, id_parti_vehiculo, id_parti_equipo, id_parti_evento, id_parti_evento_pista, estado)
+                VALUES (corredores.parti_nro_equipo, corredores.id_parti_vehiculo, corredores.id_parti_equipo, id_event, corredores.id_parti_evento_pista, 'c');
+            commit;
+        end loop;
+    END;
+$$;
+
 
 --(8) Generar estrategia
 --1 Generar las 24h resumen de datos
@@ -589,6 +603,7 @@ $$;
 CREATE OR REPLACE PROCEDURE usar_pieza_inventario (id_equipo SMALLINT, pieza CHAR(2), cant_pz NUMERIC(1))
     LANGUAGE plpgsql AS $$
     begin
+        raise notice 'Usando pieza % para el id equipo %', pieza, id_equipo;
         UPDATE lotes_repuestos  SET cant_disponible = cant_disponible - cant_pz WHERE lotes_repuestos.id_equipo = usar_pieza_inventario.id_equipo AND lotes_repuestos.tipo_pieza = pieza;
         commit;
     end;
@@ -643,6 +658,7 @@ $$;
 
 -- GENERAR POSIBILE FALLA
 --Ej: call generar_posible_falla(11::smallint, 1::smallint, 1::smallint, 9::smallint, 508::smallint, 1::smallint, 1);
+
 CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_pista SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), id_equipo_carrera SMALLINT, id_equipo_veh SMALLINT,  hora NUMERIC(2))
     LANGUAGE plpgsql AS $$
     DECLARE
@@ -709,77 +725,81 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
             WHEN 'LM P2' THEN
                 indice_falla := indice_falla + 1;
         END CASE;
-				
-        
+
+        raise notice 'Indice de falla: % para equipo % en la hora %', indice_falla, nro_equipo, hora;
+
         --Analisis del indice
         if (indice_falla >= 12 and indice_falla <= 17) then
         		aux_falla:= gen_random(1,6);
             --falla parcial
             --Registrar falla
-            
-           IF (aux_falla = 1) THEN 
+
+           IF (aux_falla = 1) THEN
                 --Falla de neumáticos
                 aux_pz := 'ne';
                 aux_cant_pz := 4;
-            ELSIF (aux_falla = 2) THEN 
+            ELSIF (aux_falla = 2) THEN
                 --Falla frenos
                 aux_pz := 'fr';
                 aux_cant_pz := 1;
-            ELSIF (aux_falla = 3) THEN 
+            ELSIF (aux_falla = 3) THEN
              --Falla presión aceite
              		aux_pz := 'pa';
-            ELSIF (aux_falla = 4) THEN 
+            ELSIF (aux_falla = 4) THEN
              --Falla transmisión
              		aux_pz := 'tr';
                	aux_cant_pz := 1;
-           ELSIF (aux_falla = 5) THEN 
+           ELSIF (aux_falla = 5) THEN
              --Falla fuga aceite
              		aux_pz := 'fa';
                 aux_cant_pz := 1;
-            ELSIF (aux_falla = 6) THEN 
+            ELSIF (aux_falla = 6) THEN
              --Falla calibración neumáticos
                 aux_pz := 'cn';
-            END IF; 
+            END IF;
 							--Notificamos falla
         			aux_id_suc := obtener_suceso_id(id_event, hora);
-             INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla) 
+             INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 'p') RETURNING id_falla INTO aux_id_falla;
-          	
+
             --Generamos parada en pits por falla
             call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
-           
+
            --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
            if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
-           			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);  
+           			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);
                  if(disp) then
                  		--hay disponibilidad => descontar
+                    raise  notice 'Usar pieza de inventario';
                     call usar_pieza_inventario(id_equipo, aux_pz, aux_cant_pz);
-                 else 
-                 		--no hay disponibilidad => cambiar status = abandono
+                 else
+                 	--no hay disponibilidad => cambiar status = abandono
+                     raise  notice 'cambiar_status_equipo por NO HAY disponibilidad';
                     call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
                  end if;
            end if;
-                   
-        else
+
+        elsif (indice_falla >= 18 and indice_falla <= 20) then
         		aux_falla:= gen_random(1,6);
             --falla total
             --Abandona carrera
+        	raise  notice 'cambiar_status_equipo por FALLA TOTAL';
             call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
-            
+
             --Registrar pieza
-            IF (aux_falla = 1) THEN 
+            IF (aux_falla = 1) THEN
                 --Insertar falla de neumáticos
                 aux_pz := 'cc';
-            ELSIF (aux_falla = 2) THEN 
+            ELSIF (aux_falla = 2) THEN
                 --Insertar falla frenos
                 aux_pz := 'tg';
-            ELSIF (aux_falla = 3) THEN 
+            ELSIF (aux_falla = 3) THEN
              --Insertar falla presión aceite
                 aux_pz := 'mt';
-            ELSIF (aux_falla = 4) THEN 
+            ELSIF (aux_falla = 4) THEN
              --Insertar falla transmisión
                 aux_pz := 'fg';
-            ELSIF (aux_falla = 5) THEN 
+            ELSIF (aux_falla = 5) THEN
              --Insertar falla fuga aceite
                 aux_pz := 'fe';
             ELSIF(aux_falla = 6) THEN
@@ -789,7 +809,7 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                 aux_id_suc := obtener_suceso_id(id_event, hora);
         			INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 't') RETURNING id_falla INTO aux_id_falla;
-            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);                     
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
             --Obtener prob de accidente indv o colectivo
            	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
             if (aux_ind_accidente >= 0 AND aux_ind_accidente <= 9) then
@@ -1341,8 +1361,8 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 'p') RETURNING id_falla INTO aux_id_falla;
           	
             --Generamos parada en pits por falla
-            --CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
-           CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
+            CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
+           --CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
            --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
            if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
            			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);  
@@ -1384,8 +1404,8 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
             aux_id_suc := obtener_suceso_id(id_event, hora);
         		INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 't') RETURNING id_falla INTO aux_id_falla;
-            CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
-            --call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);                     
+            --CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
+            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);                     
             --Obtener prob de accidente indv o colectivo
            	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
             if (aux_ind_accidente >= 0 AND aux_ind_accidente <= 9) then

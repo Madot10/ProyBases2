@@ -116,7 +116,8 @@ DROP SEQUENCE IF EXISTS sec_lotes_repuestos;
 CREATE SEQUENCE sec_lotes_repuestos
     AS SMALLINT
     MINVALUE 1
-    MAXVALUE 32767;
+    MAXVALUE 32767
+    cycle;
 
 CREATE TABLE lotes_repuestos(
   cod_lote SMALLINT DEFAULT nextval('sec_lotes_repuestos'),
@@ -274,7 +275,8 @@ DROP SEQUENCE IF EXISTS sec_fallas;
 CREATE SEQUENCE sec_fallas
     AS SMALLINT
     MINVALUE 1
-    MAXVALUE 32767;
+    MAXVALUE 32767
+    cycle;
 
 CREATE TABLE fallas(
   id_falla SMALLINT DEFAULT nextval('sec_fallas'),
@@ -300,7 +302,8 @@ DROP SEQUENCE IF EXISTS sec_parada_pits;
 CREATE SEQUENCE sec_parada_pits
     AS SMALLINT
     MINVALUE 1
-    MAXVALUE 32767;
+    MAXVALUE 32767
+    cycle;
 
 CREATE TABLE parada_pits(
   id_parada SMALLINT DEFAULT nextval('sec_parada_pits'),
@@ -349,7 +352,8 @@ DROP SEQUENCE IF EXISTS sec_accidentes;
 CREATE SEQUENCE sec_accidentes
     AS SMALLINT
     MINVALUE 1
-    MAXVALUE 32767;
+    MAXVALUE 32767
+    cycle;
 
 CREATE TABLE accidentes(
   id_accid SMALLINT DEFAULT nextval('sec_accidentes') ,

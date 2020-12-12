@@ -4,10 +4,17 @@ const { database } = require("../config/db.config");
 class SimulacionReportesCont {
     //Simulacion
     getSimulacion(req, res) {
-        const { anno_ref } = req.body;
+        //const { anno_ref } = req.body;
+
+        const pista = req.params.pista;
+        const anno_ref = req.params.anno_ref;
+        const clima = req.params.clima;
 
         database
-            .query(`INSERTE LLAMADO DE FUNCIÓN QUE ARRANCA LA SIMULACIÓN $1`, [anno_ref])
+            .query(
+                `call simulacion_le_mans( $1::SMALLINT, '10/12/2020'::TIMESTAMP, $2::SMALLINT, $3)`,
+                [pista, anno_ref, clima]
+            )
             .then(function (data) {
                 res.status(200).json(data);
             })

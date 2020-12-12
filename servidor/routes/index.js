@@ -7,7 +7,7 @@ const { SimulacionReportesCont } = require("../controllers/SimulacionReportesCon
 var rep = new SimulacionReportesCont();
 
 //Simulación
-router.get("/simulacion", rep.getSimulacion);
+router.get("/simulacion/:anno_ref/:pista/:clima", rep.getSimulacion);
 
 //Reportes
 //Reporte 1 - Ranking por año

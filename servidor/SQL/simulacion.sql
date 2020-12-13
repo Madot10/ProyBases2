@@ -770,11 +770,11 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
            			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);
                  if(disp) then
                  		--hay disponibilidad => descontar
-                    raise  notice 'Usar pieza de inventario';
+                    raise  notice 'Usar pieza de inventario: %', aux_pz;
                     call usar_pieza_inventario(id_equipo, aux_pz, aux_cant_pz);
                  else
                  	--no hay disponibilidad => cambiar status = abandono
-                     raise  notice 'cambiar_status_equipo por NO HAY disponibilidad';
+                     raise  notice 'cambiar_status_equipo por NO HAY disponibilidad: %', aux_pz;
                     call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
                  end if;
            end if;

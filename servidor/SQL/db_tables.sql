@@ -138,7 +138,7 @@ CREATE SEQUENCE sec_pistas
 
 CREATE TABLE pistas(
   id_pista SMALLINT DEFAULT nextval('sec_pistas') PRIMARY KEY,
-  total_km NUMERIC(5) NOT NULL,
+  total_km NUMERIC(5,3) NOT NULL,
   lugares VARCHAR(25)[26] NOT NULL
 );
 

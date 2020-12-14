@@ -16,7 +16,11 @@ class SimulacionReportesCont {
                 [pista, anno_ref, clima]
             )
             .then(function (data) {
-                res.status(200).json(data);
+                database.query(`SELECT * FROM reporte_rank_anno(2020::smallint, NULL, 'car'`)
+                .then(function (data) {
+                    res.status(200).json(data.rows);
+                })
+                .catch((e) => console.error(e.stack));
             })
             .catch((e) => console.error(e.stack));
     }

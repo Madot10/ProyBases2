@@ -1266,15 +1266,15 @@ CREATE OR REPLACE PROCEDURE clasificacion_final_car (id_event SMALLINT) AS $$
 $$ LANGUAGE plpgsql;
 
 --*****************************************************************************************************
---SIN PROBAR 
---Trigger Aviso para reportar por accidente una para en los pits
-
+--Trigger Aviso para reportar por falla una para en los pits
 CREATE OR REPLACE FUNCTION trig_val_falla() RETURNS TRIGGER AS $$
     BEGIN
-        IF ((NEW.id_falla) IS NOT NULL) THEN    
-            CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
+        IF ((NEW.id_falla) IS NOT NULL) THEN
+           INSERT INTO parada_pits (id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, id_suceso, id_suc_evento, id_suc_pista, id_falla, id_falla_suceso, id_falla_s_evento, id_falla_s_pista, id_falla_carrera, falla_nro_equipo, id_falla_vehiculo, id_falla_equipo, id_falla_evento, id_falla_pista, motivo)
+                        VALUES (NEW.id_carrera, NEW.car_nro_equipo, NEW.id_car_vehiculo, NEW.id_car_equipo, NEW.id_car_evento, NEW.id_car_pista, NEW.id_suceso, NEW.id_suceso_evento, NEW.id_suceso_pista, NEW.id_falla, NEW.id_suceso, NEW.id_suceso_evento, NEW.id_suceso_pista, NEW.id_carrera,NEW.car_nro_equipo, NEW.id_car_vehiculo, NEW.id_car_equipo,NEW.id_car_evento, NEW.id_suceso_pista, 'fa');
         END IF;
-        RRETURNS NEW;
+
+        RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
 CREATE trigger trig_falla_parada AFTER INSERT ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val_falla();

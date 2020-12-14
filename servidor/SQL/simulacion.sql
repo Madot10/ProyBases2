@@ -770,11 +770,11 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
            			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);
                  if(disp) then
                  		--hay disponibilidad => descontar
-                    raise  notice 'Usar pieza de inventario: %', aux_pz;
+                    raise  notice 'Usar pieza de inventario';
                     call usar_pieza_inventario(id_equipo, aux_pz, aux_cant_pz);
                  else
                  	--no hay disponibilidad => cambiar status = abandono
-                     raise  notice 'cambiar_status_equipo por NO HAY disponibilidad: %', aux_pz;
+                     raise  notice 'cambiar_status_equipo por NO HAY disponibilidad';
                     call cambiar_status_equipo(id_event, id_equipo, nro_equipo, 'a');
                  end if;
            end if;
@@ -1254,6 +1254,7 @@ CREATE OR REPLACE FUNCTION trig_val_accidente() RETURNS TRIGGER AS $$
         IF ((NEW.id_falla) IS NOT NULL) THEN    
             CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
         END IF;
+        RRETURNS NEW;
     END;
 $$ LANGUAGE plpgsql;
 --CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
@@ -1361,8 +1362,8 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 'p') RETURNING id_falla INTO aux_id_falla;
           	
             --Generamos parada en pits por falla
-            CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
-           --CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
+            --CALL generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
+           CALL trig_val_accidente();
            --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
            if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
            			 disp := verificar_disp_pieza (id_equipo, aux_pz , aux_cant_pz);  
@@ -1404,8 +1405,8 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
             aux_id_suc := obtener_suceso_id(id_event, hora);
         		INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 't') RETURNING id_falla INTO aux_id_falla;
-            --CREATE trigger trig_val_accidente AFTER INSERT OR UPDATE ON fallas FOR EACH ROW EXECUTE PROCEDURE trig_val accidente();
-            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);                     
+            CALL trig_val accidente();
+            --call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);                     
             --Obtener prob de accidente indv o colectivo
            	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
             if (aux_ind_accidente >= 0 AND aux_ind_accidente <= 9) then

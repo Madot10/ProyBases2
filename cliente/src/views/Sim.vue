@@ -7,11 +7,7 @@
                     Simulación con los datos del año - {{ $route.params.anno_ref }}
                 </h3>
                 <div v-for="(parti, i) in datos_rank" :key="i">
-                    <CardRaking
-                        :datos="parti"
-                        :tipo_event="car"
-                        :limites="limites"
-                    ></CardRaking>
+                    <CardRaking :datos="parti" tipo_event="car" :limites="limites"></CardRaking>
                     <br />
                 </div>
                 <!-- MENSAJE - CARGA -->
@@ -26,9 +22,10 @@
 
 <script>
 import ScreenWindow from "../components/ScreenWindow.vue";
+import CardRaking from "../components/CardRanking.vue";
 
 export default {
-    components: { ScreenWindow },
+    components: { ScreenWindow, CardRaking },
     data() {
         return {
             is_loading: true,
@@ -36,7 +33,7 @@ export default {
                 "Encendiendo luces",
                 "Animando al publico",
                 "Disfrutando la velocidad",
-                "Velocidad, soy veloz",
+                "'Velocidad, soy veloz' - Rayo Mcqueen",
                 "Probando cronómetros",
                 "Visualizando meta",
             ],
@@ -112,6 +109,7 @@ export default {
                 })
                 .then((sim_data) => {
                     console.log("DATOS OBTENIDOS", sim_data);
+                    this.generar_rank(sim_data);
                     //Simulacion finalizada
                     this.is_loading = false;
                 });

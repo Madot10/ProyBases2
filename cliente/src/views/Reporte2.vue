@@ -67,6 +67,12 @@ export default {
 
             //Agrupemos por pilotos
             datos.forEach((c, i) => {
+                //Verificamos valores de limites
+                this.guardar_valor_alto(c.nrovueltascarrera, "nro_v");
+                this.guardar_valor_alto(c.distrecorrida, "km");
+                this.guardar_valor_alto(c.velmediacarrera, "vel_media");
+                this.guardar_valor_alto(c.difvueltas, "dif_v");
+
                 //Si no existe registro de equipo
                 if (aux_rank[c.nroequipo] == null) {
                     //Guardamos index de array original
@@ -81,21 +87,16 @@ export default {
                         nombrepiloto: c.nombrepiloto,
                     });
 
-                    //Verificamos valores de limites
-                    this.guardar_valor_alto(c.nrovueltascarrera, "nro_v");
-                    this.guardar_valor_alto(c.distrecorrida, "km");
-                    this.guardar_valor_alto(c.velmediacarrera, "vel_media");
-                    this.guardar_valor_alto(c.difvueltas, "dif_v");
-
                     aux_arr.push(c);
                 } else {
                     //Tenemos registro, guardamos
-                    datos[aux_rank[c.nroequipo]].pilotos.push({
-                        gentilicio: c.gentilicio,
-                        imgbanderapiloto: c.imgbanderapiloto,
-                        imgpiloto: c.imgpiloto,
-                        nombrepiloto: c.nombrepiloto,
-                    });
+                    if (datos[aux_rank[c.nroequipo]].pilotos.length < 3)
+                        datos[aux_rank[c.nroequipo]].pilotos.push({
+                            gentilicio: c.gentilicio,
+                            imgbanderapiloto: c.imgbanderapiloto,
+                            imgpiloto: c.imgpiloto,
+                            nombrepiloto: c.nombrepiloto,
+                        });
                 }
             });
             //Guardamos

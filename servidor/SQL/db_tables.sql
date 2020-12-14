@@ -245,12 +245,12 @@ CREATE TABLE sucesos(
 
 DROP SEQUENCE IF EXISTS sec_resumen_datos;
 CREATE SEQUENCE sec_resumen_datos
-    AS SMALLINT
+    AS INTEGER
     MINVALUE 1
-    MAXVALUE 32767;
+    MAXVALUE 2147483647;
 
 CREATE TABLE resumen_datos(
-  id_resumen SMALLINT DEFAULT nextval('sec_resumen_datos'),
+  id_resumen INTEGER DEFAULT nextval('sec_resumen_datos'),
   id_suceso SMALLINT,
   id_suceso_evento SMALLINT,
   id_suceso_pista SMALLINT,
@@ -300,13 +300,13 @@ CREATE TABLE fallas(
 
 DROP SEQUENCE IF EXISTS sec_parada_pits;
 CREATE SEQUENCE sec_parada_pits
-    AS SMALLINT
+    AS INTEGER
     MINVALUE 1
-    MAXVALUE 32767
+    MAXVALUE 2147483647
     cycle;
 
 CREATE TABLE parada_pits(
-  id_parada SMALLINT DEFAULT nextval('sec_parada_pits'),
+  id_parada INTEGER DEFAULT nextval('sec_parada_pits'),
   --ids de la carrera
   id_carrera SMALLINT,
   car_nro_equipo NUMERIC(3),

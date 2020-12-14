@@ -577,9 +577,18 @@ $$ LANGUAGE plpgsql;
 --EJ: select  verificar_disp_pieza(1::smallint, 'ne', 1)
 CREATE OR REPLACE FUNCTION verificar_disp_pieza (id_equipo SMALLINT, pieza CHAR(2), cant_pz NUMERIC(1)) RETURNS BOOLEAN AS $$
   DECLARE
-  	aux_disp INT;
+  	aux_disp INTEGER;
+    aux_pieza CHAR(2);
   BEGIN
-  	  SELECT COUNT(lr.cod_lote) INTO aux_disp FROM lotes_repuestos AS lr WHERE lr.id_equipo = verificar_disp_pieza.id_equipo AND lr.cant_disponible >= cant_pz AND lr.tipo_pieza = pieza;
+      --Ajustamos valor
+      IF (pieza = 'pa' or pieza = 'fa') then
+          aux_pieza := 'ac';
+      else
+          aux_pieza := pieza;
+      end if;
+
+      --Verificamos cantidad
+  	  SELECT COUNT(lr.cod_lote) INTO aux_disp FROM lotes_repuestos AS lr WHERE lr.id_equipo = verificar_disp_pieza.id_equipo AND lr.cant_disponible >= cant_pz AND lr.tipo_pieza = aux_pieza;
       IF (aux_disp <> 0) THEN
       	--hay disponibilidad
         RETURN TRUE;
@@ -602,12 +611,23 @@ $$;
 --USAR PIEZA DE INVENTARIO
 CREATE OR REPLACE PROCEDURE usar_pieza_inventario (id_equipo SMALLINT, pieza CHAR(2), cant_pz NUMERIC(1))
     LANGUAGE plpgsql AS $$
+    declare
+        aux_pieza CHAR(2);
     begin
-        raise notice 'Usando pieza % para el id equipo %', pieza, id_equipo;
-        UPDATE lotes_repuestos  SET cant_disponible = cant_disponible - cant_pz WHERE lotes_repuestos.id_equipo = usar_pieza_inventario.id_equipo AND lotes_repuestos.tipo_pieza = pieza;
+        --Ajustamos valor
+          IF (pieza = 'pa' or pieza = 'fa') then
+              aux_pieza := 'ac';
+          else
+              aux_pieza := pieza;
+          end if;
+
+        raise notice 'Usando pieza % para el id equipo %', aux_pieza, id_equipo;
+
+        UPDATE lotes_repuestos  SET cant_disponible = cant_disponible - cant_pz WHERE lotes_repuestos.id_equipo = usar_pieza_inventario.id_equipo AND lotes_repuestos.tipo_pieza = aux_pieza;
         commit;
     end;
 $$;
+
 
 --GENERAR INDICE DE ACCIDENTE
 CREATE OR REPLACE FUNCTION generar_indice_accidente(id_event SMALLINT, id_equipo SMALLINT, nro_equipo NUMERIC(3), hora NUMERIC(2))
@@ -729,7 +749,7 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
         raise notice 'Indice de falla: % para equipo % en la hora %', indice_falla, nro_equipo, hora;
 
         --Analisis del indice
-        if (indice_falla >= 12 and indice_falla <= 17) then
+        if (indice_falla >= 10 and indice_falla <= 16) then
         		aux_falla:= gen_random(1,6);
             --falla parcial
             --Registrar falla
@@ -779,7 +799,7 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                  end if;
            end if;
 
-        elsif (indice_falla >= 18 and indice_falla <= 20) then
+        elsif (indice_falla >= 17 and indice_falla <= 20) then
         		aux_falla:= gen_random(1,6);
             --falla total
             --Abandona carrera

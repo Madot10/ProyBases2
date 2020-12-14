@@ -783,7 +783,7 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 'p') RETURNING id_falla INTO aux_id_falla;
 
             --Generamos parada en pits por falla
-            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
+            --call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
 
            --Registrar uso de pieza (*verificar disponibilidad => si no hay cambiar status)
            if (aux_falla = 1 or aux_falla = 2 or aux_falla = 4 or aux_falla = 5) then
@@ -829,7 +829,7 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
                 aux_id_suc := obtener_suceso_id(id_event, hora);
         			INSERT INTO fallas(id_suceso, id_suceso_evento, id_suceso_pista, id_carrera, car_nro_equipo, id_car_vehiculo, id_car_equipo, id_car_evento, id_car_pista, pieza, tipo_falla)
                         VALUES (aux_id_suc, id_event, id_event_pista, id_equipo_carrera, nro_equipo, id_equipo_veh, id_equipo, id_event, id_event_pista, aux_pz, 't') RETURNING id_falla INTO aux_id_falla;
-            call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
+            --call generar_parada_pits (id_event, hora, id_equipo, nro_equipo, 'fa', aux_id_falla);
             --Obtener prob de accidente indv o colectivo
            	aux_ind_accidente := generar_indice_accidente(id_event, id_equipo, nro_equipo, hora);
             if (aux_ind_accidente >= 0 AND aux_ind_accidente <= 9) then

@@ -713,18 +713,18 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
         WHEN 'i' THEN
             indice_falla := indice_falla + 2;
         WHEN 'c' THEN
-            indice_falla := indice_falla;
+            indice_falla := indice_falla + 1;
         END CASE;
 
         --Clima
         aux_clima := obtener_clima_hora(id_event, hora);
         CASE aux_clima
         WHEN 'd' THEN
-            indice_falla := indice_falla;
+            indice_falla := indice_falla + 1;
         WHEN 'll' THEN
             indice_falla := indice_falla + 5;
         WHEN 'n' THEN
-            indice_falla := indice_falla + 1;
+            indice_falla := indice_falla + 2;
         END CASE;
 
         --Categoría del vehículo del equipo
@@ -732,18 +732,18 @@ CREATE OR REPLACE PROCEDURE generar_posible_falla (id_event SMALLINT, id_event_p
         CASE aux_cat
             WHEN 'LMP 900' THEN
             WHEN 'LM P675' THEN
-                indice_falla := indice_falla + 3;
+                indice_falla := indice_falla + gen_random(2,6);
 
             WHEN 'LM GTP' THEN
             WHEN 'LM GTS' THEN
             WHEN 'LM GT' THEN
             WHEN 'LM GT1' THEN
             WHEN 'LM GT2' THEN
-                indice_falla := indice_falla + 4;
+                indice_falla := indice_falla + gen_random(2,5);
 
             WHEN 'LM P1' THEN
             WHEN 'LM P2' THEN
-                indice_falla := indice_falla + 1;
+                indice_falla := indice_falla + gen_random(2,6);
         END CASE;
 
         raise notice 'Indice de falla: % para equipo % en la hora %', indice_falla, nro_equipo, hora;

@@ -155,3 +155,18 @@ WHERE  sucesos.hora = 24 AND car.puesto_final <> 0 AND
        WHERE c.puesto_final <> 0
         GROUP BY v.categoria);
 
+
+--OBTENER CLIMA
+--DROP FUNCTION obtener_metereologia_evento (anno_event SMALLINT);
+--Ej: SELECT * FROM obtener_metereologia_evento(2020::smallint)
+CREATE OR REPLACE FUNCTION obtener_metereologia_evento (anno_event SMALLINT)
+    RETURNS TABLE (
+        clima CHAR(2),
+        hora NUMERIC(2)
+                  ) LANGUAGE plpgsql AS $$
+    DECLARE
+    BEGIN
+        RETURN QUERY SELECT (s.metereologia).clima, s.hora FROM sucesos s WHERE s.id_evento = obt_evento_id(anno_event) ORDER BY s.hora;
+    END;
+$$;
+

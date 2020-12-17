@@ -8,6 +8,8 @@ var rep = new SimulacionReportesCont();
 
 //Simulación
 router.get("/simulacion/:anno_ref/:pista/:clima", rep.getSimulacion);
+//Clima
+router.get("/clima/:anno", rep.getClima);
 
 //Reportes
 //Reporte 1 - Ranking por año

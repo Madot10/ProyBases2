@@ -26,6 +26,16 @@ class SimulacionReportesCont {
             .catch((e) => console.error(e.stack));
     }
 
+    getClima(req, res) {
+        const anno = req.params.anno;
+        database
+            .query(`SELECT * FROM obtener_metereologia_evento($1::smallint)`, [anno])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
     //Reportes
 
     //Ranking por año

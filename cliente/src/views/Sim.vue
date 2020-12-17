@@ -6,10 +6,13 @@
                 <h3 class="text-center mb-2 w-100">
                     Simulación con los datos del año - {{ $route.params.anno_ref }}
                 </h3>
+                <CardClima :datos="datos_clima" v-show="!is_loading"></CardClima>
+
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking :datos="parti" tipo_event="car" :limites="limites"></CardRaking>
                     <br />
                 </div>
+
                 <!-- MENSAJE - CARGA -->
                 <div v-show="is_loading == true" class="text-center mx-auto">
                     <h3>{{ frase_activa }}</h3>
@@ -23,9 +26,10 @@
 <script>
 import ScreenWindow from "../components/ScreenWindow.vue";
 import CardRaking from "../components/CardRanking.vue";
+import CardClima from "../components/CardClima.vue";
 
 export default {
-    components: { ScreenWindow, CardRaking },
+    components: { ScreenWindow, CardRaking, CardClima },
     data() {
         return {
             is_loading: true,
@@ -42,6 +46,7 @@ export default {
             ],
             frase_activa: "Iniciando simulación...",
             datos_rank: [],
+            datos_clima: [],
             limites: {
                 nro_v: 0,
                 km: 0,
@@ -105,6 +110,8 @@ export default {
         obtener_datos() {
             let urlApi = `http://localhost:3000/simulacion/${this.$route.params.anno_ref}/${this.$route.params.pista}/${this.$route.params.clima}`;
 
+            let urlClimaApi = `http://localhost:3000/clima/2020`;
+
             //Solicitamos datos
             fetch(urlApi)
                 .then((response) => {
@@ -113,8 +120,20 @@ export default {
                 .then((sim_data) => {
                     console.log("DATOS OBTENIDOS", sim_data);
                     this.generar_rank(sim_data);
-                    //Simulacion finalizada
-                    this.is_loading = false;
+
+                    //Solicitar clima
+                    fetch(urlClimaApi)
+                        .then((response) => {
+                            return response.json();
+                        })
+                        .then((clima_data) => {
+                            console.log("CLIMA ", clima_data);
+
+                            this.datos_clima = clima_data;
+
+                            //Simulacion finalizada
+                            this.is_loading = false;
+                        });
                 });
         },
         //Cambio de frase

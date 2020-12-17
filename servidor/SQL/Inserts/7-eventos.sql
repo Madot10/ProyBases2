@@ -1,0 +1,10 @@
+INSERT INTO eventos(id_pista,fecha) VALUES (1,'18/06/2000 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (1,'17/06/2001 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (2,'16/06/2002 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (2,'15/06/2003 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (2,'13/06/2004 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (2,'19/06/2005 16:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (2,'18/06/2006 17:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (3,'17/06/2007 15:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (3,'15/06/2008 15:00');
+INSERT INTO eventos(id_pista,fecha) VALUES (3,'14/06/2009 15:00');

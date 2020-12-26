@@ -395,3 +395,41 @@ CREATE OR REPLACE FUNCTION reporte_datos_participacion(id_pilot SMALLINT)
                     WHERE  p2.id_piloto = id_pilot);
     END;
 $$;
+
+--REPORTE 6
+--Participacion segun marca(fabricante_auto) y modelo de Veh
+--Ej: SELECT * FROM reporte_participaciones_marcas_modelos('Audi');
+--Ej: SELECT * FROM reporte_participaciones_marcas_modelos();
+CREATE OR REPLACE FUNCTION reporte_participaciones_marcas_modelos(marca VARCHAR(30) DEFAULT NULL, model VARCHAR(30) DEFAULT NULL)
+RETURNS TABLE (
+    AnnoParticipacion DOUBLE PRECISION,
+    Modelo VARCHAR(30),
+    Fabricante VARCHAR(30),
+    TipoVeh CHAR(2),
+    ImgVehiculo TEXT,
+    ModeloMotor VARCHAR(30),
+    cc NUMERIC(4),
+    cilindros VARCHAR(3),
+    FabNeumatico VARCHAR(30),
+    NombreEquipo VARCHAR(35),
+    NroEquipo NUMERIC(3),
+    NombrePiloto TEXT,
+    ImgPiloto TEXT,
+    Gentilicio VARCHAR(30),
+    ImgBanderaPiloto TEXT
+              ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT EXTRACT(YEAR FROM ev.fecha) AnnoParticipacion, veh.modelo Modelo, veh.fabricante_auto Fabricante, veh.tipo TipoVeh, img_vehiculo ImgVehiculo, (veh.modelo_motor).modelo ModeloMotor, (veh.modelo_motor).cc, (veh.modelo_motor).cilindros, veh.fabricante_neumatico FabNeumatico, e.nombre NombreEquipo, p.nro_equipo NroEquipo, ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, pilot.img_piloto ImgPiloto, p_pilot.gentilicio Gentilicio, p_pilot.img_bandera ImgBanderaPiloto
+        FROM vehiculos veh
+            INNER JOIN participaciones p on veh.id_vehiculo = p.id_vehiculo
+            INNER JOIN eventos ev on p.id_evento = ev.id_evento and p.id_event_pista = ev.id_pista
+            INNER JOIN equipos e on p.id_equipo = e.id_equipo
+            INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+            INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+            INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais
+        WHERE (marca IS NULL OR veh.fabricante_auto = marca) AND (model IS NULL OR veh.modelo = model);
+    END;
+$$;
+
+
+

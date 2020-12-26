@@ -291,3 +291,16 @@ SELECT  evt.fecha FechaPartipacion, parti.nro_equipo NroEquipo, veh.categoria Ve
               IN (SELECT parti.nro_equipo, parti.id_vehiculo, parti.id_equipo, parti.id_evento, parti.id_event_pista FROM participaciones parti
                     INNER JOIN plantillas p2 on parti.nro_equipo = p2.parti_nro_equipo and parti.id_vehiculo = p2.id_parti_vehiculo and parti.id_equipo = p2.id_parti_equipo and parti.id_evento = p2.id_parti_evento and parti.id_event_pista = p2.id_parti_evento_pista
                     WHERE  p2.id_piloto = 1);
+                    
+
+
+--REPORTE 6
+--Participacion segun marca(fabricante_auto) y modelo de Veh
+SELECT EXTRACT(YEAR FROM ev.fecha), veh.modelo Modelo, veh.fabricante_auto Fabricante, veh.tipo TipoVeh, img_vehiculo ImgVehiculo, (veh.modelo_motor).modelo ModeloMotor, (veh.modelo_motor).cc, (veh.modelo_motor).cilindros, veh.fabricante_neumatico FabNeumatico, e.nombre NombreEquipo, p.nro_equipo NroEquipo, ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, pilot.img_piloto, p_pilot.gentilicio, p_pilot.img_bandera
+FROM vehiculos veh
+    INNER JOIN participaciones p on veh.id_vehiculo = p.id_vehiculo
+    INNER JOIN eventos ev on p.id_evento = ev.id_evento and p.id_event_pista = ev.id_pista
+    INNER JOIN equipos e on p.id_equipo = e.id_equipo
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+    INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais

@@ -291,7 +291,7 @@ SELECT  evt.fecha FechaPartipacion, parti.nro_equipo NroEquipo, veh.categoria Ve
               IN (SELECT parti.nro_equipo, parti.id_vehiculo, parti.id_equipo, parti.id_evento, parti.id_event_pista FROM participaciones parti
                     INNER JOIN plantillas p2 on parti.nro_equipo = p2.parti_nro_equipo and parti.id_vehiculo = p2.id_parti_vehiculo and parti.id_equipo = p2.id_parti_equipo and parti.id_evento = p2.id_parti_evento and parti.id_event_pista = p2.id_parti_evento_pista
                     WHERE  p2.id_piloto = 1);
-                    
+
 
 
 --REPORTE 6
@@ -304,3 +304,19 @@ FROM vehiculos veh
     INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
     INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
     INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais
+
+
+--Edad al momento del evento
+SELECT age(e.fecha, pilotos.fec_nacimiento) FROM pilotos
+    INNER JOIN plantillas p on pilotos.id_piloto = p.id_piloto
+    INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+    INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+
+
+--REPORTE 7
+SELECT EXTRACT(YEAR FROM MIN(age(e.fecha, pil.fec_nacimiento))) edad, EXTRACT(YEAR FROM e.fecha) AnnoParticipacion, ((pil.identificacion).primer_nombre || ' ' ||  (pil.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pil.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pil
+    INNER JOIN plantillas p on pil.id_piloto = p.id_piloto
+    INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+    INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+    INNER JOIN paises p_piloto on pil.id_pais = p_piloto.id_pais
+GROUP BY NombrePiloto,AnnoParticipacion,Gentilicio, ImgPiloto, ImgBanderaPiloto ORDER BY edad LIMIT 1

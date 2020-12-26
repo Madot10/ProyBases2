@@ -431,5 +431,62 @@ RETURNS TABLE (
     END;
 $$;
 
+--REPORTE 7
+--EJ: SELECT * FROM reporte_piloto_joven(2005::smallint);
+--Ej: SELECT * FROM reporte_piloto_joven();
+CREATE OR REPLACE FUNCTION reporte_piloto_joven (anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        Edad DOUBLE PRECISION,
+        AnnoParticipacion DOUBLE PRECISION,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgPiloto TEXT,
+        ImgBanderaPiloto TEXT
+                 ) LANGUAGE  plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT EXTRACT(YEAR FROM MIN(age(e.fecha, pil.fec_nacimiento))) edad, EXTRACT(YEAR FROM e.fecha) AnnoParticipacion, ((pil.identificacion).primer_nombre || ' ' ||  (pil.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pil.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pil
+            INNER JOIN plantillas p on pil.id_piloto = p.id_piloto
+            INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+            INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+            INNER JOIN paises p_piloto on pil.id_pais = p_piloto.id_pais
+        WHERE (anno_ref IS NULL OR parti.id_evento = id_evnt)
+        GROUP BY NombrePiloto,AnnoParticipacion,p_piloto.Gentilicio, ImgPiloto, ImgBanderaPiloto ORDER BY edad LIMIT 1;
+    END;
+$$;
+
+--REPORTE 8
+--EJ: SELECT * FROM reporte_piloto_mayor(2005::smallint);
+--EJ: SELECT * FROM reporte_piloto_mayor();
+CREATE OR REPLACE FUNCTION reporte_piloto_mayor (anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        Edad DOUBLE PRECISION,
+        AnnoParticipacion DOUBLE PRECISION,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgPiloto TEXT,
+        ImgBanderaPiloto TEXT
+                 ) LANGUAGE  plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT EXTRACT(YEAR FROM MIN(age(e.fecha, pil.fec_nacimiento))) edad, EXTRACT(YEAR FROM e.fecha) AnnoParticipacion, ((pil.identificacion).primer_nombre || ' ' ||  (pil.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pil.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pil
+            INNER JOIN plantillas p on pil.id_piloto = p.id_piloto
+            INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+            INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+            INNER JOIN paises p_piloto on pil.id_pais = p_piloto.id_pais
+        WHERE (anno_ref IS NULL OR parti.id_evento = id_evnt)
+        GROUP BY NombrePiloto,AnnoParticipacion,p_piloto.Gentilicio, ImgPiloto, ImgBanderaPiloto ORDER BY edad DESC LIMIT 1;
+    END;
+$$;
 
 

@@ -324,3 +324,74 @@ RETURNS TABLE (
     END;
 $$;
 
+--REPORTE 5 (2 partes)
+--LOGROS DE PILOTO
+--EJ: SELECT * FROM reporte_logros_piloto(1::smallint)
+--DROP FUNCTION  reporte_logros_piloto(id_pilot SMALLINT)
+--5.1 DATOS PILOTO
+CREATE OR REPLACE FUNCTION reporte_logros_piloto(id_pilot SMALLINT)
+    RETURNS TABLE(
+        AnnoPrimeraParticipacion DOUBLE PRECISION,
+        CantParticipaciones BIGINT,
+        CantPrimerLugar BIGINT,
+        CantPodium BIGINT,
+        NombrePiloto TEXT,
+        FechaNacimiento DATE,
+        FechaFallecimiento DATE,
+        Edad  DOUBLE PRECISION,
+        imgPiloto TEXT,
+        Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT
+                 ) LANGUAGE plpgsql AS $$
+
+    BEGIN
+        RETURN QUERY SELECT EXTRACT(YEAR FROM(SELECT MIN(e.fecha) FROM participaciones p  INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista WHERE  p2.id_piloto = pilot.id_piloto)) AnnoPrimeraParticipacion,
+             --Cant participaciones
+            (SELECT COUNT(p.id_evento) FROM participaciones p INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto WHERE  p2.id_piloto = pilot.id_piloto) CantParticipaciones,
+            --Cant de veces en 1er lugar
+            (SELECT COUNT(c.puesto_final) FROM participaciones p  INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista WHERE  p2.id_piloto = pilot.id_piloto AND (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti INNER JOIN equipos on parti.id_equipo = equipos.id_equipo INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo  INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista  WHERE c.puesto_final <> 0 ORDER BY c.puesto_final, v.categoria) dt WHERE dt.r_num <= 1)) CantPrimerLugar,
+            --Cant de veces en el podium
+            (SELECT COUNT(c.puesto_final) FROM participaciones p  INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista WHERE  p2.id_piloto = pilot.id_piloto AND (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti INNER JOIN equipos on parti.id_equipo = equipos.id_equipo INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo  INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista  WHERE c.puesto_final <> 0 ORDER BY c.puesto_final, v.categoria) dt WHERE dt.r_num <= 3)) CantPodium,
+            --Datos del piloto
+            ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, pilot.fec_nacimiento FechaNacimiento, pilot.fec_fallecimiento FechaFallecimiento, extract(YEAR FROM age(pilot.fec_nacimiento)) Edad ,pilot.img_piloto ImgPiloto, p_pilot.gentilicio Gentilicio, p_pilot.img_bandera ImgBanderaPiloto
+               FROM participaciones AS parti
+                INNER JOIN plantillas p on parti.nro_equipo = p.parti_nro_equipo and parti.id_vehiculo = p.id_parti_vehiculo and parti.id_equipo = p.id_parti_equipo and parti.id_evento = p.id_parti_evento and parti.id_event_pista = p.id_parti_evento_pista
+                INNER JOIN equipos eq ON parti.id_equipo = eq.id_equipo
+                INNER JOIN pilotos pilot on p.id_piloto = pilot.id_piloto
+                INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais
+            WHERE pilot.id_piloto = id_pilot LIMIT 1;
+    END;
+$$;
+
+--5.2 DATOS PARTICIPACIONES
+--EJ: SELECT * FROM reporte_datos_participacion(1::smallint);
+--Para ser llamado luego del anterior
+CREATE OR REPLACE FUNCTION reporte_datos_participacion(id_pilot SMALLINT)
+    RETURNS TABLE (
+        FechaPartipacion timestamp,
+         NroEquipo NUMERIC(3),
+         VehCategoria CHAR(7),
+         NombreEquipo VARCHAR(35),
+        PaisEquipo VARCHAR(56),
+        ImgVehiculo TEXT,
+        NombreVehiculo VARCHAR(30),
+        NombrePiloto TEXT,
+        ImgPiloto TEXT,
+        Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT  evt.fecha FechaPartipacion, parti.nro_equipo NroEquipo, veh.categoria VehCategoria, eq.nombre NombreEquipo, p_equipo.nombre PaisEquipo, veh.img_vehiculo ImgVehiculo, Veh.modelo NombreVehiculo, ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, pilot.img_piloto ImgPiloto, p_pilot.gentilicio Gentilicio, p_pilot.img_bandera imgBanderaPiloto
+       FROM participaciones AS parti
+        INNER JOIN plantillas p on parti.nro_equipo = p.parti_nro_equipo and parti.id_vehiculo = p.id_parti_vehiculo and parti.id_equipo = p.id_parti_equipo and parti.id_evento = p.id_parti_evento and parti.id_event_pista = p.id_parti_evento_pista
+        INNER JOIN eventos evt ON parti.id_evento = evt.id_evento and parti.id_event_pista = evt.id_pista
+        INNER JOIN equipos eq ON parti.id_equipo = eq.id_equipo
+        INNER JOIN pilotos pilot on p.id_piloto = pilot.id_piloto
+        INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais
+        INNER JOIN paises p_equipo on p_equipo.id_pais = eq.id_pais
+        INNER JOIN vehiculos veh on parti.id_vehiculo = veh.id_vehiculo
+    WHERE (parti.nro_equipo, parti.id_vehiculo, parti.id_equipo, parti.id_evento, parti.id_event_pista)
+              IN (SELECT parti.nro_equipo, parti.id_vehiculo, parti.id_equipo, parti.id_evento, parti.id_event_pista FROM participaciones parti
+                    INNER JOIN plantillas p2 on parti.nro_equipo = p2.parti_nro_equipo and parti.id_vehiculo = p2.id_parti_vehiculo and parti.id_equipo = p2.id_parti_equipo and parti.id_evento = p2.id_parti_evento and parti.id_event_pista = p2.id_parti_evento_pista
+                    WHERE  p2.id_piloto = id_pilot);
+    END;
+$$;

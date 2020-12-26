@@ -386,3 +386,39 @@ WHERE  (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM
                     ORDER BY c.puesto_final, v.categoria) dt
         WHERE dt.r_num <= 3 AND dt.r_num <> 1)
 
+SELECT ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pilot.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto, podiums.NumPodium FROM pilotos pilot
+    INNER JOIN (SELECT p2.id_piloto PilotoID, COUNT(c.puesto_final) NumPodium FROM participaciones p
+            INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+            INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto
+            INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista
+            INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista
+                WHERE  (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM
+                                  (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti
+                                        INNER JOIN equipos on parti.id_equipo = equipos.id_equipo
+                                        INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+                                        INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+                                        INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+                                    WHERE c.puesto_final <> 0
+                                    ORDER BY c.puesto_final, v.categoria) dt
+                        WHERE dt.r_num <= 3 AND dt.r_num <> 1) GROUP BY PilotoID) podiums ON podiums.PilotoID = pilot.id_piloto
+    INNER JOIN paises p_piloto ON pilot.id_pais = p_piloto.id_pais
+
+    --REPORTE 14
+
+--Pilotos que no han abandonado alguna vez
+SELECT pilotos.id_piloto FROM pilotos
+    INNER JOIN plantillas p on pilotos.id_piloto = p.id_piloto
+    INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+    INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+WHERE c.estado <> 'a'
+    GROUP BY pilotos.id_piloto
+
+--Pilotos que nunca pisaron la línea de meta de 24 horas
+SELECT ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pilot.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pilot
+    INNER JOIN paises p_piloto on pilot.id_pais = p_piloto.id_pais
+WHERE pilot.id_piloto NOT IN (SELECT pilotos.id_piloto FROM pilotos
+            INNER JOIN plantillas p on pilotos.id_piloto = p.id_piloto
+            INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
+            INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+        WHERE c.estado <> 'a'
+            GROUP BY pilotos.id_piloto);

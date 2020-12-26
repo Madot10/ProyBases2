@@ -422,3 +422,59 @@ WHERE pilot.id_piloto NOT IN (SELECT pilotos.id_piloto FROM pilotos
             INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
         WHERE c.estado <> 'a'
             GROUP BY pilotos.id_piloto);
+
+--REPORTE 15
+--En el podium(1,2 y3er lugar)
+SELECT veh.fabricante_auto, veh.fabricante_neumatico FROM participaciones p
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto
+    INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista
+    INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista
+    INNER JOIN vehiculos veh on p.id_vehiculo = veh.id_vehiculo
+    WHERE   (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM
+                          (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti
+                                INNER JOIN equipos on parti.id_equipo = equipos.id_equipo
+                                INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+                                INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+                                INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+                            WHERE c.puesto_final <> 0
+                            ORDER BY c.puesto_final, v.categoria) dt
+                WHERE dt.r_num <= 3)
+
+--Por fabricante de auto (EN EL PODIUM)
+--FALTA PAIS DE MARCA
+SELECT COUNT(veh.fabricante_auto), veh.fabricante_auto FabricanteAuto FROM participaciones p
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto
+    INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista
+    INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista
+    INNER JOIN vehiculos veh on p.id_vehiculo = veh.id_vehiculo
+    WHERE   (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM
+                          (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti
+                                INNER JOIN equipos on parti.id_equipo = equipos.id_equipo
+                                INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+                                INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+                                INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+                            WHERE c.puesto_final <> 0
+                            ORDER BY c.puesto_final, v.categoria) dt
+                WHERE dt.r_num <= 3)
+    GROUP BY FabricanteAuto
+
+--Por fabricante de neumaticos (EN EL PODIUM)
+--FALTA PAIS DE MARCA
+SELECT COUNT(veh.fabricante_neumatico), veh.fabricante_neumatico FabricanteNeumatico FROM participaciones p
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos p3 on p2.id_piloto = p3.id_piloto
+    INNER JOIN carreras c on p.nro_equipo = c.parti_nro_equipo and p.id_vehiculo = c.id_parti_vehiculo and p.id_equipo = c.id_parti_equipo and p.id_evento = c.id_parti_evento and p.id_event_pista = c.id_parti_evento_pista
+    INNER JOIN eventos e on p.id_evento = e.id_evento and p.id_event_pista = e.id_pista
+    INNER JOIN vehiculos veh on p.id_vehiculo = veh.id_vehiculo
+    WHERE   (e.fecha, p.nro_equipo) IN (SELECT dt.fecha, dt.nro_equipo FROM
+                          (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti
+                                INNER JOIN equipos on parti.id_equipo = equipos.id_equipo
+                                INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+                                INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+                                INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+                            WHERE c.puesto_final <> 0
+                            ORDER BY c.puesto_final, v.categoria) dt
+                WHERE dt.r_num <= 3)
+    GROUP BY FabricanteNeumatico

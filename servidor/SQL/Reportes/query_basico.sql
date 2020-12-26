@@ -313,10 +313,57 @@ SELECT age(e.fecha, pilotos.fec_nacimiento) FROM pilotos
     INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
 
 
---REPORTE 7
+--REPORTE 7/8
 SELECT EXTRACT(YEAR FROM MIN(age(e.fecha, pil.fec_nacimiento))) edad, EXTRACT(YEAR FROM e.fecha) AnnoParticipacion, ((pil.identificacion).primer_nombre || ' ' ||  (pil.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pil.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pil
     INNER JOIN plantillas p on pil.id_piloto = p.id_piloto
     INNER JOIN participaciones parti on p.parti_nro_equipo = parti.nro_equipo and p.id_parti_vehiculo = parti.id_vehiculo and p.id_parti_equipo = parti.id_equipo and p.id_parti_evento = parti.id_evento and p.id_parti_evento_pista = parti.id_event_pista
     INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
     INNER JOIN paises p_piloto on pil.id_pais = p_piloto.id_pais
 GROUP BY NombrePiloto,AnnoParticipacion,Gentilicio, ImgPiloto, ImgBanderaPiloto ORDER BY edad LIMIT 1
+
+--Pilotos con mayor num de participaciones
+SELECT pilot.id_piloto Id FROM participaciones p
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+GROUP BY Id HAVING COUNT(p.id_evento) > ((SELECT COUNT(*) FROM eventos) - 1);
+
+--REPORTE 9
+--DATOS PILOTOS CON MAYOR NUMERO DE PARTICIPACIONES
+SELECT ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto, pilot.img_piloto ImgPiloto, p.gentilicio, p.img_bandera ImgBanderaPiloto
+FROM pilotos pilot
+    INNER JOIN paises p on pilot.id_pais = p.id_pais
+WHERE pilot.id_piloto IN (SELECT pilot.id_piloto Id FROM participaciones p
+        INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+        INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+    GROUP BY Id HAVING COUNT(p.id_evento) > ((SELECT COUNT(*) FROM eventos) - 1))
+
+--REPORTE 10
+--Primera participacion de pilotos
+SELECT MIN(evt.fecha) Fecha, pilot.id_piloto PilotoID FROM eventos evt
+    INNER JOIN participaciones p on evt.id_evento = p.id_evento and evt.id_pista = p.id_event_pista
+    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+    INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+GROUP BY PilotoID
+
+--GANADOR EN SU PRIMERA PARTICIPACION
+SELECT EXTRACT(YEAR FROM e.fecha), ((pil.identificacion).primer_nombre || ' ' ||  (pil.identificacion).primer_apellido) NombrePiloto, p_piloto.gentilicio Gentilicio, pil.img_piloto ImgPiloto, p_piloto.img_bandera ImgBanderaPiloto FROM pilotos pil
+    --Primera participacion
+    INNER JOIN (SELECT MIN(evt.fecha) Fecha, pilot.id_piloto PilotoID FROM eventos evt
+                    INNER JOIN participaciones p on evt.id_evento = p.id_evento and evt.id_pista = p.id_event_pista
+                    INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
+                    INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
+                GROUP BY PilotoID) pr_parti ON pr_parti.PilotoID = pil.id_piloto
+    INNER JOIN plantillas p3 on pil.id_piloto = p3.id_piloto
+    INNER JOIN participaciones parti on p3.parti_nro_equipo = parti.nro_equipo and p3.id_parti_vehiculo = parti.id_vehiculo and p3.id_parti_equipo = parti.id_equipo and p3.id_parti_evento = parti.id_evento and p3.id_parti_evento_pista = parti.id_event_pista
+    INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista AND e.fecha = pr_parti.Fecha
+    --Primer lugar de una cat
+    INNER JOIN (SELECT dt.fecha, dt.nro_equipo FROM
+              (SELECT e.fecha, parti.nro_equipo, row_number() over (PARTITION By e.fecha, v.categoria ORDER BY c.puesto_final) r_num FROM participaciones parti
+                    INNER JOIN equipos on parti.id_equipo = equipos.id_equipo
+                    INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
+                    INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
+                    INNER JOIN eventos e on parti.id_evento = e.id_evento and parti.id_event_pista = e.id_pista
+                WHERE c.puesto_final <> 0
+                ORDER BY c.puesto_final, v.categoria) dt
+                 WHERE dt.r_num <= 1) cat_win ON cat_win.nro_equipo = parti.nro_equipo AND cat_win.fecha = e.fecha
+    INNER JOIN paises p_piloto on pil.id_pais = p_piloto.id_pais

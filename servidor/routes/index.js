@@ -28,5 +28,26 @@ router.get("/logros_datos/:id_pilot", rep.getLogrosPiloto);
 router.get("/logros_part/:id_pilot", rep.getDatosParticipacion);
 //Reporte 6 - Participacion segun marca (fabricante_auto) y modelo de Veh
 router.get("/part_marca_modelo/:marca/:modelo", rep.getParticipacionMarcaModelo);
+//Reporte 7 - Piloto más joven
+router.get("/piloto_joven/:anno", rep.getPilotoJoven);
+//Reporte 8 - Piloto más veterano
+router.get("/piloto_veterano/:anno", rep.getPilotoVeterano);
+//Reporte 9 - Pilotos con mayores participaciones
+router.get("/piloto_mayores_part", rep.getPilotosMayoresPart);
+//Reporte 10 - Ganador en su primera participacion
+router.get("/ganador_primer_part/:anno", rep.getGanadorPrimeraPart);
+//Reporte 11 - Velocidades medias mas altas
+router.get("/mejores_vel/:ord/:anno", rep.getMejoresVelocidades);
+//Reporte 12 - Distancias mas largas recorridas
+router.get("/mejores_dist/:cant", rep.getMejoresDistancias);
+//Reporte 13 - En el podium, pero nunca en el primer escalón
+router.get("/podium", rep.getPodium);
+//Reporte 14 - Pilotos que nunca pisaron la línea de meta de 24 horas
+router.get("/abandonos", rep.getAbandonos);
+
+//Reporte 15 - Victorias por marca
+
+//Reporte 16 - Mujeres piloto en Le Mans
+router.get("/mujeres_piloto/:anno", rep.getMujeresPiloto);
 
 module.exports = router;

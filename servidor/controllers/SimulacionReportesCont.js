@@ -1,6 +1,13 @@
 "use strict";
 const { database } = require("../config/db.config");
 
+function verificar_int(anno){
+    if(parseInt(anno,10) === 0){
+        return null;
+    }
+    return anno;
+}
+
 class SimulacionReportesCont {
     //Simulacion
     getSimulacion(req, res) {
@@ -27,7 +34,9 @@ class SimulacionReportesCont {
     getClima(req, res) {
         const anno = req.params.anno;
         database
-            .query(`SELECT * FROM obtener_metereologia_evento($1::smallint)`, [anno])
+            .query(`SELECT * FROM obtener_metereologia_evento($1::smallint)`,[
+                anno
+            ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
@@ -55,7 +64,7 @@ class SimulacionReportesCont {
             .query(`SELECT * FROM reporte_rank_anno($1::smallint, $2, $3)`, [
                 anno,
                 categoria,
-                order,
+                order
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
@@ -73,7 +82,7 @@ class SimulacionReportesCont {
             .query(`SELECT * FROM reporte_ranking_hora($1::smallint, $2::smallint, $3)`, [
                 anno,
                 hora,
-                categoria,
+                categoria
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
@@ -89,7 +98,7 @@ class SimulacionReportesCont {
         database
             .query(`SELECT * FROM reporte_ganadores_le_mans($1::CHAR(7) ,$2::smallint)`, [
                 categoria,
-                anno,
+                anno
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
@@ -100,19 +109,14 @@ class SimulacionReportesCont {
     //4. Ranking por numero de equipo
     getRankingEquipo(req, res) {
         var anno = req.params.anno;
+        anno = verificar_int(anno);
         var num_equipo = req.params.num_equipo;
+        num_equipo = verificar_int(num_equipo);
         
-        if(parseInt(anno,10) === 0){
-            anno = null;
-        }
-        if(parseInt(num_equipo,10) === 0){
-            num_equipo = null;
-        }
-
         database
             .query(`SELECT * FROM reporte_rank_nro_equipo($1::SMALLINT, $2::SMALLINT)`, [
                 num_equipo,
-                anno,
+                anno
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
@@ -164,7 +168,7 @@ class SimulacionReportesCont {
         database
             .query(`SELECT * FROM reporte_participaciones_marcas_modelos($1,$2)`, [
                 marca,
-                modelo,
+                modelo
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
@@ -172,6 +176,131 @@ class SimulacionReportesCont {
             .catch((e) => console.error(e.stack));
     }
 
+    //7. Piloto más joven
+    getPilotoJoven(req, res) {
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(`SELECT * FROM reporte_piloto_joven($1::smallint)`, [
+                anno
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //8. Piloto más veterano
+    getPilotoVeterano(req, res) {
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(` SELECT * FROM reporte_piloto_mayor($1::smallint)`, [
+                anno
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //9. Pilotos con mayores participaciones
+    getPilotosMayoresPart(req, res) {
+        database
+            .query(`SELECT * FROM  reporte_pilotos_mayor_participaciones()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //10. Ganador en su primera participacion
+    getGanadorPrimeraPart(req, res) {
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(`SELECT * FROM reporte_ganador_primera_participacion($1::smallint)`, [
+                anno
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //11. Velocidades medias mas altas
+    getMejoresVelocidades(req, res) {
+        const ord = req.params.ord;
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(`SELECT * FROM reporte_top_vel_media($1, $2::smallint)`, [
+                ord,
+                anno
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+
+    //12. Distancias mas largas recorridas
+    getMejoresDistancias(req, res) {
+        const cant = req.params.cant;
+
+        database
+            .query(`SELECT * FROM reporte_distancias_mas_largas($1)`, [
+                cant
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //13. En el podium, pero nunca en el primer escalón
+    getPodium(req, res) {
+        database
+            .query(`SELECT * FROM reporte_pilotos_podiums()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+    //14. En el podium, pero nunca en el primer escalón
+    getAbandonos(req, res) {
+        database
+            .query(`SELECT * FROM reporte_pilotos_nunca_meta()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
+
+
+    //15. Victorias por marca
+
+
+     //16. Mujeres piloto en Le Mans
+     getMujeresPiloto(req, res) {
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(`SELECT * FROM reporte_mujeres_pilotos($1::smallint)`, [
+                anno
+            ])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => console.error(e.stack));
+    }
 }
 
 module.exports = { SimulacionReportesCont };

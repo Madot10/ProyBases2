@@ -1,3 +1,17 @@
+--Lista de pilotos
+--select * from pilotos();
+CREATE OR REPLACE FUNCTION pilotos()
+RETURNS TABLE (
+    IdPiloto SMALLINT,
+    NombrePiloto TEXT
+              ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT pilot.id_piloto IdPiloto, ((pilot.identificacion).primer_nombre || ' ' ||  (pilot.identificacion).primer_apellido) NombrePiloto
+        FROM pilotos pilot;
+    END;
+$$;
+
+
 -- REPORTE 1 - Ranking por año
 -- order_by: eny o car
 -- EJ: SELECT * FROM reporte_rank_anno(2000::smallint, 'LMP 900', 'eny');
@@ -427,7 +441,7 @@ RETURNS TABLE (
             INNER JOIN plantillas p2 on p.nro_equipo = p2.parti_nro_equipo and p.id_vehiculo = p2.id_parti_vehiculo and p.id_equipo = p2.id_parti_equipo and p.id_evento = p2.id_parti_evento and p.id_event_pista = p2.id_parti_evento_pista
             INNER JOIN pilotos pilot on p2.id_piloto = pilot.id_piloto
             INNER JOIN paises p_pilot on pilot.id_pais = p_pilot.id_pais
-        WHERE (marca IS NULL OR veh.fabricante_auto = marca) AND (model IS NULL OR veh.modelo = model);
+        WHERE (marca IS NULL OR veh.fabricante_auto like marca) AND (model IS NULL OR veh.modelo like model);
     END;
 $$;
 

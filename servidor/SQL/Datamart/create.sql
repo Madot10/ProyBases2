@@ -63,8 +63,8 @@ CREATE SEQUENCE sec_equipos
  
 CREATE TABLE dim_equipo(
 	id_equipo SMALLINT DEFAULT nextval('sec_equipos') PRIMARY KEY,
-  nombre VARCHAR(30) NOT NULL,
-  nombre_pais VARCHAR(56) NOT NULL,
+  nombre VARCHAR(35) NOT NULL,
+  nombre_pais VARCHAR(60) NOT NULL,
 	img_bandera TEXT NOT NULL
 );
   

@@ -65,7 +65,6 @@ CREATE TABLE dim_equipo(
 	id_equipo SMALLINT DEFAULT nextval('sec_equipos') PRIMARY KEY,
     nombre VARCHAR(35) NOT NULL,
     nombre_pais VARCHAR(60) NOT NULL,
-    img_piloto TEXT NOT NULL,
 	img_bandera TEXT NOT NULL
 );
   
@@ -85,6 +84,7 @@ CREATE TABLE dim_piloto (
   nombre VARCHAR(30) NOT NULL,
   apellido VARCHAR(30) NOT NULL,
   genero CHAR(10) NOT NULL,
+  img_piloto TEXT NOT NULL,
   CONSTRAINT check_gen CHECK(genero in ('femenino', 'masculino'))
 );
   

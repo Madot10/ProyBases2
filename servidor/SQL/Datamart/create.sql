@@ -26,13 +26,13 @@ CREATE SEQUENCE sec_veh
     
 CREATE TABLE dim_vehiculo (
 	id_vehiculo SMALLINT DEFAULT nextval('sec_veh') PRIMARY KEY,
-	categoria CHAR(7) NOT NULL,
+	categoria CHAR(10) NOT NULL,
     modelo_motor VARCHAR (30) NOT NULL,
   img_vehiculo TEXT NOT NULL,
   tipo CHAR(2) NOT NULL,
   modelo VARCHAR(30) NOT NULL,
   cilindros VARCHAR(3) NOT NULL,
-  cc NUMERIC(4) NOT NULL,
+  cc NUMERIC(5) NOT NULL,
   --Agregar categorias de otra decada
   CONSTRAINT check_categoria CHECK(categoria in ('C1', 'C2', 'C3', 'C4', 'S1', 'S2' , 'GTP', 'LM GT875', 'WSC', 'IMSAGTS', 'LM P', 'LMP 900', 'LM GTP', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
   CONSTRAINT check_tipo CHECK(tipo in ('h', 'nh'))

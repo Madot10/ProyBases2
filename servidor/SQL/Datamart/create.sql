@@ -34,7 +34,7 @@ CREATE TABLE dim_vehiculo (
   cilindros VARCHAR(3) NOT NULL,
   cc NUMERIC(4) NOT NULL,
   --Agregar categorias de otra decada
-  CONSTRAINT check_categoria CHECK(categoria in ('C1', 'C2', 'C3', 'S1', 'S2' , 'GTP', 'LM GT875', 'WSC', 'IMSAGTS', 'LM P', 'LMP 900', 'LM GTP', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
+  CONSTRAINT check_categoria CHECK(categoria in ('C1', 'C2', 'C3', 'C4', 'S1', 'S2' , 'GTP', 'LM GT875', 'WSC', 'IMSAGTS', 'LM P', 'LMP 900', 'LM GTP', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
   CONSTRAINT check_tipo CHECK(tipo in ('h', 'nh'))
 );
   

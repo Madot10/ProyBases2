@@ -631,7 +631,7 @@ DB: DB_7</note>
       <schema_name/>
     </partitioning>
     <connection>c_db_7</connection>
-    <sql>SELECT e.nombre, e.nacionalidad, 'data:image/jpeg;base64,' || encode(lu.bandera, 'base64') ImgBandera FROM equipo e
+    <sql>SELECT e.nombre, e.nacionalidad, encode(lu.bandera, 'base64') ImgBandera FROM equipo e
  INNER JOIN lugar lu ON e.fk_id_lug = lu.id_lug</sql>
     <limit>0</limit>
     <lookup/>

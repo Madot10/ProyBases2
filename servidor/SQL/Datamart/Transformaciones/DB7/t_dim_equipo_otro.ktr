@@ -562,6 +562,11 @@ DB: DB_7</note>
   <order>
     <hop>
       <from>Table input Equipo</from>
+      <to>String operations</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>String operations</from>
       <to>Insert / update Equipo </to>
       <enabled>Y</enabled>
     </hop>
@@ -614,7 +619,7 @@ DB: DB_7</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>272</xloc>
+      <xloc>416</xloc>
       <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
@@ -648,6 +653,46 @@ DB: DB_7</note>
     </remotesteps>
     <GUI>
       <xloc>112</xloc>
+      <yloc>96</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>String operations</name>
+    <type>StringOperations</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>nombre</in_stream_name>
+        <out_stream_name/>
+        <trim_type>none</trim_type>
+        <lower_upper>none</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>yes</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
       <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>

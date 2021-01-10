@@ -458,14 +458,14 @@ BD: BD_7</note>
     </notepad>
   </notepads>
   <connection>
-    <name>c_db_7</name>
+    <name>c_dw_le_vams</name>
     <server>localhost</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
-    <database>dw_equipo7_lemans</database>
+    <database>le_vams_dw</database>
     <port>5432</port>
     <username>postgres</username>
-    <password>Encrypted 2be98afc86ad78081bb18bc71da93ff8b</password>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce218cc1fb8f</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -509,14 +509,14 @@ BD: BD_7</note>
     </attributes>
   </connection>
   <connection>
-    <name>conector_le_vams</name>
+    <name>c_le_db7</name>
     <server>localhost</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
-    <database>sistema_le_vams</database>
+    <database>db7</database>
     <port>5432</port>
     <username>postgres</username>
-    <password>Encrypted 2be98afc86ad78081bb18bc71da93ff8b</password>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce218cc1fb8f</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -638,7 +638,7 @@ BD: BD_7</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>conector_le_vams</connection>
+    <connection>c_dw_le_vams</connection>
     <commit>100</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
@@ -781,7 +781,7 @@ BD: BD_7</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>c_db_7</connection>
+    <connection>c_le_db7</connection>
     <sql>SELECT DISTINCT (pe.nombre).primer_nombre, (pe.nombre).primer_apellido, pe.fecha_nacimiento, pe.fecha_fallecimiento,
 		pe.femenino as genero, pil.nacionalidad as gentilicio,
 		encode(p.bandera, 'base64') ImgBandera,

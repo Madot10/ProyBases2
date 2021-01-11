@@ -581,18 +581,23 @@ DB: 7</note>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>String operations</from>
-      <to>Split CC</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Add constants Cilindro</from>
       <to>If field value is null</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>If field value is null</from>
-      <to>Table output</to>
+      <to>Insert / update</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>String operations</from>
+      <to>Add col Fab_Neumatico</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Add col Fab_Neumatico</from>
+      <to>Split CC</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -630,7 +635,7 @@ DB: 7</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>880</xloc>
+      <xloc>944</xloc>
       <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
@@ -818,7 +823,7 @@ DB: 7</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>880</xloc>
+      <xloc>944</xloc>
       <yloc>256</yloc>
       <draw>Y</draw>
     </GUI>
@@ -863,7 +868,7 @@ DB: 7</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
+      <xloc>816</xloc>
       <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
@@ -925,11 +930,12 @@ DB: 7</note>
        (au.vehiculo).motor,
        cat.nombre Categoria,
        encode(parti.vehiculo, 'base64') ImgVehiculo,
-       par.caracteristicas[1][2] cc
+       par.caracteristicas[1][2] cc,
+       (au.vehiculo).nombre_fabricante fabricante_auto
 FROM AUTO as au
-         INNER JOIN compatibilidad com ON au.id_aut = com.fk_id_aut
-         INNER JOIN parte par ON com.fk_id_part = par.id_part AND par.tipo = 'motor'
-		INNER JOIN categoria cat ON au.fk_id_cat = cat.id_cat
+    INNER JOIN compatibilidad com ON au.id_aut = com.fk_id_aut
+    INNER JOIN parte par ON com.fk_id_part = par.id_part AND par.tipo = 'motor'
+	INNER JOIN categoria cat ON au.fk_id_cat = cat.id_cat
     INNER JOIN participacion parti ON au.id_aut = parti.fk_id_aut</sql>
     <limit>0</limit>
     <lookup/>
@@ -951,8 +957,8 @@ FROM AUTO as au
     </GUI>
   </step>
   <step>
-    <name>Table output</name>
-    <type>TableOutput</type>
+    <name>Insert / update</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -962,50 +968,112 @@ FROM AUTO as au
       <schema_name/>
     </partitioning>
     <connection>c_dw_le_vams</connection>
-    <schema/>
-    <table>dim_vehiculo</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>dim_vehiculo</table>
+      <key>
+        <name>modeloveh</name>
+        <field>modelo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>motor</name>
+        <field>modelo_motor</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>categoria</name>
+        <field>categoria</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>tipo</name>
+        <rename>tipo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>modelo</name>
+        <rename>modeloveh</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>modelo_motor</name>
+        <rename>motor</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>categoria</name>
+        <rename>catVeh</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>img_vehiculo</name>
+        <rename>imgvehiculo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>cc</name>
+        <rename>CC</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>cilindros</name>
+        <rename>cilindros</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fabricante_auto</name>
+        <rename>fabricante_auto</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>fabricante_neumatico</name>
+        <rename>fabricante_neumatico</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>944</xloc>
+      <yloc>368</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Add col Fab_Neumatico</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
-        <column_name>modelo</column_name>
-        <stream_name>modeloveh</stream_name>
-      </field>
-      <field>
-        <column_name>modelo_motor</column_name>
-        <stream_name>motor</stream_name>
-      </field>
-      <field>
-        <column_name>categoria</column_name>
-        <stream_name>catVeh</stream_name>
-      </field>
-      <field>
-        <column_name>cc</column_name>
-        <stream_name>CC</stream_name>
-      </field>
-      <field>
-        <column_name>tipo</column_name>
-        <stream_name>tipo</stream_name>
-      </field>
-      <field>
-        <column_name>cilindros</column_name>
-        <stream_name>cilindros</stream_name>
-      </field>
-      <field>
-        <column_name>img_vehiculo</column_name>
-        <stream_name>imgvehiculo</stream_name>
+        <name>fabricante_neumatico</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>goodyear</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
       </field>
     </fields>
     <attributes/>
@@ -1017,8 +1085,8 @@ FROM AUTO as au
       </output>
     </remotesteps>
     <GUI>
-      <xloc>880</xloc>
-      <yloc>368</yloc>
+      <xloc>720</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

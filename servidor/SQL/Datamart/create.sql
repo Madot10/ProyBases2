@@ -25,7 +25,7 @@ CREATE SEQUENCE sec_veh
 CREATE TABLE dim_vehiculo (
 	id_vehiculo SMALLINT DEFAULT nextval('sec_veh') PRIMARY KEY,
 	categoria CHAR(10) NOT NULL,
-    modelo_motor VARCHAR (30) NOT NULL,
+  modelo_motor VARCHAR (30) NOT NULL,
   img_vehiculo TEXT NOT NULL,
   tipo CHAR(2) NOT NULL,
   modelo VARCHAR(30) NOT NULL,

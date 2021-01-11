@@ -1,6 +1,4 @@
 -- CREATE database le_vams_dw;
-
-
 --DIM TIEMPO
 DROP SEQUENCE IF EXISTS sec_tiempo;
 CREATE SEQUENCE sec_tiempo
@@ -33,26 +31,12 @@ CREATE TABLE dim_vehiculo (
   modelo VARCHAR(30) NOT NULL,
   cilindros VARCHAR(3) NOT NULL,
   cc NUMERIC(5) NOT NULL,
+  fabricante_auto VARCHAR(30) NOT NULL,
+  fabricante_neumatico VARCHAR(30) NOT NULL,
   --Agregar categorias de otra decada
   CONSTRAINT check_categoria CHECK(categoria in ('C1', 'C2', 'C3', 'C4', 'S1', 'S2' , 'GTP', 'LM GT875', 'WSC', 'IMSAGTS', 'LM P', 'LMP 900', 'LM GTP', 'LM GTS', 'LM GT', 'LM P675', 'LM P1', 'LM P2', 'LM GT1', 'LM GT2')),
   CONSTRAINT check_tipo CHECK(tipo in ('h', 'nh'))
 );
-  
-  
---DIM MARCA
-DROP SEQUENCE IF EXISTS sec_marca;
-CREATE SEQUENCE sec_marca
-    AS SMALLINT
-    MINVALUE 1
-    MAXVALUE 32767;
-
-CREATE TABLE dim_marca(
-	id_marca SMALLINT DEFAULT nextval('sec_marca') PRIMARY KEY,
-  tipo CHAR(2) NOT NULL,
-  fabricante VARCHAR(30) NOT NULL,
-  CONSTRAINT check_tipo CHECK(tipo in ('au', 'ne'))
-);
-  
 
 --DIM EQUIPO
 DROP SEQUENCE IF EXISTS sec_equipos;
@@ -103,12 +87,10 @@ CREATE TABLE dim_piloto (
     --fk
     id_dim_tiempo SMALLINT,
     id_dim_vehiculo SMALLINT,
-    id_dim_marca SMALLINT,
     id_dim_equipo SMALLINT,
     id_dim_piloto SMALLINT,
     CONSTRAINT fk_dim_tiempo FOREIGN KEY (id_dim_tiempo) REFERENCES dim_tiempo(id_tiempo) ON DELETE CASCADE,
     CONSTRAINT fk_dim_vehiculo FOREIGN KEY (id_dim_vehiculo) REFERENCES dim_vehiculo(id_vehiculo) ON DELETE CASCADE,
-    CONSTRAINT fk_dim_marca FOREIGN KEY (id_dim_marca) REFERENCES dim_marca(id_marca) ON DELETE CASCADE,
     CONSTRAINT fk_dim_equipo FOREIGN KEY (id_dim_equipo) REFERENCES dim_equipo(id_equipo) ON DELETE CASCADE,
     CONSTRAINT fk_dim_piloto FOREIGN KEY (id_dim_piloto) REFERENCES dim_piloto(id_piloto) ON DELETE CASCADE
   );

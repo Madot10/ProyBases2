@@ -136,3 +136,20 @@ SELECT DISTINCT dt.anno, dv.fabricante_auto, dv.modelo, dv.img_vehiculo, de.nomb
     INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
     INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
 ORDER BY parti.velocidad_media_ensayo DESC LIMIT 15;
+
+--REPORTE 15
+--Victoria por marca
+
+--Por fab auto
+SELECT COUNT(*) CantVic, dv.fabricante_auto fabAuto FROM ft_participacion parti
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+WHERE parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3
+GROUP BY fabAuto
+ORDER BY CantVic DESC;
+
+--Por fab neumatico
+SELECT COUNT(*) CantVic, dv.fabricante_neumatico fabNeu FROM ft_participacion parti
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+WHERE parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3
+GROUP BY fabNeu
+ORDER BY CantVic DESC;

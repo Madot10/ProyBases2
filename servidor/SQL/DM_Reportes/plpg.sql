@@ -394,3 +394,165 @@ CREATE OR REPLACE FUNCTION reporte_distancias_mas_largas(limit_num NUMERIC(3) DE
         ORDER BY  DistRecorrida Desc LIMIT limit_num;
     END;
 $$;
+
+
+ --REPORTE 13
+--EJ: SELECT * FROM reporte_pilotos_podiums();
+--CREATE OR REPLACE FUNCTION reporte_pilotos_podiums()
+CREATE OR REPLACE FUNCTION reporte_pilotos_podiums(anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE (
+        Anno NUMERIC(4),
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgBanderaPiloto TEXT,
+        ImgPiloto TEXT
+        ) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT pp.Anno, pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera, pilot.img_piloto FROM dim_piloto pilot
+                INNER JOIN (SELECT MIN(dt.anno) Anno, dp.id_piloto FROM ft_participacion parti
+                INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+                INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            WHERE parti.puesto_final_carrera <> 1 AND (parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3) AND (anno_ref IS NULL OR dt.id_tiempo = id_evnt)
+                GROUP BY id_piloto) pp ON pp.id_piloto = pilot.id_piloto
+                ORDER BY  Anno;
+    END;
+$$;
+
+--REPORTE 14
+--EJ: SELECT * FROM reporte_pilotos_nunca_meta()
+--DROP FUNCTION reporte_pilotos_nunca_meta();
+CREATE OR REPLACE FUNCTION reporte_pilotos_nunca_meta(anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE (
+        CantAbandonos BIGINT,
+        Anno NUMERIC(4),
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgBanderaPiloto TEXT,
+        ImgPiloto TEXT
+        ) LANGUAGE plpgsql AS $$
+
+    BEGIN
+        RETURN QUERY SELECT parti_a.CantAbandono VecesAbandono ,dt.Anno, pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera, pilot.img_piloto FROM dim_piloto pilot
+            INNER JOIN ft_participacion ON pilot.id_piloto = ft_participacion.id_dim_piloto
+            INNER JOIN dim_tiempo dt on ft_participacion.id_dim_tiempo = dt.id_tiempo
+            INNER JOIN (SELECT count(*) CantAbandono, pilot.id_piloto FROM dim_piloto pilot INNER JOIN ft_participacion fp on pilot.id_piloto = fp.id_dim_piloto WHERE (fp.estado = 'a') GROUP BY pilot.id_piloto) parti_a ON parti_a.id_piloto = pilot.id_piloto
+        ORDER BY  Anno;
+    END;
+$$;
+
+--REPORTE 15
+--VICTORIA POR MARCA
+--True: marca auto
+--False: marca neumatico
+--SELECT * FROM reporte_victoria_por_marca(FALSE);
+CREATE OR REPLACE FUNCTION reporte_victoria_por_marca(marca_auto BOOLEAN DEFAULT TRUE)
+    RETURNS TABLE (
+        CantidadVictoria BIGINT,
+        Fabricante VARCHAR(30)
+    ) LANGUAGE plpgsql AS $$
+BEGIN
+    IF marca_auto IS TRUE THEN
+        --Marca de auto
+        RETURN QUERY SELECT COUNT(*) CantVic, dv.fabricante_auto fabAuto FROM ft_participacion parti
+            INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+        WHERE parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3
+        GROUP BY fabAuto
+        ORDER BY CantVic DESC;
+    ELSE
+        --Marca de neumatico
+          RETURN QUERY SELECT COUNT(*) CantVic, dv.fabricante_neumatico fabNeu FROM ft_participacion parti
+                INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+            WHERE parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3
+            GROUP BY fabNeu
+            ORDER BY CantVic DESC;
+        end if;
+END;
+$$;
+
+
+--REPORTE 16
+--MUJERE PILOTO
+
+--LOGROS DE PILOTO
+--SELECT * FROM reporte_mujeres_pilotos();
+DROP FUNCTION  reporte_mujeres_pilotos(anno_ref SMALLINT);
+CREATE OR REPLACE FUNCTION reporte_mujeres_pilotos(anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        AnnoPrimeraParticipacion NUMERIC(4),
+        CantParticipaciones BIGINT,
+        CantPrimerLugar BIGINT,
+        CantPodium BIGINT,
+        NombrePiloto TEXT,
+        FechaNacimiento DATE,
+        FechaFallecimiento DATE,
+        Edad  DOUBLE PRECISION,
+        imgPiloto TEXT,
+        Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT
+                 ) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT DISTINCT --Año de primera participacion
+               (SELECT MIN(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto =  pilot.id_piloto) AnnoPrimeraParticipacion,
+               --Numero total de participaciones
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto) CantParticipaciones,
+                --Veces en el 1er puesto
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND parti.puesto_final_carrera = 1) CantPrimerLugar,
+               --Veces en el podium (1,2 y3er lugar)
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND( parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3)) CantPodium,
+                --Datos
+                p.nombre || ' ' || p.apellido NombrePiloto, p.fec_nacimiento, p.fec_fallecimiento,  EXTRACT(YEAR FROM age(p.fec_nacimiento)), p.img_piloto, p.gentilicio, p.img_bandera BanderaPiloto
+        FROM ft_participacion parti
+            INNER JOIN dim_piloto p on parti.id_dim_piloto = p.id_piloto and p.genero = 'femenino'
+        WHERE (anno_ref IS NULL OR parti.id_dim_tiempo = id_evnt );
+    END;
+$$;
+
+-- DATOS PARTICIPACIONES
+--SELECT * FROM reporte_datos_participacion_mujeres()
+CREATE OR REPLACE FUNCTION reporte_datos_participacion_mujeres(anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE (
+        FechaPartipacion numeric(4),
+         NroEquipo NUMERIC(3),
+         VehCategoria CHAR(7),
+         NombreEquipo VARCHAR(35),
+        PaisEquipo VARCHAR(56),
+        imgBanderaPais TEXT,
+        ImgVehiculo TEXT,
+        NombreVehiculo VARCHAR(30),
+        NombrePiloto TEXT,
+        ImgPiloto TEXT,
+        Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT dt.anno, parti.nro_equipo, dv.categoria, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, de.img_bandera ImgBanderaPais, dv.img_vehiculo, dv.modelo ModeloVeh, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.img_piloto, dp.gentilicio, dp.img_bandera ImgBanderaPiloto FROM ft_participacion parti
+            INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+            INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+            INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        WHERE (de.id_equipo, dt.id_tiempo, dv.id_vehiculo, parti.nro_equipo) IN
+              (SELECT de.id_equipo, dt.id_tiempo, dv.id_vehiculo, parti.nro_equipo FROM ft_participacion parti
+                INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+                INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+                INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+                INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto AND dp.genero = 'femenino')
+        AND (anno_ref IS NULL OR parti.id_dim_tiempo = id_evnt );
+    END;
+$$;

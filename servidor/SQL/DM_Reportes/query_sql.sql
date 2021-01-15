@@ -97,3 +97,42 @@ WHERE (age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fe
     INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
     INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
 GROUP BY anno ORDER BY edad )
+
+--REPORTE 9
+--Pilotos con + participaciones
+SELECT COUNT(*) NroParti, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.gentilicio, dp.img_piloto, dp.img_bandera FROM ft_participacion parti
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+GROUP BY  NombrePiloto, gentilicio, img_piloto, img_bandera ORDER BY NroParti DESC LIMIT 10;
+
+--REPORTE 10
+--GANADOR EN SU PRIMERA PARTICIPACION
+
+-- Primera participacion y ganador
+SELECT MIN(dt.anno), dp.id_piloto FROM ft_participacion parti
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+WHERE parti.puesto_final_carrera = 1
+    GROUP BY id_piloto
+
+SELECT pp.Anno, pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera, pilot.img_piloto FROM dim_piloto pilot
+    INNER JOIN (SELECT MIN(dt.anno) Anno, dp.id_piloto FROM ft_participacion parti
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+WHERE parti.puesto_final_carrera = 1
+    GROUP BY id_piloto) pp ON pp.id_piloto = pilot.id_piloto
+    ORDER BY  Anno
+
+--REPORTE 11
+--Ordenamiento carrera
+SELECT DISTINCT dt.anno, dv.fabricante_auto, dv.modelo, dv.img_vehiculo, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, de.img_bandera, parti.velocidad_media_carrera FROM ft_participacion parti
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+    INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+ORDER BY parti.velocidad_media_carrera DESC LIMIT 15;
+
+--Ordenamiento ensayo
+SELECT DISTINCT dt.anno, dv.fabricante_auto, dv.modelo, dv.img_vehiculo, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, de.img_bandera, parti.velocidad_media_ensayo FROM ft_participacion parti
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+    INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+ORDER BY parti.velocidad_media_ensayo DESC LIMIT 15;

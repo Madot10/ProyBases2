@@ -250,3 +250,147 @@ CREATE OR REPLACE FUNCTION reporte_piloto_mayor (anno_ref SMALLINT DEFAULT NULL)
         GROUP BY anno ORDER BY edad ) AND (anno_ref IS NULL OR dt.anno = anno_ref);
     END;
 $$;
+
+--REPORTE 9
+--Pilotos con + parti
+--EJ: SELECT * FROM  reporte_pilotos_mayor_participaciones()
+--DROP FUNCTION reporte_pilotos_mayor_participaciones();
+CREATE OR REPLACE FUNCTION reporte_pilotos_mayor_participaciones()
+    RETURNS TABLE (
+        NroParticipaciones BIGINT,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgPiloto TEXT,
+        ImgBanderaPiloto TEXT
+                  ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT COUNT(*) NroParti, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.gentilicio, dp.img_piloto, dp.img_bandera FROM ft_participacion parti
+                INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            GROUP BY  NombrePiloto, dp.gentilicio, img_piloto, img_bandera ORDER BY NroParti DESC LIMIT 10;
+    END;
+$$;
+
+--REPORTE 10
+--GANADOR EN SU PRIMERA PARTICIPACION
+--SELECT * FROM reporte_ganador_primera_participacion(2000::smallint);
+--SELECT * FROM reporte_ganador_primera_participacion();
+
+DROP FUNCTION reporte_ganador_primera_participacion(anno_ref SMALLINT );
+CREATE OR REPLACE FUNCTION reporte_ganador_primera_participacion(anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE (
+        Anno NUMERIC(4),
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgBanderaPiloto TEXT,
+        ImgPiloto TEXT
+        ) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT pp.Anno, pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera, pilot.img_piloto FROM dim_piloto pilot
+                INNER JOIN (SELECT MIN(dt.anno) Anno, dp.id_piloto FROM ft_participacion parti
+                INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+                INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            WHERE parti.puesto_final_carrera = 1 AND (anno_ref IS NULL OR dt.id_tiempo = id_evnt)
+                GROUP BY id_piloto) pp ON pp.id_piloto = pilot.id_piloto
+                ORDER BY  Anno;
+    END;
+$$;
+
+--REPORTE 11
+--TOP 15
+--EJ: SELECT * FROM reporte_top_vel_media('car', 2000::smallint);
+--EJ: SELECT * FROM reporte_top_vel_media();
+--EJ: SELECT * FROM reporte_top_vel_media('car');
+CREATE OR REPLACE FUNCTION reporte_top_vel_media(t_ord CHAR(3) DEFAULT 'car', anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        Anno numeric(4),
+        Fabricante VARCHAR(30),
+        Modelo VARCHAR(30),
+        ImgVehiculo TEXT,
+        NombreEquipo VARCHAR(35),
+        PaisEquipo VARCHAR(56),
+        NroEquipo NUMERIC(3),
+        ImgBanderaEquipo TEXT,
+        VelMedia NUMERIC(5,2)
+                 ) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        IF t_ord = 'eny' THEN
+            --Ordenamiento por ensayo
+            RETURN QUERY SELECT DISTINCT dt.anno, dv.fabricante_auto, dv.modelo, dv.img_vehiculo, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, parti.nro_equipo, de.img_bandera, parti.velocidad_media_ensayo FROM ft_participacion parti
+                INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+                INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+                INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+                WHERE (anno_ref IS NULL OR dt.id_tiempo = id_evnt)
+            ORDER BY parti.velocidad_media_ensayo DESC LIMIT 15;
+        ELSE
+            --Ordenamineto por carrera
+            RETURN QUERY SELECT DISTINCT dt.anno, dv.fabricante_auto, dv.modelo, dv.img_vehiculo, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, parti.nro_equipo, de.img_bandera, parti.velocidad_media_carrera FROM ft_participacion parti
+                INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+                INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+                INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+                WHERE (anno_ref IS NULL OR dt.id_tiempo = id_evnt)
+            ORDER BY parti.velocidad_media_carrera DESC LIMIT 15;
+        end if;
+    END;
+$$;
+
+--REPORTE 12
+--Por distancia recorrida
+--EJ: SELECT * FROM reporte_distancias_mas_largas();
+
+CREATE OR REPLACE FUNCTION reporte_distancias_mas_largas(limit_num NUMERIC(3) DEFAULT 30)
+    RETURNS TABLE (
+        anno NUMERIC(4),
+        NombreEquipo varchar(35),
+        NroEquipo NUMERIC(3),
+        PaisEquipo VARCHAR(56),
+        imgBanderaEquipo TEXT,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        imgBanderaPiloto TEXT,
+        imgPiloto TEXT,
+        NombreVehiculo VARCHAR(30),
+        ModeloMotor VARCHAR(30),
+        cilindros VARCHAR(3),
+        cc NUMERIC(4),
+        categoria CHAR(7),
+        imgVehiculo TEXT,
+        PuestoEnsayo NUMERIC(3),
+        MejorVueltaEnsayo TIME,
+        VelMediaEnsayo NUMERIC(5,2),
+        PuestoCarrera NUMERIC(3),
+        NroVueltasCarrera NUMERIC(3),
+        DistRecorrida NUMERIC(8),
+        VelMediaCarrera NUMERIC(5,2),
+        MejorVueltaCarrera TIME,
+        DifVueltas NUMERIC(3)
+    ) LANGUAGE plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+
+        RETURN QUERY SELECT t.anno, eq.nombre NombreEquipo, parti.nro_equipo, eq.nombre_pais PaisEquipo, eq.img_bandera BanderaEquipo,
+            pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera BanderaPiloto, pilot.img_piloto,
+            veh.modelo ModeloVeh, veh.modelo_motor, veh.cilindros, veh.cc, veh.categoria, veh.img_vehiculo,
+            parti.puesto_final_ensayo, parti.tiempo_mejor_vuelta_ensayo, parti.velocidad_media_ensayo,
+            parti.puesto_final_carrera, parti.nro_vueltas_carrera_total, (parti.nro_vueltas_carrera_total * parti.total_km_pista) DistRecorrida, parti.velocidad_media_carrera, parti.tiempo_mejor_vuelta_carrera,
+            CASE WHEN (parti.nro_vueltas_carrera_total - obt_vueltas_equipo_ant(parti.id_dim_tiempo, parti.id_dim_equipo, parti.puesto_final_carrera::smallint))=0 OR (parti.nro_vueltas_carrera_total - obt_vueltas_equipo_ant(parti.id_dim_tiempo, parti.id_dim_equipo, parti.puesto_final_carrera::smallint)) IS NULL THEN 1 ELSE (parti.nro_vueltas_carrera_total - obt_vueltas_equipo_ant(parti.id_dim_tiempo, parti.id_dim_equipo, parti.puesto_final_carrera::smallint)) END DiffVueltas
+        FROM ft_participacion parti
+            INNER JOIN dim_equipo eq ON parti.id_dim_equipo = eq.id_equipo
+            INNER JOIN dim_piloto pilot ON parti.id_dim_piloto = pilot.id_piloto
+            INNER JOIN dim_vehiculo veh ON parti.id_dim_vehiculo = veh.id_vehiculo
+            INNER JOIN dim_tiempo t ON parti.id_dim_tiempo = t.id_tiempo
+        ORDER BY  DistRecorrida Desc LIMIT limit_num;
+    END;
+$$;

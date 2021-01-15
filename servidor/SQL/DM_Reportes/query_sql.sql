@@ -12,3 +12,71 @@ FROM ft_participacion parti
     INNER JOIN dim_vehiculo veh ON parti.id_dim_vehiculo = veh.id_vehiculo
     INNER JOIN dim_tiempo t ON parti.id_dim_tiempo = t.id_tiempo
 WHERE (NULL IS NULL OR parti.id_dim_tiempo = 1) AND parti.nro_equipo = 1;
+
+
+--REPORTE 5
+--Año de primera participacion AnnoPrimeraParticipacion
+SELECT MIN(t.anno) FROM ft_participacion parti
+    INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto
+    INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo
+WHERE pilot.id_piloto = 500;
+
+--Numero total de participaciones
+SELECT COUNT(t.anno) FROM ft_participacion parti
+    INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto
+    INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo
+WHERE pilot.id_piloto = 700;
+
+--Veces en el 1er puesto
+SELECT COUNT(t.anno) FROM ft_participacion parti
+    INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto
+    INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo
+WHERE pilot.id_piloto = 700 AND parti.puesto_final_carrera = 1;
+
+--Veces en el podium (1,2 y3er lugar)
+SELECT COUNT(t.anno) FROM ft_participacion parti
+    INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto
+    INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo
+WHERE pilot.id_piloto = 208 AND( parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3);
+
+SELECT --Año de primera participacion
+       (SELECT MIN(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto =  pilot.id_piloto) AnnoPrimeraParticipacion,
+       --Numero total de participaciones
+        (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto) CantParticipaciones,
+        --Veces en el 1er puesto
+        (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND parti.puesto_final_carrera = 1) CantPrimerLugar,
+       --Veces en el podium (1,2 y3er lugar)
+        (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND( parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3)) CantPodium,
+        --Datos
+        p.nombre || ' ' || p.apellido NombrePiloto, p.fec_nacimiento, p.fec_fallecimiento, p.gentilicio, EXTRACT(YEAR FROM age(p.fec_nacimiento)), p.img_bandera BanderaPiloto, p.img_piloto
+FROM ft_participacion parti
+    INNER JOIN dim_piloto p on parti.id_dim_piloto = p.id_piloto
+WHERE p.id_piloto = 1
+
+--Obtener ids donde ha participado
+SELECT de.id_equipo, dt.id_tiempo, dv.id_vehiculo, parti.nro_equipo FROM ft_participacion parti
+    INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto AND dp.id_piloto = 1
+
+--TABLA DETALLADA
+SELECT dt.anno, parti.nro_equipo, dv.categoria, de.nombre NombreEquipo, de.nombre_pais PaisEquipo, de.img_bandera ImgBanderaPais, dv.img_vehiculo, dv.modelo ModeloVeh, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.img_piloto, dp.gentilicio, dp.img_bandera ImgBanderaPiloto FROM ft_participacion parti
+    INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+WHERE (de.id_equipo, dt.id_tiempo, dv.id_vehiculo, parti.nro_equipo) IN
+      (SELECT de.id_equipo, dt.id_tiempo, dv.id_vehiculo, parti.nro_equipo FROM ft_participacion parti
+        INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+        INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+        INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto AND dp.id_piloto = 1)
+
+--REPORTE 6
+--Parti por marca y modelo de auto
+SELECT dt.anno, dv.img_vehiculo, dv.fabricante_auto, dv.modelo, dv.tipo, dv.modelo_motor, dv.cilindros, dv.cc, dv.categoria, dv.fabricante_neumatico, de.nombre NombreEquipo, parti.nro_equipo, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.img_piloto, dp.gentilicio, dp.img_bandera imgBanderaPaisPiloto  FROM ft_participacion parti
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+    INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+    INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo

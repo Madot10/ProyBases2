@@ -315,7 +315,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_tiempo.kjb</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_tiempo.kjb</filename>
       <jobname/>
       <directory/>
       <arg_from_previous>N</arg_from_previous>
@@ -352,7 +352,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_vehiculo.kjb</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_vehiculo.kjb</filename>
       <jobname/>
       <directory/>
       <arg_from_previous>N</arg_from_previous>
@@ -389,7 +389,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_equipo.kjb</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_equipo.kjb</filename>
       <jobname/>
       <directory/>
       <arg_from_previous>N</arg_from_previous>
@@ -426,7 +426,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_piloto.kjb</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Jobs\job_load_dim_piloto.kjb</filename>
       <jobname/>
       <directory/>
       <arg_from_previous>N</arg_from_previous>
@@ -463,7 +463,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Transformaciones\t_ft_participaciones.ktr</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Transformaciones\t_ft_participaciones.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -501,7 +501,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Transformaciones\DB7\t_ft_participaciones_otro.ktr</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Transformaciones\DB7\t_ft_participaciones_otro.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>

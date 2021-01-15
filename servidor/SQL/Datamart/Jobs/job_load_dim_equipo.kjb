@@ -344,7 +344,7 @@ Abortando</bodymessage>
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Transformaciones\DB7\t_dim_equipo_otro.ktr</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Transformaciones\DB7\t_dim_equipo_otro.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -382,7 +382,7 @@ Abortando</bodymessage>
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>C:\Users\Miguel\Documents\GitHub\ProyBases2\servidor\SQL\Datamart\Transformaciones\t_dim_equipo.ktr</filename>
+      <filename>C:\Users\alans\Documents\University\7mo semestre\B.D. II\ProyBases2\servidor\SQL\Datamart\Transformaciones\t_dim_equipo.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>

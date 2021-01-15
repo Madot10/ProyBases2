@@ -80,3 +80,20 @@ SELECT dt.anno, dv.img_vehiculo, dv.fabricante_auto, dv.modelo, dv.tipo, dv.mode
     INNER JOIN dim_vehiculo dv on parti.id_dim_vehiculo = dv.id_vehiculo
     INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
     INNER JOIN dim_equipo de on parti.id_dim_equipo = de.id_equipo
+
+--REPORTE 7
+--Piloto más joven
+
+--Edad de mas jovenes por año
+SELECT MIN(EXTRACT(YEAR FROM age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento))) Edad, dt.anno FROM ft_participacion parti
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+GROUP BY anno ORDER BY edad --LIMIT 1;
+
+SELECT dt.anno, EXTRACT(YEAR FROM age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.gentilicio, dp.img_piloto FROM ft_participacion parti
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+WHERE (age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento), dt.anno) IN (SELECT MIN(age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dt.anno FROM ft_participacion parti
+    INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+    INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+GROUP BY anno ORDER BY edad )

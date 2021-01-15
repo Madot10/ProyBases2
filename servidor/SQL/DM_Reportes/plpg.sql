@@ -190,5 +190,63 @@ RETURNS TABLE (
     END;
 $$;
 
+--REPORTE 7
+--Mas joven
+--EJ: SELECT * FROM reporte_piloto_joven(2005::smallint);
+--Ej: SELECT * FROM reporte_piloto_joven();
+CREATE OR REPLACE FUNCTION reporte_piloto_joven (anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        AnnoParticipacion numeric(4),
+        Edad DOUBLE PRECISION,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgPiloto TEXT,
+        ImgBanderaPiloto TEXT
+                 ) LANGUAGE  plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
 
+        RETURN QUERY SELECT dt.anno, EXTRACT(YEAR FROM age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.gentilicio, dp.img_piloto, dp.img_bandera FROM ft_participacion parti
+            INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        WHERE (age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento), dt.anno) IN (SELECT MIN(age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dt.anno FROM ft_participacion parti
+            INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        GROUP BY anno ORDER BY edad ) AND (anno_ref IS NULL OR dt.anno = anno_ref);
+    END;
+$$;
  
+
+--REPORTE 8
+--Piloto mayor
+--EJ: SELECT * FROM reporte_piloto_mayor(2005::smallint);
+--EJ: SELECT * FROM reporte_piloto_mayor();
+CREATE OR REPLACE FUNCTION reporte_piloto_mayor (anno_ref SMALLINT DEFAULT NULL)
+    RETURNS TABLE(
+        AnnoParticipacion numeric(4),
+        Edad DOUBLE PRECISION,
+        NombrePiloto TEXT,
+        Gentilicio VARCHAR(60),
+        ImgPiloto TEXT,
+        ImgBanderaPiloto TEXT
+                 ) LANGUAGE  plpgsql AS $$
+    DECLARE
+        id_evnt SMALLINT;
+    BEGIN
+        IF anno_ref IS NOT NULL THEN
+            id_evnt := obt_evento_id(anno_ref);
+        END IF;
+
+        RETURN QUERY SELECT dt.anno, EXTRACT(YEAR FROM age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dp.nombre || ' ' || dp.apellido NombrePiloto, dp.gentilicio, dp.img_piloto, dp.img_bandera FROM ft_participacion parti
+            INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        WHERE (age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento), dt.anno) IN (SELECT MAX(age(to_date(dt.dia || '/' || dt.mes || '/'|| dt.anno,'DD/MM/YYYY'), dp.fec_nacimiento)) Edad, dt.anno FROM ft_participacion parti
+            INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
+            INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
+        GROUP BY anno ORDER BY edad ) AND (anno_ref IS NULL OR dt.anno = anno_ref);
+    END;
+$$;

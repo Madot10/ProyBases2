@@ -35,6 +35,12 @@ const routes = [
         name: "Reporte 3",
         component: () => import("../views/Reporte3.vue"),
     },
+    //Reporte 4
+    {
+        path: "/ranking-equipo/:anno_sel/:nro_sel",
+        name: "Reporte 4",
+        component: () => import("../views/Reporte4.vue"),
+    },
     {
         path: "/simulacion/:anno_ref/:pista/:clima",
         name: "Simulacion",

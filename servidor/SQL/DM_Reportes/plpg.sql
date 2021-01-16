@@ -31,6 +31,29 @@ CREATE OR REPLACE FUNCTION obt_evento_id(anno_ref NUMERIC(4))
     end;
 $$;
 
+--Getter de annos en sist para opciones
+--SELECT * FROM obt_annos_db();
+CREATE OR REPLACE FUNCTION obt_annos_db()
+    RETURNS TABLE (
+        Anno NUMERIC(4)
+                  ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT dt.anno FROM dim_tiempo dt ORDER BY dt.anno;
+    END;
+$$;
+
+--Getter de nro de equipos en sist para opciones
+--SELECT * FROM obt_nro_equipos_db();
+CREATE OR REPLACE FUNCTION obt_nro_equipos_db()
+    RETURNS TABLE (
+        NroEquipo NUMERIC(3)
+                  ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT parti.nro_equipo FROM ft_participacion parti GROUP BY nro_equipo ORDER BY nro_equipo;
+    END;
+$$;
+
+
 --REPORTES
 
 -- REPORTE 4

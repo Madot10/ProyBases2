@@ -13,6 +13,12 @@ router.get("/clima/:anno", rep.getClima);
 //Pilotos
 router.get("/pilotos", rep.getPilotos);
 
+//Parametros
+//Obtener annos
+router.get("/param/annos", rep.getAnnoParam);
+//Obtener nro team
+router.get("/param/nro_equipo", rep.getNroEquipoParam);
+
 //Reportes
 //Reporte 1 - Ranking por año
 router.get("/ranking_anno/:anno/:cat/:tipo", rep.getRankingAnno);

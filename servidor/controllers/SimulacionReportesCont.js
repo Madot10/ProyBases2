@@ -50,6 +50,33 @@ class SimulacionReportesCont {
             .catch((e) => console.error(e.stack));
     }
 
+    //Parametros
+    //Obtener annos
+    getAnnoParam(req, res) {
+        database
+            .query(`SELECT * FROM obt_annos_db()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
+    //Obtener nros equipos
+    getNroEquipoParam(req, res) {
+        database
+            .query(`SELECT * FROM obt_nro_equipos_db()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
     //Reportes
 
     //1. Ranking por año

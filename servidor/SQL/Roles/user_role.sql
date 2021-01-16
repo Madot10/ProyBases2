@@ -1,3 +1,6 @@
+--revocamos comportamiento por defecto
+ALTER default privileges revoke execute on functions from public;
+
 --creación de usuarios
 CREATE USER dev LOGIN PASSWORD '12345';
 CREATE USER analista1 LOGIN PASSWORD '12345';

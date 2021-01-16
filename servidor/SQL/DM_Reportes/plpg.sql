@@ -80,7 +80,7 @@ CREATE OR REPLACE FUNCTION reporte_rank_nro_equipo (n_equipo NUMERIC(3) DEFAULT 
             INNER JOIN dim_piloto pilot ON parti.id_dim_piloto = pilot.id_piloto
             INNER JOIN dim_vehiculo veh ON parti.id_dim_vehiculo = veh.id_vehiculo
             INNER JOIN dim_tiempo t ON parti.id_dim_tiempo = t.id_tiempo
-        WHERE (anno_ref IS NULL OR parti.id_dim_tiempo = id_evnt) AND parti.nro_equipo = n_equipo;
+        WHERE (anno_ref IS NULL OR parti.id_dim_tiempo = id_evnt) AND (n_equipo IS NULL OR parti.nro_equipo = n_equipo);
     END;
 $$;
 

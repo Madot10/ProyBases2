@@ -18,6 +18,26 @@
             ></b-form-select>
         </b-form-group>
 
+        <!-- SELECCIONAR UN PILOTO -->
+        <b-form-group
+            label="Selecciona un piloto"
+            label-for="input-3"
+            v-show="reporte == 5 || reporte == 16"
+        >
+            <b-form-select
+                id="input-3"
+                v-model="aux_piloto_selected"
+                :options="pilotos"
+            ></b-form-select>
+        </b-form-group>
+
+        <p
+            class="text-danger"
+            v-show="(reporte == 5 || reporte == 16) && aux_piloto_selected == null"
+        >
+            *Debes seleccionar los parámetros
+        </p>
+
         <!-- FOOTER  -->
         <b-button block pill variant="outline-primary" @click="enviar_parametros()">
             GENERAR REPORTE
@@ -32,9 +52,11 @@ export default {
         return {
             annos: [],
             nros_teams: [],
+            pilotos: [],
 
             aux_anno_selected: null,
             aux_nro_team_selected: null,
+            aux_piloto_selected: null,
         };
     },
     methods: {
@@ -95,23 +117,108 @@ export default {
                             },
                         });
                     });
+            } else if (this.reporte == 5) {
+                //Reporte 5
+                //Pilotos
+                fetch("http://localhost:3000/param/pilotos")
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((pilotos_data) => {
+                        console.log(pilotos_data);
+                        this.pilotos = pilotos_data.map((p) => {
+                            return {
+                                value: p.idpiloto,
+                                text: p.nombrepiloto,
+                            };
+                        });
+                        this.pilotos.unshift({
+                            value: null,
+                            text: "Seleccione un piloto",
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("ERROR desde SV", err);
+                        this.$router.push({
+                            name: "Reportes",
+                            params: {
+                                error: 1,
+                            },
+                        });
+                    });
+            } else if (this.reporte == 16) {
+                //Reporte 5
+                //Pilotos
+                fetch("http://localhost:3000/param/pilotos-fem")
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((pilotos_data) => {
+                        console.log(pilotos_data);
+                        this.pilotos = pilotos_data.map((p) => {
+                            return {
+                                value: p.idpiloto,
+                                text: p.nombrepiloto,
+                            };
+                        });
+                        this.pilotos.unshift({
+                            value: null,
+                            text: "Seleccione un piloto",
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("ERROR desde SV", err);
+                        this.$router.push({
+                            name: "Reportes",
+                            params: {
+                                error: 1,
+                            },
+                        });
+                    });
             }
         },
-        enviar_parametros() {
+        validar_select() {
             switch (this.reporte) {
-                case 4:
-                    this.$router.push({
-                        name: "Reporte 4",
-                        params: {
-                            anno_sel: this.aux_anno_selected,
-                            nro_sel: this.aux_nro_team_selected,
-                        },
-                    });
+                case 16:
+                case 5:
+                    if (this.aux_piloto_selected == false) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                     break;
 
                 default:
+                    return true;
                     break;
             }
+        },
+        enviar_parametros() {
+            if (this.validar_select())
+                switch (this.reporte) {
+                    case 4:
+                        this.$router.push({
+                            name: "Reporte 4",
+                            params: {
+                                anno_sel: this.aux_anno_selected,
+                                nro_sel: this.aux_nro_team_selected,
+                            },
+                        });
+                        break;
+
+                    case 5:
+                    case 16:
+                        this.$router.push({
+                            name: "Reporte 5",
+                            params: {
+                                pilot_sel: this.aux_piloto_selected,
+                            },
+                        });
+                        break;
+
+                    default:
+                        break;
+                }
         },
     },
     watch: {

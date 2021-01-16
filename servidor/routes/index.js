@@ -18,6 +18,10 @@ router.get("/pilotos", rep.getPilotos);
 router.get("/param/annos", rep.getAnnoParam);
 //Obtener nro team
 router.get("/param/nro_equipo", rep.getNroEquipoParam);
+//Obtener pilotos
+router.get("/param/pilotos", rep.getPilotosParam);
+//Obtener pilotos mujeres
+router.get("/param/pilotos-fem", rep.getPilotosMujeresParam);
 
 //Reportes
 //Reporte 1 - Ranking por año

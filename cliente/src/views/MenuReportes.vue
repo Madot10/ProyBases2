@@ -63,6 +63,33 @@
                                 >EJECUTAR</b-button
                             >
                         </b-card>
+
+                        <b-card title="5- Logros por piloto">
+                            <b-card-text>
+                                Reporte detallado de las participaciones de un piloto</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(5)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
+                        <b-card title="16- Mujeres piloto en Le mans">
+                            <b-card-text>
+                                Reporte que muestra el registro de participaciones de mujeres piloto
+                                en la carrera.</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(16)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
                     </b-card-group>
 
                     <modal-opciones-reportes :reporte="reporte_selected"></modal-opciones-reportes>

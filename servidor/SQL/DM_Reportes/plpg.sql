@@ -53,6 +53,32 @@ CREATE OR REPLACE FUNCTION obt_nro_equipos_db()
     END;
 $$;
 
+--Obtener pilotos disponibles a consultar
+--SELECT * FROM obt_pilotos_db()
+CREATE OR REPLACE FUNCTION obt_pilotos_db()
+    RETURNS TABLE (
+        IDpiloto SMALLINT,
+        NombrePiloto TEXT
+                  ) LANGUAGE plpgsql AS  $$
+    BEGIN
+        RETURN QUERY SELECT pilot.id_piloto, (pilot.nombre || ' ' || pilot.apellido) Nombre FROM dim_piloto pilot ORDER BY Nombre;
+    END;
+$$;
+
+--Obtener pilotos femeninas disponibles a consultar
+--SELECT * FROM obt_pilotos_fem_db()
+CREATE OR REPLACE FUNCTION obt_pilotos_fem_db()
+    RETURNS TABLE (
+        IDpiloto SMALLINT,
+        NombrePiloto TEXT
+                  ) LANGUAGE plpgsql AS  $$
+    BEGIN
+        RETURN QUERY SELECT pilot.id_piloto, (pilot.nombre || ' ' || pilot.apellido) Nombre FROM dim_piloto pilot WHERE pilot.genero='femenino' ORDER BY Nombre;
+    END;
+$$;
+
+
+
 
 --REPORTES
 
@@ -115,7 +141,7 @@ $$;
 --EJ: SELECT * FROM reporte_logros_piloto(1::smallint)
 --DROP FUNCTION  reporte_logros_piloto(id_pilot SMALLINT)
 --5.1 DATOS PILOTO
-DROP FUNCTION  reporte_logros_piloto(id_pilot SMALLINT)
+--DROP FUNCTION  reporte_logros_piloto(id_pilot SMALLINT)
 CREATE OR REPLACE FUNCTION reporte_logros_piloto(id_pilot SMALLINT)
     RETURNS TABLE(
         AnnoPrimeraParticipacion NUMERIC(4),
@@ -183,7 +209,7 @@ $$;
 --Participacion segun marca(fabricante_auto) y modelo de Veh
 --Ej: SELECT * FROM reporte_participaciones_marcas_modelos('Audi');
 --Ej: SELECT * FROM reporte_participaciones_marcas_modelos();
-DROP FUNCTION reporte_participaciones_marcas_modelos(marca VARCHAR(30), model VARCHAR(30));
+--DROP FUNCTION reporte_participaciones_marcas_modelos(marca VARCHAR(30), model VARCHAR(30));
 CREATE OR REPLACE FUNCTION reporte_participaciones_marcas_modelos(marca VARCHAR(30) DEFAULT NULL, model VARCHAR(30) DEFAULT NULL)
 RETURNS TABLE (
     AnnoParticipacion NUMERIC(4),
@@ -298,7 +324,7 @@ $$;
 --SELECT * FROM reporte_ganador_primera_participacion(2000::smallint);
 --SELECT * FROM reporte_ganador_primera_participacion();
 
-DROP FUNCTION reporte_ganador_primera_participacion(anno_ref SMALLINT );
+--DROP FUNCTION reporte_ganador_primera_participacion(anno_ref SMALLINT );
 CREATE OR REPLACE FUNCTION reporte_ganador_primera_participacion(anno_ref SMALLINT DEFAULT NULL)
     RETURNS TABLE (
         Anno NUMERIC(4),
@@ -504,7 +530,7 @@ $$;
 
 --LOGROS DE PILOTO
 --SELECT * FROM reporte_mujeres_pilotos();
-DROP FUNCTION  reporte_mujeres_pilotos(anno_ref SMALLINT);
+--DROP FUNCTION  reporte_mujeres_pilotos(anno_ref SMALLINT);
 CREATE OR REPLACE FUNCTION reporte_mujeres_pilotos(anno_ref SMALLINT DEFAULT NULL)
     RETURNS TABLE(
         AnnoPrimeraParticipacion NUMERIC(4),

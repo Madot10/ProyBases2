@@ -77,6 +77,32 @@ class SimulacionReportesCont {
             });
     }
 
+    //Obtener pilotos
+    getPilotosParam(req, res) {
+        database
+            .query(`SELECT * FROM obt_pilotos_db()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
+    //Obtener pilotos mujeres
+    getPilotosMujeresParam(req, res) {
+        database
+            .query(`SELECT * FROM obt_pilotos_fem_db()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
     //Reportes
 
     //1. Ranking por año

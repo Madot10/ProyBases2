@@ -21,6 +21,7 @@ GRANT analista_negocios_3 to analista3;
 
 --definir roles
 --rol analista 1
+--select * from dim_tiempo;
 GRANT SELECT ON TABLE dim_equipo TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_piloto TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_tiempo TO analista_negocios_1;
@@ -52,21 +53,25 @@ GRANT EXECUTE ON FUNCTION reporte_ganador_primera_participacion(SMALLINT) TO ana
 --rol analista 3
 GRANT analista_negocios_1 to analista3;
 --Reporte 11
---SELECT * FROM reporte_top_vel_media('car', 2000::smallint);
+SELECT * FROM reporte_top_vel_media('car', 2000::smallint);
 GRANT EXECUTE ON FUNCTION reporte_top_vel_media(CHAR(3),SMALLINT) TO analista_negocios_3;
 --Reporte 12
 GRANT EXECUTE ON FUNCTION reporte_distancias_mas_largas(NUMERIC(3)) TO analista_negocios_3;
 --Reporte 13
---GRANT EXECUTE ON FUNCTION reporte_pilotos_podiums() TO analista_negocios_3;
+GRANT EXECUTE ON FUNCTION reporte_pilotos_podiums() TO analista_negocios_3;
 --Reporte 14
---GRANT EXECUTE ON FUNCTION reporte_pilotos_nunca_meta() TO analista_negocios_3;
+GRANT EXECUTE ON FUNCTION reporte_pilotos_nunca_meta() TO analista_negocios_3;
 --Reporte 15
 --Falta
---Reporte 16
---GRANT EXECUTE ON FUNCTION reporte_mujeres_pilotos(smallint) TO analista_negocios_3;
+--Reporte 16.1
+GRANT EXECUTE ON FUNCTION reporte_mujeres_pilotos(SMALLINT) TO analista_negocios_3;
+--Reporte 16.2
+GRANT EXECUTE ON FUNCTION reporte_datos_participacion_mujeres(SMALLINT) TO analista_negocios_3;
 
 --rol desarrollador
-
+GRANT analista_negocios_1 to dev;
+GRANT analista_negocios_2 to dev;
+GRANT analista_negocios_3 to dev;
 
 
 --probando
@@ -76,11 +81,22 @@ select * from dim_tiempo;
 
 --En caso de tener que borrar un rol:
 CREATE ROLE aux;
-REASSIGN OWNED BY analista_negocios_3 TO aux;
-DROP OWNED BY analista_negocios_3;
-DROP ROLE analista_negocios_3;
+REASSIGN OWNED BY analista_negocios_2 TO aux;
+DROP OWNED BY analista_negocios_2;
+DROP ROLE analista_negocios_2;
 
-CREATE ROLE analista_negocios_3;
-GRANT analista_negocios_3 TO analista3;
+drop user analista2;
+CREATE USER analista2 LOGIN PASSWORD '12345';
+CREATE ROLE analista_negocios_2;
+GRANT analista_negocios_2 TO analista2;
 DROP ROLE aux;
+
+
+
+
+
+
+
+
+
 

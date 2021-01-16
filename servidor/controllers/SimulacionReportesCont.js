@@ -1,8 +1,8 @@
 "use strict";
 const { database } = require("../config/db.config");
 
-function verificar_int(anno){
-    if(parseInt(anno,10) === 0){
+function verificar_int(anno) {
+    if (parseInt(anno, 10) === 0) {
         return null;
     }
     return anno;
@@ -34,9 +34,7 @@ class SimulacionReportesCont {
     getClima(req, res) {
         const anno = req.params.anno;
         database
-            .query(`SELECT * FROM obtener_metereologia_evento($1::smallint)`,[
-                anno
-            ])
+            .query(`SELECT * FROM obtener_metereologia_evento($1::smallint)`, [anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
@@ -64,12 +62,15 @@ class SimulacionReportesCont {
             .query(`SELECT * FROM reporte_rank_anno($1::smallint, $2, $3)`, [
                 anno,
                 categoria,
-                order
+                order,
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //2. Ranking por hora
@@ -82,12 +83,15 @@ class SimulacionReportesCont {
             .query(`SELECT * FROM reporte_ranking_hora($1::smallint, $2::smallint, $3)`, [
                 anno,
                 hora,
-                categoria
+                categoria,
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //3. Ganadores de Le Mans
@@ -98,12 +102,15 @@ class SimulacionReportesCont {
         database
             .query(`SELECT * FROM reporte_ganadores_le_mans($1::CHAR(7) ,$2::smallint)`, [
                 categoria,
-                anno
+                anno,
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //4. Ranking por numero de equipo
@@ -112,16 +119,19 @@ class SimulacionReportesCont {
         anno = verificar_int(anno);
         var num_equipo = req.params.num_equipo;
         num_equipo = verificar_int(num_equipo);
-        
+
         database
             .query(`SELECT * FROM reporte_rank_nro_equipo($1::SMALLINT, $2::SMALLINT)`, [
                 num_equipo,
-                anno
+                anno,
             ])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //5.1. Logros del piloto - Datos del piloto
@@ -129,13 +139,14 @@ class SimulacionReportesCont {
         const id_pilot = req.params.id_pilot;
 
         database
-            .query(`SELECT * FROM reporte_logros_piloto($1::smallint)`, [
-                id_pilot
-            ])
+            .query(`SELECT * FROM reporte_logros_piloto($1::smallint)`, [id_pilot])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //5.2. Logros del piloto - Datos de las participaciones
@@ -143,37 +154,37 @@ class SimulacionReportesCont {
         const id_pilot = req.params.id_pilot;
 
         database
-            .query(`SELECT * FROM reporte_datos_participacion($1::smallint)`, [
-                id_pilot
-            ])
+            .query(`SELECT * FROM reporte_datos_participacion($1::smallint)`, [id_pilot])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
-    
     //6. Participacion segun marca (fabricante_auto) y modelo de Veh
     getParticipacionMarcaModelo(req, res) {
         var marca = req.params.marca;
         var modelo = req.params.modelo;
-        
-        if(String(marca) == '0'){
+
+        if (String(marca) == "0") {
             marca = null;
         }
-        if(String(modelo) == '0'){
+        if (String(modelo) == "0") {
             modelo = null;
         }
 
         database
-            .query(`SELECT * FROM reporte_participaciones_marcas_modelos($1,$2)`, [
-                marca,
-                modelo
-            ])
+            .query(`SELECT * FROM reporte_participaciones_marcas_modelos($1,$2)`, [marca, modelo])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //7. Piloto más joven
@@ -182,13 +193,14 @@ class SimulacionReportesCont {
         anno = verificar_int(anno);
 
         database
-            .query(`SELECT * FROM reporte_piloto_joven($1::smallint)`, [
-                anno
-            ])
+            .query(`SELECT * FROM reporte_piloto_joven($1::smallint)`, [anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //8. Piloto más veterano
@@ -197,13 +209,14 @@ class SimulacionReportesCont {
         anno = verificar_int(anno);
 
         database
-            .query(` SELECT * FROM reporte_piloto_mayor($1::smallint)`, [
-                anno
-            ])
+            .query(` SELECT * FROM reporte_piloto_mayor($1::smallint)`, [anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //9. Pilotos con mayores participaciones
@@ -213,7 +226,10 @@ class SimulacionReportesCont {
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //10. Ganador en su primera participacion
@@ -222,13 +238,14 @@ class SimulacionReportesCont {
         anno = verificar_int(anno);
 
         database
-            .query(`SELECT * FROM reporte_ganador_primera_participacion($1::smallint)`, [
-                anno
-            ])
+            .query(`SELECT * FROM reporte_ganador_primera_participacion($1::smallint)`, [anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //11. Velocidades medias mas altas
@@ -238,29 +255,29 @@ class SimulacionReportesCont {
         anno = verificar_int(anno);
 
         database
-            .query(`SELECT * FROM reporte_top_vel_media($1, $2::smallint)`, [
-                ord,
-                anno
-            ])
+            .query(`SELECT * FROM reporte_top_vel_media($1, $2::smallint)`, [ord, anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
-
 
     //12. Distancias mas largas recorridas
     getMejoresDistancias(req, res) {
         const cant = req.params.cant;
 
         database
-            .query(`SELECT * FROM reporte_distancias_mas_largas($1)`, [
-                cant
-            ])
+            .query(`SELECT * FROM reporte_distancias_mas_largas($1)`, [cant])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //13. En el podium, pero nunca en el primer escalón
@@ -270,7 +287,10 @@ class SimulacionReportesCont {
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 
     //14. En el podium, pero nunca en el primer escalón
@@ -280,26 +300,28 @@ class SimulacionReportesCont {
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
-
 
     //15. Victorias por marca
 
-
-     //16. Mujeres piloto en Le Mans
-     getMujeresPiloto(req, res) {
+    //16. Mujeres piloto en Le Mans
+    getMujeresPiloto(req, res) {
         var anno = req.params.anno;
         anno = verificar_int(anno);
 
         database
-            .query(`SELECT * FROM reporte_mujeres_pilotos($1::smallint)`, [
-                anno
-            ])
+            .query(`SELECT * FROM reporte_mujeres_pilotos($1::smallint)`, [anno])
             .then(function (data) {
                 res.status(200).json(data.rows);
             })
-            .catch((e) => console.error(e.stack));
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
     }
 }
 

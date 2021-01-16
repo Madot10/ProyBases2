@@ -1,5 +1,8 @@
 <template>
     <ScreenWindow>
+        <b-toast id="error-toast" title="Error" variant="danger">
+            ¡No se puede ejecutar el reporte seleccionado!
+        </b-toast>
         <b-container class="h-100">
             <b-row class="h-100" align-v="center">
                 <b-col col></b-col>
@@ -73,6 +76,14 @@ export default {
             this.reporte_selected = nro_reporte;
             this.$bvModal.show("modal-reportes");
         },
+    },
+    mounted() {
+        console.log("Montando interfaz menu", this.$route.params.error);
+        let is_error = this.$route.params.error === 1 ? true : false;
+        if (is_error) {
+            //Mostrar aviso
+            this.$bvToast.show("error-toast");
+        }
     },
 };
 </script>

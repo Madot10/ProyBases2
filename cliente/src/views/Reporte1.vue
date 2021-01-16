@@ -114,6 +114,15 @@ export default {
                 .then((ranking_data) => {
                     this.generar_rank(ranking_data);
                     console.log("DATOS OBTENIDOS", ranking_data);
+                })
+                .catch((err) => {
+                    console.log("ERROR desde SV", err);
+                    this.$router.push({
+                        name: "Reportes",
+                        params: {
+                            error: 1,
+                        },
+                    });
                 });
         },
     },

@@ -470,7 +470,7 @@ $$;
  --REPORTE 13
 --EJ: SELECT * FROM reporte_pilotos_podiums();
 --CREATE OR REPLACE FUNCTION reporte_pilotos_podiums()
-CREATE OR REPLACE FUNCTION reporte_pilotos_podiums(anno_ref SMALLINT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION reporte_pilotos_podiums()
     RETURNS TABLE (
         Anno NUMERIC(4),
         NombrePiloto TEXT,
@@ -478,27 +478,21 @@ CREATE OR REPLACE FUNCTION reporte_pilotos_podiums(anno_ref SMALLINT DEFAULT NUL
         ImgBanderaPiloto TEXT,
         ImgPiloto TEXT
         ) LANGUAGE plpgsql AS $$
-    DECLARE
-        id_evnt SMALLINT;
     BEGIN
-        IF anno_ref IS NOT NULL THEN
-            id_evnt := obt_evento_id(anno_ref);
-        END IF;
-
         RETURN QUERY SELECT pp.Anno, pilot.nombre || ' ' || pilot.apellido NombrePiloto, pilot.gentilicio, pilot.img_bandera, pilot.img_piloto FROM dim_piloto pilot
                 INNER JOIN (SELECT MIN(dt.anno) Anno, dp.id_piloto FROM ft_participacion parti
                 INNER JOIN dim_tiempo dt on parti.id_dim_tiempo = dt.id_tiempo
                 INNER JOIN dim_piloto dp on parti.id_dim_piloto = dp.id_piloto
-            WHERE parti.puesto_final_carrera <> 1 AND (parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3) AND (anno_ref IS NULL OR dt.id_tiempo = id_evnt)
+            WHERE parti.puesto_final_carrera <> 1 AND (parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3)
                 GROUP BY id_piloto) pp ON pp.id_piloto = pilot.id_piloto
-                ORDER BY  Anno;
+                order by pp.Anno;
     END;
 $$;
 
 --REPORTE 14
 --EJ: SELECT * FROM reporte_pilotos_nunca_meta()
 --DROP FUNCTION reporte_pilotos_nunca_meta();
-CREATE OR REPLACE FUNCTION reporte_pilotos_nunca_meta(anno_ref SMALLINT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION reporte_pilotos_nunca_meta()
     RETURNS TABLE (
         CantAbandonos BIGINT,
         Anno NUMERIC(4),
@@ -513,7 +507,7 @@ CREATE OR REPLACE FUNCTION reporte_pilotos_nunca_meta(anno_ref SMALLINT DEFAULT 
             INNER JOIN ft_participacion ON pilot.id_piloto = ft_participacion.id_dim_piloto
             INNER JOIN dim_tiempo dt on ft_participacion.id_dim_tiempo = dt.id_tiempo
             INNER JOIN (SELECT count(*) CantAbandono, pilot.id_piloto FROM dim_piloto pilot INNER JOIN ft_participacion fp on pilot.id_piloto = fp.id_dim_piloto WHERE (fp.estado = 'a') GROUP BY pilot.id_piloto) parti_a ON parti_a.id_piloto = pilot.id_piloto
-        ORDER BY  Anno;
+        ORDER BY dt.Anno;
     END;
 $$;
 

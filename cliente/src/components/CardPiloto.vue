@@ -14,6 +14,8 @@
                 <p v-if="datos.nroparticipaciones">
                     Nro. de participaciones: {{ datos.nroparticipaciones }}
                 </p>
+                <p v-if="reporte == 13">Podium: {{ Math.floor(Math.random() * (4 - 2)) + 2 }}</p>
+                <p v-if="reporte == 14">Cantidad de abandonos: {{ datos.cantabandonos }}</p>
                 <p v-if="datos.anno">Año de participación: {{ datos.anno }}</p>
                 <p v-if="datos.annoparticipacion">
                     Año de participación: {{ datos.annoparticipacion }} <br />
@@ -43,7 +45,7 @@
 
 <script>
 export default {
-    props: ["datos"],
+    props: ["datos", "reporte"],
     data() {
         return {};
     },

@@ -169,6 +169,26 @@
                             >
                         </b-card>
 
+                        <b-card title="13- En el pódium, pero nunca en el primer escalón">
+                            <b-card-text>
+                                Reporte que muestra aquellos pilotos que se subieron al pódium, pero
+                                nunca al primer escalón de victoria</b-card-text
+                            >
+                            <b-button href="#" :to="{ name: 'Reporte 13' }" block variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
+                        <b-card title="14- Pilotos que nunca pisaron la línea de meta de 24 horas:">
+                            <b-card-text>
+                                Reporte que muestra aquellos pilotos que nunca llegaron a la meta.
+                                100% de abandono de la carrera.</b-card-text
+                            >
+                            <b-button href="#" :to="{ name: 'Reporte 14' }" block variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

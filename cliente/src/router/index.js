@@ -83,6 +83,18 @@ const routes = [
         name: "Reporte 12",
         component: () => import("../views/Reporte12.vue"),
     },
+    //Reporte 13
+    {
+        path: "/podium",
+        name: "Reporte 13",
+        component: () => import("../views/Reporte13.vue"),
+    },
+    //Reporte 14
+    {
+        path: "/abandonos",
+        name: "Reporte 14",
+        component: () => import("../views/Reporte14.vue"),
+    },
     {
         path: "/simulacion/:anno_ref/:pista/:clima",
         name: "Simulacion",

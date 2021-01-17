@@ -118,6 +118,16 @@
                             >
                         </b-card>
 
+                        <b-card title="9- Mayor número de participaciones en Le Mans">
+                            <b-card-text>
+                                Reporte que muestra el número más alto de participaciones por
+                                piloto.</b-card-text
+                            >
+                            <b-button href="#" :to="{ name: 'Reporte 9' }" block variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

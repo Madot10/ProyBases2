@@ -12,12 +12,20 @@
                     {{ datos.nroequipo }} - {{ datos.nombreequipo }}
                     <b-img rounded :src="'data:image/png;base64,' + datos.imgbanderaequipo"></b-img>
                 </h3>
+                <p>({{datos.fechapartipacion || datos.annoparticipacion}})</p>
                
                 <!--CATEGORIA Veh-->
-                <p>{{ datos.categoria }}</p>
+                <p>{{ datos.categoria || datos.vehcategoria }}</p>
                 <!--Modelo Veh-->
-                <p>{{ datos.nombrevehiculo }}</p>
-                
+                <p>{{ datos.nombrevehiculo || datos.modelo }}</p>
+                 <!--Motor Motor-->
+                <p>{{ datos.modelomotor }} {{ datos.cilindros }} {{ datos.cc }}cc</p>
+                <!-- Fabricantes-->
+                <p v-if="datos.fabneumatico">
+                    Fab. neumáticos: {{datos.fabneumatico}} <br>
+                    Fabricante: {{datos.fabricante}} <br>
+                    Tipo: {{datos.tipoveh == 'nh' ? 'No híbrido' : datos.tipoveh == 'h ' ? 'Híbrido' : '' }}
+                </p>
 
                
             </b-col>
@@ -45,7 +53,7 @@ import PillPiloto from "./PillPiloto.vue";
 
 export default {
     components: { PillPiloto },
-    props: ["datos"],
+    props: ["datos", "reporte"],
     data() {
         return {
             data_nro_v: [{ value: 1, color: "#1589CB" }],

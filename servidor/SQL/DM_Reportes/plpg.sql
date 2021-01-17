@@ -77,6 +77,28 @@ CREATE OR REPLACE FUNCTION obt_pilotos_fem_db()
     END;
 $$;
 
+--Obtener fabricantes de auto
+CREATE OR REPLACE FUNCTION obt_fabricantes_auto()
+    RETURNS TABLE(
+        FabricanteAuto varchar(30)
+                 ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT veh.fabricante_auto FROM dim_vehiculo veh  GROUP BY veh.fabricante_auto ORDER BY veh.fabricante_auto;
+    end;
+$$;
+SELECT * FROM obt_fabricantes_auto()
+
+--Obtener modelos de autos
+CREATE OR REPLACE FUNCTION obt_modelos_auto()
+    RETURNS TABLE(
+        ModelosAuto varchar(30)
+                 ) LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY SELECT veh.modelo FROM dim_vehiculo veh GROUP BY veh.modelo ORDER BY veh.modelo;
+    end;
+$$;
+SELECT * FROM obt_modelos_auto()
+
 
 
 

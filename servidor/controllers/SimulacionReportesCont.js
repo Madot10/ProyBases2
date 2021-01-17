@@ -103,6 +103,32 @@ class SimulacionReportesCont {
             });
     }
 
+    //Obtener fabricantes de auto
+    getFabricantesAuto(req, res) {
+        database
+            .query(`SELECT * FROM obt_fabricantes_auto()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
+    //Obtener modelos de autos
+    getModelosAuto(req, res) {
+        database
+            .query(`SELECT * FROM obt_modelos_auto()`)
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
+
     //Reportes
 
     //1. Ranking por año

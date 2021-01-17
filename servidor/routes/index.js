@@ -22,6 +22,10 @@ router.get("/param/nro_equipo", rep.getNroEquipoParam);
 router.get("/param/pilotos", rep.getPilotosParam);
 //Obtener pilotos mujeres
 router.get("/param/pilotos-fem", rep.getPilotosMujeresParam);
+//Obtener fabricantes de auto
+router.get("/param/fab-auto", rep.getFabricantesAuto);
+//Obtener modelos de autos
+router.get("/param/model-auto", rep.getModelosAuto);
 
 //Reportes
 //Reporte 1 - Ranking por año

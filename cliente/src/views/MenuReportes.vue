@@ -77,6 +77,19 @@
                             >
                         </b-card>
 
+                        <b-card title="6- Participaciones marca y modelo de auto">
+                            <b-card-text>
+                                Reporte de las participaciones según marca y modelo</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(6)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

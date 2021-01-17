@@ -58,9 +58,8 @@ router.get("/mejores_dist/:cant", rep.getMejoresDistancias);
 router.get("/podium", rep.getPodium);
 //Reporte 14 - Pilotos que nunca pisaron la línea de meta de 24 horas
 router.get("/abandonos", rep.getAbandonos);
-
 //Reporte 15 - Victorias por marca
-
+router.get("/victorias_marcas/:isfabauto", rep.getVictoriasMarca);
 //Reporte 16 - Mujeres piloto en Le Mans
 router.get("/mujeres_piloto/:anno", rep.getMujeresPiloto);
 

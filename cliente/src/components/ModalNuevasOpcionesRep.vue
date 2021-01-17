@@ -79,6 +79,15 @@
             ></b-form-select>
         </b-form-group>
 
+        <!-- SELECCIONAR TIPO DE FAB-->
+        <b-form-group label="Selecciona un tipo" label-for="input-6" v-show="reporte == 15">
+            <b-form-select
+                id="input-6"
+                v-model="aux_tip_fab_selected"
+                :options="tipo_fab"
+            ></b-form-select>
+        </b-form-group>
+
         <p
             class="text-danger"
             v-show="
@@ -86,7 +95,8 @@
                     ((reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11) &&
                         aux_anno_selected == null) ||
                     (reporte == 11 && aux_tipo_evnt_selected == null) ||
-                    (reporte == 12 && aux_limit_selected == null)
+                    (reporte == 12 && aux_limit_selected == null) ||
+                    (reporte == 15 && aux_tip_fab_selected == null)
             "
         >
             *Debes seleccionar los parámetros
@@ -127,6 +137,10 @@ export default {
                 { value: 50, text: "50 autos" },
                 { value: 60, text: "60 autos" },
             ],
+            tipo_fab: [
+                { value: true, text: "Marca de auto" },
+                { value: false, text: "Marca de neumatico" },
+            ],
 
             aux_anno_selected: null,
             aux_nro_team_selected: null,
@@ -135,6 +149,7 @@ export default {
             aux_model_auto_selected: null,
             aux_tipo_evnt_selected: null,
             aux_limit_selected: null,
+            aux_tip_fab_selected: null,
         };
     },
     methods: {
@@ -390,6 +405,13 @@ export default {
                         return true;
                     }
                     break;
+                case 15:
+                    if (this.reporte == 15 && this.aux_tip_fab_selected == null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    break;
                 default:
                     return true;
                     break;
@@ -472,6 +494,14 @@ export default {
                             },
                         });
                         break;
+
+                    case 15:
+                        this.$router.push({
+                            name: "Reporte 15",
+                            params: {
+                                isauto_sel: this.aux_tip_fab_selected,
+                            },
+                        });
                         break;
                     default:
                         break;

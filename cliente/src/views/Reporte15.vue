@@ -3,37 +3,24 @@
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
                 <h3 class="text-center mb-2 w-100">
-                    Velocidades medias más altas
+                    Victorias por marca
                 </h3>
 
                 <div v-for="(parti, i) in data_parti" :key="i" class="w-100">
                     <b-container>
                         <b-row align-v="center">
-                            <b-col cols="5">
-                                <!-- IMG VEHICULO -->
-                                <b-img
-                                    rounded
-                                    :src="check_base64(parti.imgvehiculo)"
-                                    fluid-grow
-                                ></b-img>
+                            <b-col cols="2">
+                                <h1>{{ i + 1 }}°</h1>
                             </b-col>
-                            <b-col cols="6">
-                                <!-- Nro equipo, Nombre y bandera de nac -->
+                            <b-col cols="8">
+                                <h2>{{ parti.fabricante.toUpperCase() }}</h2>
                                 <h3>
-                                    {{ parti.nroequipo }} - {{ parti.nombreequipo }}
-                                    <b-img
-                                        rounded
-                                        :src="check_base64(parti.imgbanderaequipo)"
-                                    ></b-img>
+                                    -
                                 </h3>
-                                <!-- ANO DE PARTICIPACION -->
+
                                 <p>
-                                    <b>AÑO DE PARTICIPACIÓN: {{ parti.anno }}</b>
+                                    <b>CANTIDAD DE VICTORIAS: {{ parti.cantidadvictoria }}</b>
                                 </p>
-                                <!--Modelo Veh-->
-                                <p>{{ parti.modelo }}</p>
-                                <!--Modelo Veh-->
-                                <p>Vel. media registrada: {{ parti.velmedia }} km/h</p>
                             </b-col>
                         </b-row>
                     </b-container>
@@ -75,7 +62,7 @@ export default {
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000/mejores_vel/${this.$route.params.ord_sel}/${this.$route.params.anno_sel}`;
+            let urlApi = `http://localhost:3000/victorias_marcas/${this.$route.params.isauto_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)

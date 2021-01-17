@@ -95,6 +95,12 @@ const routes = [
         name: "Reporte 14",
         component: () => import("../views/Reporte14.vue"),
     },
+    //Reporte 15
+    {
+        path: "/victorias-marcas/:isauto_sel",
+        name: "Reporte 15",
+        component: () => import("../views/Reporte15.vue"),
+    },
     {
         path: "/simulacion/:anno_ref/:pista/:clima",
         name: "Simulacion",

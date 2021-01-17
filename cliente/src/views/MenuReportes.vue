@@ -155,7 +155,7 @@
                             >
                         </b-card>
 
-                        <b-card title="12- .Distancias más largas recorridas en Le Mans">
+                        <b-card title="12- Distancias más largas recorridas en Le Mans">
                             <b-card-text>
                                 Reporte que muestra las mayores distancias alcanzadas en las 24
                                 horas de Le Mans</b-card-text
@@ -185,6 +185,20 @@
                                 100% de abandono de la carrera.</b-card-text
                             >
                             <b-button href="#" :to="{ name: 'Reporte 14' }" block variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
+                        <b-card title="15- Victorias por marca">
+                            <b-card-text>
+                                Reporte que muestra las marcas victoriosas incluyendo carros y
+                                neumáticos</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(15)"
+                                block
+                                variant="primary"
                                 >EJECUTAR</b-button
                             >
                         </b-card>

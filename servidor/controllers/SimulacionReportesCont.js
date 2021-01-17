@@ -385,6 +385,19 @@ class SimulacionReportesCont {
     }
 
     //15. Victorias por marca
+    getVictoriasMarca(req, res) {
+        const fabauto = req.params.isfabauto;
+
+        database
+            .query(`SELECT * FROM reporte_victoria_por_marca($1)`, [fabauto])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
 
     //16. Mujeres piloto en Le Mans
     getMujeresPiloto(req, res) {

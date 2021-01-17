@@ -346,7 +346,7 @@ class SimulacionReportesCont {
     //12. Distancias mas largas recorridas
     getMejoresDistancias(req, res) {
         const cant = req.params.cant;
-
+        console.log("cant", cant);
         database
             .query(`SELECT * FROM reporte_distancias_mas_largas($1)`, [cant])
             .then(function (data) {

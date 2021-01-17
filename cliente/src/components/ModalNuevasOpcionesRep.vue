@@ -66,13 +66,27 @@
             ></b-form-select>
         </b-form-group>
 
+        <!-- SELECCIONAR CANT LIMITE -->
+        <b-form-group
+            label="Selecciona cantidad limite de autos"
+            label-for="input-6"
+            v-show="reporte == 12"
+        >
+            <b-form-select
+                id="input-5"
+                v-model="aux_limit_selected"
+                :options="limite_resultados"
+            ></b-form-select>
+        </b-form-group>
+
         <p
             class="text-danger"
             v-show="
                 ((reporte == 5 || reporte == 16) && aux_piloto_selected == null) ||
                     ((reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11) &&
                         aux_anno_selected == null) ||
-                    (reporte == 11 && aux_tipo_evnt_selected == null)
+                    (reporte == 11 && aux_tipo_evnt_selected == null) ||
+                    (reporte == 12 && aux_limit_selected == null)
             "
         >
             *Debes seleccionar los parámetros
@@ -105,6 +119,14 @@ export default {
                     text: "Carrera",
                 },
             ],
+            limite_resultados: [
+                { value: 10, text: "10 autos" },
+                { value: 20, text: "20 autos" },
+                { value: 30, text: "30 autos" },
+                { value: 40, text: "40 autos" },
+                { value: 50, text: "50 autos" },
+                { value: 60, text: "60 autos" },
+            ],
 
             aux_anno_selected: null,
             aux_nro_team_selected: null,
@@ -112,6 +134,7 @@ export default {
             aux_fab_auto_selected: null,
             aux_model_auto_selected: null,
             aux_tipo_evnt_selected: null,
+            aux_limit_selected: null,
         };
     },
     methods: {
@@ -360,6 +383,13 @@ export default {
                         return true;
                     }
                     break;
+                case 12:
+                    if (this.reporte == 12 && this.aux_limit_selected == null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    break;
                 default:
                     return true;
                     break;
@@ -432,6 +462,16 @@ export default {
                                 anno_sel: this.aux_anno_selected,
                             },
                         });
+                        break;
+
+                    case 12:
+                        this.$router.push({
+                            name: "Reporte 12",
+                            params: {
+                                limit_sel: this.aux_limit_selected,
+                            },
+                        });
+                        break;
                         break;
                     default:
                         break;

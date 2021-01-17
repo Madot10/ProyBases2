@@ -155,6 +155,20 @@
                             >
                         </b-card>
 
+                        <b-card title="12- .Distancias más largas recorridas en Le Mans">
+                            <b-card-text>
+                                Reporte que muestra las mayores distancias alcanzadas en las 24
+                                horas de Le Mans</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(12)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

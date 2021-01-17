@@ -11,14 +11,19 @@
                     {{ datos.nombrepiloto }}
                     <b-img rounded :src="check_base64(datos.imgbanderapiloto)"></b-img>
                 </h3>
-                <p>
+                <p v-if="datos.annoparticipacion">
+                    Año de participación: {{ datos.annoparticipacion }} <br />
+                    Edad: {{ datos.edad }} años
+                </p>
+                <p v-if="datos.fechanacimiento">
                     Fecha nacimiento: {{ new Date(datos.fechanacimiento) }} ({{ datos.edad }} años)
                     <br />
                     <span v-if="datos.fechafallecimiento != null"
                         >{{ new Date(datos.fechafallecimiento) }} <br
                     /></span>
                 </p>
-                <div>
+                <div v-if="datos.cantparticipaciones">
+                    <hr />
                     <h5>Datos</h5>
                     <p>
                         Primera participación: {{ datos.annoprimeraparticipacion }} <br />

@@ -1,7 +1,11 @@
 <template>
     <b-modal id="modal-new-reportes" hide-footer centered title="Parámetros de reporte">
         <!-- SELECCIONAR AÑO -->
-        <b-form-group label="Selecciona un año" label-for="input-1" v-show="reporte == 4">
+        <b-form-group
+            label="Selecciona un año"
+            label-for="input-1"
+            v-show="reporte == 4 || reporte == 7 || reporte == 8"
+        >
             <b-form-select
                 id="input-1"
                 v-model="aux_anno_selected"
@@ -51,7 +55,10 @@
 
         <p
             class="text-danger"
-            v-show="(reporte == 5 || reporte == 16) && aux_piloto_selected == null"
+            v-show="
+                ((reporte == 5 || reporte == 16) && aux_piloto_selected == null) ||
+                    ((reporte == 7 || reporte == 8) && aux_anno_selected == null)
+            "
         >
             *Debes seleccionar los parámetros
         </p>
@@ -254,6 +261,34 @@ export default {
                             },
                         });
                     });
+            } else if (this.reporte == 7 || this.reporte == 8) {
+                //Annos
+                fetch("http://localhost:3000/param/annos")
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((annos_data) => {
+                        console.log(annos_data);
+                        this.annos = annos_data.map((a) => {
+                            return {
+                                value: a.anno,
+                                text: a.anno,
+                            };
+                        });
+                        this.annos.unshift({
+                            value: 0,
+                            text: "Cada año",
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("ERROR desde SV", err);
+                        this.$router.push({
+                            name: "Reportes",
+                            params: {
+                                error: 1,
+                            },
+                        });
+                    });
             }
         },
         validar_select() {
@@ -270,6 +305,17 @@ export default {
                     if (
                         this.aux_fab_auto_selected == null ||
                         this.aux_model_auto_selected == null
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    break;
+                case 7:
+                case 8:
+                    if (
+                        (this.reporte == 7 || this.reporte == 8) &&
+                        this.aux_anno_selected == null
                     ) {
                         return false;
                     } else {
@@ -309,6 +355,24 @@ export default {
                             params: {
                                 fab_sel: this.aux_fab_auto_selected,
                                 model_sel: this.aux_model_auto_selected,
+                            },
+                        });
+                        break;
+                    case 7:
+                        this.$router.push({
+                            name: "Reporte 7y8",
+                            params: {
+                                v: "n",
+                                anno_sel: this.aux_anno_selected,
+                            },
+                        });
+                        breaks;
+                    case 8:
+                        this.$router.push({
+                            name: "Reporte 7y8",
+                            params: {
+                                v: "o",
+                                anno_sel: this.aux_anno_selected,
                             },
                         });
                         break;

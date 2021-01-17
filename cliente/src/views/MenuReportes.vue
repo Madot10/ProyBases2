@@ -90,6 +90,34 @@
                             >
                         </b-card>
 
+                        <b-card title="7- Piloto más joven del año en Le Mans">
+                            <b-card-text>
+                                Reporte que muestra el conductor más joven al inicio de cada una de
+                                las ediciones de la carrera.</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(7)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
+                        <b-card title="8- Piloto más veterano del año en Le Mans">
+                            <b-card-text>
+                                Reporte que muestra el conductor más veterano al inicio de cada una
+                                de las ediciones de la carrera.</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(8)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

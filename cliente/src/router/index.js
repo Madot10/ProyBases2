@@ -53,6 +53,12 @@ const routes = [
         name: "Reporte 6",
         component: () => import("../views/Reporte6.vue"),
     },
+    //Reporte 7y8
+    {
+        path: "/carrera-pilotos/:v/:anno_sel",
+        name: "Reporte 7y8",
+        component: () => import("../views/Reporte78.vue"),
+    },
     {
         path: "/simulacion/:anno_ref/:pista/:clima",
         name: "Simulacion",

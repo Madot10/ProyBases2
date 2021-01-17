@@ -270,7 +270,6 @@ class SimulacionReportesCont {
     getPilotoJoven(req, res) {
         var anno = req.params.anno;
         anno = verificar_int(anno);
-
         database
             .query(`SELECT * FROM reporte_piloto_joven($1::smallint)`, [anno])
             .then(function (data) {

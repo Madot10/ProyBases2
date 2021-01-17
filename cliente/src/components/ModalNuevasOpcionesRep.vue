@@ -4,7 +4,7 @@
         <b-form-group
             label="Selecciona un año"
             label-for="input-1"
-            v-show="reporte == 4 || reporte == 7 || reporte == 8 || reporte == 10"
+            v-show="reporte == 4 || reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11"
         >
             <b-form-select
                 id="input-1"
@@ -53,11 +53,26 @@
             ></b-form-select>
         </b-form-group>
 
+        <!-- SELECCIONAR UN TIPO DE EVENTO -->
+        <b-form-group
+            label="Selecciona un tipo de evento"
+            label-for="input-6"
+            v-show="reporte == 11"
+        >
+            <b-form-select
+                id="input-5"
+                v-model="aux_tipo_evnt_selected"
+                :options="tipos_eventos"
+            ></b-form-select>
+        </b-form-group>
+
         <p
             class="text-danger"
             v-show="
                 ((reporte == 5 || reporte == 16) && aux_piloto_selected == null) ||
-                    ((reporte == 7 || reporte == 8 || reporte == 10) && aux_anno_selected == null)
+                    ((reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11) &&
+                        aux_anno_selected == null) ||
+                    (reporte == 11 && aux_tipo_evnt_selected == null)
             "
         >
             *Debes seleccionar los parámetros
@@ -80,12 +95,23 @@ export default {
             pilotos: [],
             fab_auto: [],
             model_auto: [],
+            tipos_eventos: [
+                {
+                    value: "eny",
+                    text: "Ensayo",
+                },
+                {
+                    value: "car",
+                    text: "Carrera",
+                },
+            ],
 
             aux_anno_selected: null,
             aux_nro_team_selected: null,
             aux_piloto_selected: null,
             aux_fab_auto_selected: null,
             aux_model_auto_selected: null,
+            aux_tipo_evnt_selected: null,
         };
     },
     methods: {
@@ -261,7 +287,12 @@ export default {
                             },
                         });
                     });
-            } else if (this.reporte == 7 || this.reporte == 8 || this.reporte == 10) {
+            } else if (
+                this.reporte == 7 ||
+                this.reporte == 8 ||
+                this.reporte == 10 ||
+                this.reporte == 11
+            ) {
                 //Annos
                 fetch("http://localhost:3000/param/annos")
                     .then((response) => {
@@ -317,6 +348,13 @@ export default {
                         (this.reporte == 7 || this.reporte == 8) &&
                         this.aux_anno_selected == null
                     ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    break;
+                case 11:
+                    if (this.reporte == 11 && this.aux_tipo_evnt_selected == null) {
                         return false;
                     } else {
                         return true;
@@ -381,6 +419,16 @@ export default {
                         this.$router.push({
                             name: "Reporte 10",
                             params: {
+                                anno_sel: this.aux_anno_selected,
+                            },
+                        });
+                        break;
+
+                    case 11:
+                        this.$router.push({
+                            name: "Reporte 11",
+                            params: {
+                                ord_sel: this.aux_tipo_evnt_selected,
                                 anno_sel: this.aux_anno_selected,
                             },
                         });

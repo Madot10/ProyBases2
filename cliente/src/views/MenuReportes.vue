@@ -142,6 +142,19 @@
                             >
                         </b-card>
 
+                        <b-card title="11- Velocidades medias más altas en la historia de Le Mans">
+                            <b-card-text>
+                                Mostrar las velocidades más rápidas registradas.</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(11)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

@@ -128,6 +128,20 @@
                             >
                         </b-card>
 
+                        <b-card title="10- Ganador en su primera participación">
+                            <b-card-text>
+                                Ganar en su primera participación es un privilegio poco
+                                común.</b-card-text
+                            >
+                            <b-button
+                                href="#"
+                                @click="abrir_modal_reportes(10)"
+                                block
+                                variant="primary"
+                                >EJECUTAR</b-button
+                            >
+                        </b-card>
+
                         <b-card title="16- Mujeres piloto en Le mans">
                             <b-card-text>
                                 Reporte que muestra el registro de participaciones de mujeres piloto

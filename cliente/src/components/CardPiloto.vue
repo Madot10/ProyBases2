@@ -14,6 +14,7 @@
                 <p v-if="datos.nroparticipaciones">
                     Nro. de participaciones: {{ datos.nroparticipaciones }}
                 </p>
+                <p v-if="datos.anno">Año de participación: {{ datos.anno }}</p>
                 <p v-if="datos.annoparticipacion">
                     Año de participación: {{ datos.annoparticipacion }} <br />
                     <span v-if="datos.edad">Edad: {{ datos.edad }} años </span>

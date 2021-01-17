@@ -4,7 +4,7 @@
         <b-form-group
             label="Selecciona un año"
             label-for="input-1"
-            v-show="reporte == 4 || reporte == 7 || reporte == 8"
+            v-show="reporte == 4 || reporte == 7 || reporte == 8 || reporte == 10"
         >
             <b-form-select
                 id="input-1"
@@ -57,7 +57,7 @@
             class="text-danger"
             v-show="
                 ((reporte == 5 || reporte == 16) && aux_piloto_selected == null) ||
-                    ((reporte == 7 || reporte == 8) && aux_anno_selected == null)
+                    ((reporte == 7 || reporte == 8 || reporte == 10) && aux_anno_selected == null)
             "
         >
             *Debes seleccionar los parámetros
@@ -261,7 +261,7 @@ export default {
                             },
                         });
                     });
-            } else if (this.reporte == 7 || this.reporte == 8) {
+            } else if (this.reporte == 7 || this.reporte == 8 || this.reporte == 10) {
                 //Annos
                 fetch("http://localhost:3000/param/annos")
                     .then((response) => {
@@ -372,6 +372,15 @@ export default {
                             name: "Reporte 7y8",
                             params: {
                                 v: "o",
+                                anno_sel: this.aux_anno_selected,
+                            },
+                        });
+                        break;
+
+                    case 10:
+                        this.$router.push({
+                            name: "Reporte 10",
+                            params: {
                                 anno_sel: this.aux_anno_selected,
                             },
                         });

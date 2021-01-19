@@ -33,8 +33,11 @@ WHERE (pilot.identificacion).genero = 'f';*/
 
 --CREATE INDEX index_logro_piloto ON pilotos (identificacion) WHERE (pilotos.identificacion).primer_nombre = 'Frank';
 
+--Indice  Reporte #15 - Victorias por Marca
+--Probado para la BD le vams
+--EJ: explain select * from CARRERAS where puesto_final > 1 or puesto_final <= 3;
 
-
+CREATE INDEX index_vict_marca ON carreras (puesto_final) WHERE puesto_final > 1 or puesto_final <= 3;
 
 
 

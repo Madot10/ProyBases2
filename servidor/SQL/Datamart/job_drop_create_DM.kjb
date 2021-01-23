@@ -367,8 +367,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
-      <yloc>160</yloc>
+      <xloc>400</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -389,7 +389,7 @@ DROP TABLE dim_vehiculo;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>256</xloc>
+      <xloc>352</xloc>
       <yloc>160</yloc>
       <attributes_kjc/>
     </entry>
@@ -489,7 +489,22 @@ CREATE TABLE dim_piloto (
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>384</xloc>
+      <xloc>224</xloc>
+      <yloc>272</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Table exists</name>
+      <description/>
+      <type>TABLE_EXISTS</type>
+      <attributes/>
+      <tablename>ft_participacion</tablename>
+      <schemaname/>
+      <connection>c_dw_le_vams</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>224</xloc>
       <yloc>160</yloc>
       <attributes_kjc/>
     </entry>
@@ -497,7 +512,7 @@ CREATE TABLE dim_piloto (
   <hops>
     <hop>
       <from>Start</from>
-      <to>DROPs</to>
+      <to>Table exists</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -505,8 +520,17 @@ CREATE TABLE dim_piloto (
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>DROPs</from>
+      <from>Table exists</from>
       <to>CREATEs</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Table exists</from>
+      <to>DROPs</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -516,6 +540,15 @@ CREATE TABLE dim_piloto (
     <hop>
       <from>CREATEs</from>
       <to>Success</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>DROPs</from>
+      <to>CREATEs</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

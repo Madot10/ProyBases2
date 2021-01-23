@@ -26,6 +26,10 @@ REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
+--Revocar roles de CREATE a todos los usuarios menos al desarrollador
+REVOKE CREATE ON SCHEMA public FROM analista1;
+REVOKE CREATE ON SCHEMA public FROM analista2;
+REVOKE CREATE ON SCHEMA public FROM analista3;
 
 --Revocar todos los accesos por defecto a las funciones
 REVOKE EXECUTE ON FUNCTION reporte_rank_nro_equipo(NUMERIC,NUMERIC) FROM PUBLIC;
@@ -53,6 +57,15 @@ GRANT SELECT ON TABLE dim_piloto TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_tiempo TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_vehiculo TO analista_negocios_1;
 GRANT SELECT ON TABLE ft_participacion TO analista_negocios_1;
+--Roles de las funciones complementarias
+GRANT EXECUTE ON FUNCTION obt_vueltas_equipo_ant(SMALLINT,SMALLINT,SMALLINT) TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_evento_id(NUMERIC(4)) TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_annos_db() TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_nro_equipos_db() TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_pilotos_db() TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_pilotos_fem_db() TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_fabricantes_auto() TO analista_negocios_1;
+GRANT EXECUTE ON FUNCTION obt_modelos_auto() TO analista_negocios_1;
 
 --rol analista 2
 --Al analista 2 se le da el rol de analista_negocios_1 para que pueda acceder a las tablas
@@ -99,9 +112,15 @@ GRANT analista_negocios_1 to dev;
 GRANT analista_negocios_2 to dev;
 GRANT analista_negocios_3 to dev;
 --Permiso de inserts
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO desarrollador;
+ALTER ROLE desarrollador CREATEDB;
+ALTER ROLE desarrollador CREATEROLE;
+--Esto sólo lo permite para usuarios
+--Peeero no funciona
+--ALTER USER desarrollador CREATEUSER;
+
 
 --PROBAR
-
 GRANT INSERT ON TABLE dim_equipo TO desarrollador;
 GRANT INSERT ON TABLE dim_piloto TO desarrollador;
 GRANT INSERT ON TABLE dim_tiempo TO desarrollador;
@@ -117,7 +136,18 @@ GRANT INSERT ON TABLE ft_participacion TO desarrollador;
 --Reporte 15
 --SELECT * FROM reporte_victoria_por_marca(FALSE);
 --insert into dim_equipo(nombre, nombre_pais, img_bandera) VALUES ('Nuevo equipo2', 'Nuevo país2', 'Nueva imagen2');
+"""
+CREATE SEQUENCE sec_prueba
+    AS SMALLINT
+    MINVALUE 1
+    MAXVALUE 32767;
 
+CREATE TABLE prueba(
+  id_equipo SMALLINT DEFAULT nextval('sec_prueba') PRIMARY KEY,
+  nombre VARCHAR(35) NOT NULL,
+  id_pais SMALLINT
+);
+"""
 
 --En caso de tener que borrar un rol:
 CREATE ROLE aux;

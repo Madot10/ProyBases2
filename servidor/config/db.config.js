@@ -11,7 +11,7 @@ const { Pool } = require("pg");
 };*/
 //Config DM
 const db = {
-    user: "analista1",
+    user: "analista3",
     host: "localhost",
     database: "le_vams_dw",
     password: "12345",

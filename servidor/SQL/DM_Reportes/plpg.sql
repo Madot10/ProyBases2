@@ -86,7 +86,7 @@ CREATE OR REPLACE FUNCTION obt_fabricantes_auto()
         RETURN QUERY SELECT veh.fabricante_auto FROM dim_vehiculo veh  GROUP BY veh.fabricante_auto ORDER BY veh.fabricante_auto;
     end;
 $$;
-SELECT * FROM obt_fabricantes_auto()
+--SELECT * FROM obt_fabricantes_auto()
 
 --Obtener modelos de autos
 CREATE OR REPLACE FUNCTION obt_modelos_auto()
@@ -97,7 +97,7 @@ CREATE OR REPLACE FUNCTION obt_modelos_auto()
         RETURN QUERY SELECT veh.modelo FROM dim_vehiculo veh GROUP BY veh.modelo ORDER BY veh.modelo;
     end;
 $$;
-SELECT * FROM obt_modelos_auto()
+--SELECT * FROM obt_modelos_auto()
 
 
 

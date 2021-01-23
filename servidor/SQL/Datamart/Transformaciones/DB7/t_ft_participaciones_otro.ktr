@@ -642,11 +642,6 @@ DB: 7</note>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Switch / case Tipo de evento</from>
-      <to>Insert / update Carrera</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Estado participando</from>
       <to>Sort rows</to>
       <enabled>Y</enabled>
@@ -657,18 +652,28 @@ DB: 7</note>
       <enabled>Y</enabled>
     </hop>
     <hop>
+      <from>Insert / update Carrera</from>
+      <to>Dummy (do nothing) 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
       <from>Sort rows</from>
-      <to>Switch / case Tipo de evento</to>
+      <to>Filter rows</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Switch / case Tipo de evento</from>
+      <from>Filter rows</from>
+      <to>Insert / update Carrera</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filter rows</from>
+      <to>Block this step until steps finish</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Block this step until steps finish</from>
       <to>Update Ensayo</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Update Ensayo</from>
-      <to>Dummy (do nothing)</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -922,6 +927,18 @@ DB: 7</note>
         <condition>=</condition>
         <name2/>
       </key>
+      <key>
+        <name>mes</name>
+        <field>mes</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>dia</name>
+        <field>dia</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
       <value>
         <name>id_tiempo</name>
         <rename>id_fk_dim_tiempo</rename>
@@ -947,7 +964,7 @@ DB: 7</note>
     <name>Database lookup DIM VEHICULO</name>
     <type>DBLookup</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -963,7 +980,7 @@ DB: 7</note>
       <table>dim_vehiculo</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
+      <eat_row_on_failure>Y</eat_row_on_failure>
       <key>
         <name>modeloveh</name>
         <field>modelo</field>
@@ -994,6 +1011,31 @@ DB: 7</note>
     <GUI>
       <xloc>768</xloc>
       <yloc>272</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Dummy (do nothing) 2</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1184</xloc>
+      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1032,7 +1074,7 @@ DB: 7</note>
     </remotesteps>
     <GUI>
       <xloc>560</xloc>
-      <yloc>432</yloc>
+      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1071,7 +1113,7 @@ DB: 7</note>
     </remotesteps>
     <GUI>
       <xloc>560</xloc>
-      <yloc>352</yloc>
+      <yloc>368</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1122,6 +1164,180 @@ DB: 7</note>
     </GUI>
   </step>
   <step>
+    <name>Insert / update Carrera</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>c_dw_le_vams</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>ft_participacion</table>
+      <key>
+        <name>id_fk_dim_equipo</name>
+        <field>id_dim_tiempo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_vehiculo</name>
+        <field>id_dim_vehiculo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_equipo</name>
+        <field>id_dim_equipo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_piloto</name>
+        <field>id_dim_piloto</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>num_competidor</name>
+        <field>nro_equipo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>nro_equipo</name>
+        <rename>num_competidor</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>puesto_final_carrera</name>
+        <rename>posicion_final</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_km_pista</name>
+        <rename>km_pista</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>velocidad_media_carrera</name>
+        <rename>vel_media</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tiempo_mejor_vuelta_carrera</name>
+        <rename>tiempo_mejor_vuelta</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>nro_vueltas_carrera_total</name>
+        <rename>nro_vueltas</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_dim_tiempo</name>
+        <rename>id_fk_dim_tiempo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_dim_vehiculo</name>
+        <rename>id_fk_dim_vehiculo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_dim_equipo</name>
+        <rename>id_fk_dim_equipo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_dim_piloto</name>
+        <rename>id_fk_dim_piloto</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>estado</name>
+        <rename>estado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>velocidad_media_ensayo</name>
+        <rename>vel_media</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tiempo_mejor_vuelta_ensayo</name>
+        <rename>tiempo_mejor_vuelta</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>puesto_final_ensayo</name>
+        <rename>posicion_final</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1040</xloc>
+      <yloc>400</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>tipo</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>704</xloc>
+      <yloc>400</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>Switch / case Estado</name>
     <type>SwitchCase</type>
     <description/>
@@ -1155,7 +1371,7 @@ DB: 7</note>
     </remotesteps>
     <GUI>
       <xloc>384</xloc>
-      <yloc>384</yloc>
+      <yloc>400</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1171,7 +1387,7 @@ DB: 7</note>
       <schema_name/>
     </partitioning>
     <connection>c_le_db7</connection>
-    <sql>SELECT ev.ano, (auto.vehiculo).modelo ModeloVeh, cat.nombre CategoriaVeh, eq.nombre NombreEquipo, (p.nombre).primer_nombre, (p.nombre).primer_apellido, p.fecha_nacimiento ,ev.tipo, sub.num_competidor, parti.posicion_final, (ev.longitud).unidad km_pista, (parti.velocidad).unidad vel_media, parti.tiempo_mejor_vuelta, parti.numero_mejor_vuelta nro_vueltas FROM participacion parti
+    <sql>SELECT ev.ano, 15 dia, 6 mes, (auto.vehiculo).modelo ModeloVeh, cat.nombre CategoriaVeh, eq.nombre NombreEquipo, (p.nombre).primer_nombre, (p.nombre).primer_apellido, p.fecha_nacimiento ,ev.tipo, sub.num_competidor, parti.posicion_final, (ev.longitud).unidad km_pista, (parti.velocidad).unidad vel_media, parti.tiempo_mejor_vuelta, parti.numero_mejor_vuelta nro_vueltas FROM participacion parti
     INNER JOIN evento ev on parti.fk_id_eve = ev.id_eve
     INNER JOIN subdivision sub on parti.fk_id_sub = sub.id_sub
     INNER JOIN auto on parti.fk_id_aut = auto.id_aut
@@ -1197,6 +1413,77 @@ DB: 7</note>
     <GUI>
       <xloc>128</xloc>
       <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Update Ensayo</name>
+    <type>Update</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>c_dw_le_vams</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>100</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>ft_participacion</table>
+      <key>
+        <name>id_fk_dim_tiempo</name>
+        <field>id_dim_tiempo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_vehiculo</name>
+        <field>id_dim_vehiculo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_equipo</name>
+        <field>id_dim_equipo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_dim_piloto</name>
+        <field>id_dim_piloto</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>puesto_final_ensayo</name>
+        <rename>posicion_final</rename>
+      </value>
+      <value>
+        <name>velocidad_media_ensayo</name>
+        <rename>vel_media</rename>
+      </value>
+      <value>
+        <name>tiempo_mejor_vuelta_ensayo</name>
+        <rename>tiempo_mejor_vuelta</rename>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1040</xloc>
+      <yloc>512</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1334,8 +1621,8 @@ DB: 7</note>
     </GUI>
   </step>
   <step>
-    <name>Switch / case Tipo de evento</name>
-    <type>SwitchCase</type>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1344,23 +1631,25 @@ DB: 7</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <fieldname>tipo</fieldname>
-    <use_contains>N</use_contains>
-    <case_value_type>None</case_value_type>
-    <case_value_format/>
-    <case_value_decimal/>
-    <case_value_group/>
-    <default_target_step/>
-    <cases>
-      <case>
-        <value>carrera</value>
-        <target_step>Insert / update Carrera</target_step>
-      </case>
-      <case>
-        <value>clasificacion</value>
-        <target_step>Update Ensayo</target_step>
-      </case>
-    </cases>
+    <send_true_to>Insert / update Carrera</send_true_to>
+    <send_false_to>Block this step until steps finish</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>tipo</leftvalue>
+        <function>=</function>
+        <rightvalue/>
+        <value>
+          <name>constant</name>
+          <type>String</type>
+          <text>carrera</text>
+          <length>-1</length>
+          <precision>-1</precision>
+          <isnull>N</isnull>
+          <mask/>
+        </value>
+      </condition>
+    </compare>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1370,316 +1659,58 @@ DB: 7</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>864</xloc>
-      <yloc>384</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Insert / update Carrera</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>ft_participacion</table>
-      <key>
-        <name>id_fk_dim_equipo</name>
-        <field>id_dim_tiempo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_vehiculo</name>
-        <field>id_dim_vehiculo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_equipo</name>
-        <field>id_dim_equipo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_piloto</name>
-        <field>id_dim_piloto</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>num_competidor</name>
-        <field>nro_equipo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>nro_equipo</name>
-        <rename>num_competidor</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>puesto_final_carrera</name>
-        <rename>posicion_final</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>total_km_pista</name>
-        <rename>km_pista</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>velocidad_media_carrera</name>
-        <rename>vel_media</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>tiempo_mejor_vuelta_carrera</name>
-        <rename>tiempo_mejor_vuelta</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>nro_vueltas_carrera_total</name>
-        <rename>nro_vueltas</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>id_dim_tiempo</name>
-        <rename>id_fk_dim_tiempo</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>id_dim_vehiculo</name>
-        <rename>id_fk_dim_vehiculo</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>id_dim_equipo</name>
-        <rename>id_fk_dim_equipo</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>id_dim_piloto</name>
-        <rename>id_fk_dim_piloto</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>estado</name>
-        <rename>estado</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>velocidad_media_ensayo</name>
-        <rename>vel_media</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>tiempo_mejor_vuelta_ensayo</name>
-        <rename>tiempo_mejor_vuelta</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>puesto_final_ensayo</name>
-        <rename>posicion_final</rename>
-        <update>N</update>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1056</xloc>
-      <yloc>352</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Sort rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>tipo</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>704</xloc>
-      <yloc>384</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Update Ensayo</name>
-    <type>Update</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <skip_lookup>N</skip_lookup>
-    <commit>100</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>ft_participacion</table>
-      <key>
-        <name>id_fk_dim_tiempo</name>
-        <field>id_dim_tiempo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_vehiculo</name>
-        <field>id_dim_vehiculo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_equipo</name>
-        <field>id_dim_equipo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>id_fk_dim_piloto</name>
-        <field>id_dim_piloto</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>num_competidor</name>
-        <field>nro_equipo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>puesto_final_ensayo</name>
-        <rename>posicion_final</rename>
-      </value>
-      <value>
-        <name>velocidad_media_ensayo</name>
-        <rename>vel_media</rename>
-      </value>
-      <value>
-        <name>tiempo_mejor_vuelta_ensayo</name>
-        <rename>tiempo_mejor_vuelta</rename>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1056</xloc>
-      <yloc>448</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Dummy (do nothing)</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1200</xloc>
-      <yloc>496</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Dummy (do nothing) 2</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1200</xloc>
+      <xloc>832</xloc>
       <yloc>400</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Block this step until steps finish</name>
+    <type>BlockUntilStepsFinish</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <steps>
+      <step>
+        <name>Insert / update Carrera</name>
+        <CopyNr>0</CopyNr>
+      </step>
+    </steps>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>832</xloc>
+      <yloc>512</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
     <error>
+      <source_step>Database lookup DIM VEHICULO</source_step>
+      <target_step/>
+      <is_enabled>N</is_enabled>
+      <nr_valuename/>
+      <descriptions_valuename/>
+      <fields_valuename/>
+      <codes_valuename/>
+      <max_errors/>
+      <max_pct_errors/>
+      <min_pct_rows/>
+    </error>
+    <error>
       <source_step>Update Ensayo</source_step>
-      <target_step>Dummy (do nothing)</target_step>
+      <target_step>Microsoft Excel output 2</target_step>
       <is_enabled>Y</is_enabled>
       <nr_valuename/>
       <descriptions_valuename/>

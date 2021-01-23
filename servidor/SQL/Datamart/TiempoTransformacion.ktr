@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>t_ft_participaciones</name>
+    <name>TiempoTransformacion</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
     </parameters>
@@ -427,62 +428,20 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2021/01/09 15:28:03.156</created_date>
+    <created_date>2017/03/13 15:12:28.991</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2021/01/09 15:28:03.156</modified_date>
+    <modified_date>2017/03/13 15:12:28.991</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
     <notepad>
-      <note>Transformacion ETL Fact Table
-DB: Le Vams</note>
-      <xloc>176</xloc>
+      <note>Tabla estatica de tiempo
+Desde 01-01-1990 a 31-12-2009</note>
+      <xloc>96</xloc>
       <yloc>32</yloc>
       <width>174</width>
       <heigth>42</heigth>
-      <fontname>Segoe UI</fontname>
-      <fontsize>9</fontsize>
-      <fontbold>N</fontbold>
-      <fontitalic>N</fontitalic>
-      <fontcolorred>0</fontcolorred>
-      <fontcolorgreen>0</fontcolorgreen>
-      <fontcolorblue>0</fontcolorblue>
-      <backgroundcolorred>255</backgroundcolorred>
-      <backgroundcolorgreen>205</backgroundcolorgreen>
-      <backgroundcolorblue>112</backgroundcolorblue>
-      <bordercolorred>100</bordercolorred>
-      <bordercolorgreen>100</bordercolorgreen>
-      <bordercolorblue>100</bordercolorblue>
-      <drawshadow>Y</drawshadow>
-    </notepad>
-    <notepad>
-      <note>Sustituir valores nulos</note>
-      <xloc>240</xloc>
-      <yloc>224</yloc>
-      <width>126</width>
-      <heigth>26</heigth>
-      <fontname>Segoe UI</fontname>
-      <fontsize>9</fontsize>
-      <fontbold>N</fontbold>
-      <fontitalic>N</fontitalic>
-      <fontcolorred>0</fontcolorred>
-      <fontcolorgreen>0</fontcolorgreen>
-      <fontcolorblue>0</fontcolorblue>
-      <backgroundcolorred>255</backgroundcolorred>
-      <backgroundcolorgreen>205</backgroundcolorgreen>
-      <backgroundcolorblue>112</backgroundcolorblue>
-      <bordercolorred>100</bordercolorred>
-      <bordercolorgreen>100</bordercolorgreen>
-      <bordercolorblue>100</bordercolorblue>
-      <drawshadow>Y</drawshadow>
-    </notepad>
-    <notepad>
-      <note>Busqueda de FK</note>
-      <xloc>256</xloc>
-      <yloc>336</yloc>
-      <width>94</width>
-      <heigth>26</heigth>
       <fontname>Segoe UI</fontname>
       <fontsize>9</fontsize>
       <fontbold>N</fontbold>
@@ -550,92 +509,31 @@ DB: Le Vams</note>
       </attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>c_le_vams</name>
-    <server>localhost</server>
-    <type>POSTGRESQL</type>
-    <access>Native</access>
-    <database>sistema_le_vams</database>
-    <port>5432</port>
-    <username>postgres</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79ce218cc1fb8f</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>IS_CLUSTERED</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>PORT_NUMBER</code>
-        <attribute>5432</attribute>
-      </attribute>
-      <attribute>
-        <code>PRESERVE_RESERVED_WORD_CASE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>QUOTE_ALL_FIELDS</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>USE_POOLING</code>
-        <attribute>N</attribute>
-      </attribute>
-    </attributes>
-  </connection>
   <order>
     <hop>
-      <from>Table input</from>
-      <to>If field value is null</to>
+      <from>Rango Decadas</from>
+      <to>Calculator (Dif fechas)</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>If field value is null</from>
-      <to>Database lookup DIM TIEMPO</to>
+      <from>Calculator (Dif fechas)</from>
+      <to>Duplicar</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database lookup DIM TIEMPO</from>
-      <to>Database lookup DIM VEHICULO</to>
+      <from>Duplicar</from>
+      <to>date attributes</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database lookup DIM EQUIPO</from>
-      <to>Database lookup DIM Piloto</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Database lookup DIM VEHICULO</from>
-      <to>Database lookup DIM EQUIPO</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Database lookup DIM Piloto</from>
-      <to>Table output</to>
+      <from>date attributes</from>
+      <to>Table output Tiempo</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Database lookup DIM EQUIPO</name>
-    <type>DBLookup</type>
+    <name>Calculator (Dif fechas)</name>
+    <type>Calculator</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -644,29 +542,22 @@ DB: Le Vams</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema/>
-      <table>dim_equipo</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>nombre</name>
-        <field>nombre</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>id_equipo</name>
-        <rename>id_fk_equipo</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
+    <failIfNoFile>N</failIfNoFile>
+    <calculation>
+      <field_name>diff_dates</field_name>
+      <calc_type>DATE_DIFF</calc_type>
+      <field_a>end_date</field_a>
+      <field_b>start_date</field_b>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -676,273 +567,45 @@ DB: Le Vams</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
-      <yloc>464</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Database lookup DIM Piloto</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema/>
-      <table>dim_piloto</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>Y</eat_row_on_failure>
-      <key>
-        <name>nombrepiloto</name>
-        <field>nombre</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>apellidopiloto</name>
-        <field>apellido</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>fechanacpiloto</name>
-        <field>fec_nacimiento</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>id_piloto</name>
-        <rename>id_fk_piloto</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>464</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Database lookup DIM TIEMPO</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema/>
-      <table>dim_tiempo</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>anno</name>
-        <field>anno</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>mes</name>
-        <field>mes</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>dia</name>
-        <field>dia</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>id_tiempo</name>
-        <rename>id_fk_tiempo</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>368</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Database lookup DIM VEHICULO</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema/>
-      <table>dim_vehiculo</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>categoriaveh</name>
-        <field>categoria</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>modeloveh</name>
-        <field>modelo</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>id_vehiculo</name>
-        <rename>id_fk_vehiculo</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>384</xloc>
-      <yloc>368</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>If field value is null</name>
-    <type>IfNull</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <replaceAllByValue/>
-    <replaceAllMask/>
-    <selectFields>Y</selectFields>
-    <selectValuesType>N</selectValuesType>
-    <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
-    <fields>
-      <field>
-        <name>tiempomejorensayo</name>
-        <value>00:00:00</value>
-        <mask>HH:mm:ss</mask>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>240</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Table input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>c_le_vams</connection>
-    <sql>--Datos de la tabla
-SELECT parti.nro_equipo, c.puesto_final PuestoFinalCarrera, (e.estadistica).puesto PuestoFinalEnsayo, pis.total_km, (rd.estadistica).velocidad_media VelMediaCarrera, (e.estadistica).velocidad_media VelMediaEnsayo, (rd.estadistica).tiempo_mejor_vuelta TiempoMejorCarrera, (e.estadistica).tiempo_mejor_vuelta TiempoMejorEnsayo, rd.nro_vueltas, c.estado,
---Datos para FK
-    EXTRACT(YEAR FROM ev.fecha) Anno, EXTRACT(DAY FROM ev.fecha) Dia, EXTRACT(MONTH FROM ev.fecha) Mes, v.modelo ModeloVeh, v.categoria CategoriaVeh, v.fabricante_auto, v.fabricante_neumatico, eq.nombre, (pilot.identificacion).primer_nombre NombrePiloto, (pilot.identificacion).primer_apellido ApellidoPiloto, pilot.fec_nacimiento FechaNacPiloto
-FROM participaciones parti
-    INNER JOIN carreras c on parti.nro_equipo = c.parti_nro_equipo and parti.id_vehiculo = c.id_parti_vehiculo and parti.id_equipo = c.id_parti_equipo and parti.id_evento = c.id_parti_evento and parti.id_event_pista = c.id_parti_evento_pista
-    INNER JOIN ensayos e on parti.nro_equipo = e.parti_nro_equipo and parti.id_vehiculo = e.id_parti_vehiculo and parti.id_equipo = e.id_parti_equipo and parti.id_evento = e.id_parti_evento and parti.id_event_pista = e.id_parti_evento_pista
-    INNER JOIN eventos ev on parti.id_evento = ev.id_evento and parti.id_event_pista = ev.id_pista
-    INNER JOIN pistas pis on ev.id_pista = pis.id_pista
-    INNER JOIN sucesos s on s.hora = 1 and ev.id_evento = s.id_evento and ev.id_pista = s.id_event_pista
-    INNER JOIN resumen_datos rd on s.id_suceso = rd.id_suceso and c.id_carrera = rd.id_carrera and c.parti_nro_equipo = rd.car_nro_equipo and c.id_parti_vehiculo = rd.id_car_vehiculo and c.id_parti_equipo = rd.id_car_equipo and c.id_parti_evento = rd.id_car_evento and c.id_parti_evento_pista = rd.id_car_pista
-    INNER JOIN vehiculos v on parti.id_vehiculo = v.id_vehiculo
-    INNER JOIN equipos eq on parti.id_equipo = eq.id_equipo
-    INNER JOIN plantillas p on parti.nro_equipo = p.parti_nro_equipo and parti.id_vehiculo = p.id_parti_vehiculo and parti.id_equipo = p.id_parti_equipo and parti.id_evento = p.id_parti_evento and parti.id_event_pista = p.id_parti_evento_pista
-    INNER JOIN pilotos pilot on p.id_piloto = pilot.id_piloto</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
+      <xloc>224</xloc>
       <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Table output</name>
+    <name>Duplicar</name>
+    <type>CloneRow</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <nrclones>0</nrclones>
+    <addcloneflag>N</addcloneflag>
+    <cloneflagfield/>
+    <nrcloneinfield>Y</nrcloneinfield>
+    <nrclonefield>diff_dates</nrclonefield>
+    <addclonenum>Y</addclonenum>
+    <clonenumfield>delta</clonenumfield>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Table output Tiempo</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -954,11 +617,11 @@ FROM participaciones parti
     </partitioning>
     <connection>c_dw_le_vams</connection>
     <schema/>
-    <table>ft_participacion</table>
+    <table>dim_tiempo</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -971,60 +634,20 @@ FROM participaciones parti
     <return_field/>
     <fields>
       <field>
-        <column_name>nro_equipo</column_name>
-        <stream_name>nro_equipo</stream_name>
+        <column_name>anno</column_name>
+        <stream_name>anno</stream_name>
       </field>
       <field>
-        <column_name>puesto_final_carrera</column_name>
-        <stream_name>puestofinalcarrera</stream_name>
+        <column_name>mes</column_name>
+        <stream_name>mes</stream_name>
       </field>
       <field>
-        <column_name>puesto_final_ensayo</column_name>
-        <stream_name>puestofinalensayo</stream_name>
+        <column_name>dia</column_name>
+        <stream_name>dia</stream_name>
       </field>
       <field>
-        <column_name>total_km_pista</column_name>
-        <stream_name>total_km</stream_name>
-      </field>
-      <field>
-        <column_name>velocidad_media_carrera</column_name>
-        <stream_name>velmediacarrera</stream_name>
-      </field>
-      <field>
-        <column_name>velocidad_media_ensayo</column_name>
-        <stream_name>velmediaensayo</stream_name>
-      </field>
-      <field>
-        <column_name>tiempo_mejor_vuelta_carrera</column_name>
-        <stream_name>tiempomejorcarrera</stream_name>
-      </field>
-      <field>
-        <column_name>tiempo_mejor_vuelta_ensayo</column_name>
-        <stream_name>tiempomejorensayo</stream_name>
-      </field>
-      <field>
-        <column_name>nro_vueltas_carrera_total</column_name>
-        <stream_name>nro_vueltas</stream_name>
-      </field>
-      <field>
-        <column_name>estado</column_name>
-        <stream_name>estado</stream_name>
-      </field>
-      <field>
-        <column_name>id_dim_tiempo</column_name>
-        <stream_name>id_fk_tiempo</stream_name>
-      </field>
-      <field>
-        <column_name>id_dim_vehiculo</column_name>
-        <stream_name>id_fk_vehiculo</stream_name>
-      </field>
-      <field>
-        <column_name>id_dim_equipo</column_name>
-        <stream_name>id_fk_equipo</stream_name>
-      </field>
-      <field>
-        <column_name>id_dim_piloto</column_name>
-        <stream_name>id_fk_piloto</stream_name>
+        <column_name>dia_semana</column_name>
+        <stream_name>dia_semana</stream_name>
       </field>
     </fields>
     <attributes/>
@@ -1036,36 +659,169 @@ FROM participaciones parti
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
-      <yloc>576</yloc>
+      <xloc>624</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>date attributes</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <failIfNoFile>N</failIfNoFile>
+    <calculation>
+      <field_name>a_single_date</field_name>
+      <calc_type>ADD_DAYS</calc_type>
+      <field_a>start_date</field_a>
+      <field_b>delta</field_b>
+      <field_c/>
+      <value_type>Date</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask>yyyyMMdd</conversion_mask>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>anno</field_name>
+      <calc_type>YEAR_OF_DATE</calc_type>
+      <field_a>a_single_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>mes</field_name>
+      <calc_type>MONTH_OF_DATE</calc_type>
+      <field_a>a_single_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>dia</field_name>
+      <calc_type>DAY_OF_MONTH</calc_type>
+      <field_a>a_single_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>dia_semana</field_name>
+      <calc_type>DAY_OF_WEEK</calc_type>
+      <field_a>a_single_date</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>480</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Rango Decadas</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>start_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd</format>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1990-01-01</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>end_date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd</format>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2009-12-31</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms>5000</interval_in_ms>
+    <row_time_field>now</row_time_field>
+    <last_time_field>FiveSecondsAgo</last_time_field>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>96</xloc>
+      <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
-    <error>
-      <source_step>Database lookup DIM Piloto</source_step>
-      <target_step/>
-      <is_enabled>N</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
-      <max_errors/>
-      <max_pct_errors/>
-      <min_pct_rows/>
-    </error>
-    <error>
-      <source_step>Database lookup DIM VEHICULO</source_step>
-      <target_step/>
-      <is_enabled>N</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
-      <max_errors/>
-      <max_pct_errors/>
-      <min_pct_rows/>
-    </error>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>

@@ -3,13 +3,23 @@
         <b-row align-v="center">
             <b-col cols="6">
                 <!-- IMG PILOTO -->
-                <b-img rounded :src="check_base64(datos.imgpiloto)" fluid-grow></b-img>
+                <b-img
+                    id="img-pilot"
+                    center
+                    rounded
+                    :src="check_base64(datos.imgpiloto)"
+                    fluid-grow
+                ></b-img>
             </b-col>
             <b-col cols="6">
                 <!-- Nombre y bandera de nac -->
                 <h3>
                     {{ datos.nombrepiloto }}
-                    <b-img rounded :src="check_base64(datos.imgbanderapiloto)"></b-img>
+                    <b-img
+                        id="img-pais"
+                        rounded
+                        :src="check_base64(datos.imgbanderapiloto)"
+                    ></b-img>
                 </h3>
                 <p v-if="datos.nroparticipaciones">
                     Nro. de participaciones: {{ datos.nroparticipaciones }}
@@ -62,4 +72,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+#img-pilot {
+    max-width: 30vh;
+}
+
+#img-pais {
+    max-width: 30px;
+}
+</style>

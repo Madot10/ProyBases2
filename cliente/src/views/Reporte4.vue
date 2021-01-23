@@ -3,7 +3,8 @@
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
                 <h3 class="text-center mb-2 w-100">
-                    Ranking por Nro. Equipo - {{ $route.params.anno_sel }}
+                    Ranking por Nro. Equipo -
+                    {{ $route.params.anno_sel == 0 ? "" : $route.params.anno_sel }}
                 </h3>
                 <div v-for="(parti, i) in datos_rank" :key="i">
                     <CardRaking :datos="parti" tipo_event="car" :limites="limites"></CardRaking>
@@ -140,5 +141,3 @@ export default {
     },
 };
 </script>
-
-<style></style>

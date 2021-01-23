@@ -22,6 +22,7 @@
                                 <h3>
                                     {{ parti.nroequipo }} - {{ parti.nombreequipo }}
                                     <b-img
+                                        id="img-pais"
                                         rounded
                                         :src="check_base64(parti.imgbanderaequipo)"
                                     ></b-img>
@@ -105,4 +106,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+#img-pais {
+    max-width: 30px;
+}
+</style>

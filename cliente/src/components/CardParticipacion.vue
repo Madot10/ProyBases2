@@ -10,7 +10,7 @@
                 <!-- Nro equipo, Nombre y bandera de nac -->
                 <h3>
                     {{ datos.nroequipo }} - {{ datos.nombreequipo }}
-                    <b-img rounded :src="'data:image/png;base64,' + datos.imgbanderaequipo"></b-img>
+                    <b-img rounded :src="datos.imgbanderaequipo"></b-img>
                 </h3>
                 <p>({{datos.fechapartipacion || datos.annoparticipacion}})</p>
                
@@ -87,4 +87,5 @@ export default {
 .card {
     width: 100%;
 }
+
 </style>

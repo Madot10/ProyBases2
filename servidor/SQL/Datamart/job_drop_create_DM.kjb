@@ -376,11 +376,11 @@
       <description/>
       <type>SQL</type>
       <attributes/>
-      <sql>DROP TABLE ft_participacion CASCADE;
+      <sql>DROP TABLE ft_participacion;
 DROP TABLE dim_equipo;
 DROP TABLE dim_piloto;
 DROP TABLE dim_vehiculo;
-DROP TABLE dim_tiempo;</sql>
+--DROP TABLE dim_tiempo;</sql>
       <useVariableSubstitution>F</useVariableSubstitution>
       <sqlfromfile>F</sqlfromfile>
       <sqlfilename/>
@@ -399,21 +399,7 @@ DROP TABLE dim_tiempo;</sql>
       <type>SQL</type>
       <attributes/>
       <sql>-- CREATE database le_vams_dw;
---DIM TIEMPO
-DROP SEQUENCE IF EXISTS sec_tiempo;
-CREATE SEQUENCE sec_tiempo
-    AS SMALLINT
-    MINVALUE 1
-    MAXVALUE 32767;
 
-CREATE TABLE dim_tiempo(
-  id_tiempo SMALLINT DEFAULT nextval('sec_tiempo'),
-  anno NUMERIC(4) NOT NULL,
-  mes NUMERIC(2) NOT NULL,
-  dia numeric(2) NOT NULL,
-	dia_semana NUMERIC(1) NOT NULL,
-  CONSTRAINT pk_dim_tiempo PRIMARY KEY (id_tiempo)
-);
 
 --DIM VEHÍCULO
 DROP SEQUENCE IF EXISTS sec_veh;

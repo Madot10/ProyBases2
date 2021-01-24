@@ -21,11 +21,11 @@ GRANT analista_negocios_3 to analista3;
 --Revocar todos los accesos por defecto
 --revocamos comportamiento por defecto
 --ALTER default privileges revoke execute on functions from public;
-REVOKE ALL PRIVILEGES ON DATABASE le_vams_dw FROM PUBLIC;
+--REVOKE ALL PRIVILEGES ON DATABASE le_vams_dw FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
+--REVOKE ALL ON SCHEMA public FROM PUBLIC;
 --Revocar roles de CREATE a todos los usuarios menos al desarrollador
 REVOKE CREATE ON SCHEMA public FROM analista1;
 REVOKE CREATE ON SCHEMA public FROM analista2;
@@ -106,6 +106,7 @@ GRANT EXECUTE ON FUNCTION reporte_victoria_por_marca(BOOLEAN) TO analista_negoci
 GRANT EXECUTE ON FUNCTION reporte_mujeres_pilotos(SMALLINT) TO analista_negocios_3;
 --Reporte 16.2
 GRANT EXECUTE ON FUNCTION reporte_datos_participacion_mujeres(SMALLINT) TO analista_negocios_3;
+GRANT EXECUTE ON FUNCTION reporte_datos_participacion(SMALLINT) TO analista_negocios_3;
 
 --rol desarrollador
 GRANT analista_negocios_1 to dev;

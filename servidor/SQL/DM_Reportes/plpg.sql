@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION obt_annos_db()
         Anno NUMERIC(4)
                   ) LANGUAGE plpgsql AS $$
     BEGIN
-        RETURN QUERY SELECT dt.anno FROM dim_tiempo dt ORDER BY dt.anno;
+        RETURN QUERY SELECT dt.anno FROM dim_tiempo dt GROUP BY dt.anno ORDER BY dt.anno;
     END;
 $$;
 
@@ -549,6 +549,7 @@ $$;
 --DROP FUNCTION  reporte_mujeres_pilotos(anno_ref SMALLINT);
 CREATE OR REPLACE FUNCTION reporte_mujeres_pilotos(anno_ref SMALLINT DEFAULT NULL)
     RETURNS TABLE(
+        IdPiloto SMALLINT,
         AnnoPrimeraParticipacion NUMERIC(4),
         CantParticipaciones BIGINT,
         CantPrimerLugar BIGINT,
@@ -568,7 +569,9 @@ CREATE OR REPLACE FUNCTION reporte_mujeres_pilotos(anno_ref SMALLINT DEFAULT NUL
             id_evnt := obt_evento_id(anno_ref);
         END IF;
 
-        RETURN QUERY SELECT DISTINCT --Año de primera participacion
+        RETURN QUERY SELECT DISTINCT
+                p.id_piloto,
+                --Año de primera participacion
                (SELECT MIN(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto =  pilot.id_piloto) AnnoPrimeraParticipacion,
                --Numero total de participaciones
                 (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto) CantParticipaciones,

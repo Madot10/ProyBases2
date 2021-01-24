@@ -4,7 +4,14 @@
         <b-form-group
             label="Selecciona un año"
             label-for="input-1"
-            v-show="reporte == 4 || reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11"
+            v-show="
+                reporte == 4 ||
+                    reporte == 7 ||
+                    reporte == 8 ||
+                    reporte == 10 ||
+                    reporte == 11 ||
+                    reporte == 16
+            "
         >
             <b-form-select
                 id="input-1"
@@ -23,11 +30,7 @@
         </b-form-group>
 
         <!-- SELECCIONAR UN PILOTO -->
-        <b-form-group
-            label="Selecciona un piloto"
-            label-for="input-3"
-            v-show="reporte == 5 || reporte == 16"
-        >
+        <b-form-group label="Selecciona un piloto" label-for="input-3" v-show="reporte == 5">
             <b-form-select
                 id="input-3"
                 v-model="aux_piloto_selected"
@@ -91,8 +94,12 @@
         <p
             class="text-danger"
             v-show="
-                ((reporte == 5 || reporte == 16) && aux_piloto_selected == null) ||
-                    ((reporte == 7 || reporte == 8 || reporte == 10 || reporte == 11) &&
+                (reporte == 5 && aux_piloto_selected == null) ||
+                    ((reporte == 7 ||
+                        reporte == 8 ||
+                        reporte == 10 ||
+                        reporte == 11 ||
+                        reporte == 16) &&
                         aux_anno_selected == null) ||
                     (reporte == 11 && aux_tipo_evnt_selected == null) ||
                     (reporte == 12 && aux_limit_selected == null) ||
@@ -153,6 +160,9 @@ export default {
         };
     },
     methods: {
+        retornar_error() {
+            this.$bvModal.hide("modal-new-reportes");
+        },
         obtener_parametros() {
             if (this.reporte == 4) {
                 //Reporte 4
@@ -163,6 +173,9 @@ export default {
                     })
                     .then((annos_data) => {
                         console.log(annos_data);
+                        //check error
+                        if (annos_data.name == "error") this.retornar_error();
+
                         this.annos = annos_data.map((a) => {
                             return {
                                 value: a.anno,
@@ -190,6 +203,9 @@ export default {
                     })
                     .then((nros_team_data) => {
                         console.log(nros_team_data);
+                        //check error
+                        if (nros_team_data.name == "error") this.retornar_error();
+
                         this.nros_teams = nros_team_data.map((nt) => {
                             return {
                                 value: nt.nroequipo,
@@ -219,35 +235,9 @@ export default {
                     })
                     .then((pilotos_data) => {
                         console.log(pilotos_data);
-                        this.pilotos = pilotos_data.map((p) => {
-                            return {
-                                value: p.idpiloto,
-                                text: p.nombrepiloto,
-                            };
-                        });
-                        this.pilotos.unshift({
-                            value: null,
-                            text: "Seleccione un piloto",
-                        });
-                    })
-                    .catch((err) => {
-                        console.log("ERROR desde SV", err);
-                        this.$router.push({
-                            name: "Reportes",
-                            params: {
-                                error: 1,
-                            },
-                        });
-                    });
-            } else if (this.reporte == 16) {
-                //Reporte 16
-                //Pilotos
-                fetch("http://localhost:3000/param/pilotos-fem")
-                    .then((response) => {
-                        return response.json();
-                    })
-                    .then((pilotos_data) => {
-                        console.log(pilotos_data);
+                        //check error
+                        if (pilotos_data.name == "error") this.retornar_error();
+
                         this.pilotos = pilotos_data.map((p) => {
                             return {
                                 value: p.idpiloto,
@@ -277,6 +267,9 @@ export default {
                     })
                     .then((fab_data) => {
                         console.log(fab_data);
+                        //check error
+                        if (fab_data.name == "error") this.retornar_error();
+
                         this.fab_auto = fab_data.map((p) => {
                             return {
                                 value: p.fabricanteauto,
@@ -305,6 +298,9 @@ export default {
                     })
                     .then((model_data) => {
                         console.log(model_data);
+                        //check error
+                        if (model_data.name == "error") this.retornar_error();
+
                         this.model_auto = model_data.map((m) => {
                             return {
                                 value: m.modelosauto,
@@ -329,7 +325,8 @@ export default {
                 this.reporte == 7 ||
                 this.reporte == 8 ||
                 this.reporte == 10 ||
-                this.reporte == 11
+                this.reporte == 11 ||
+                this.reporte == 16
             ) {
                 //Annos
                 fetch("http://localhost:3000/param/annos")
@@ -338,12 +335,16 @@ export default {
                     })
                     .then((annos_data) => {
                         console.log(annos_data);
+                        //check error
+                        if (annos_data.name == "error") this.retornar_error();
+
                         this.annos = annos_data.map((a) => {
                             return {
                                 value: a.anno,
                                 text: a.anno,
                             };
                         });
+                        //if (!this.reporte == 16)
                         this.annos.unshift({
                             value: 0,
                             text: "Cada año",
@@ -362,7 +363,6 @@ export default {
         },
         validar_select() {
             switch (this.reporte) {
-                case 16:
                 case 5:
                     if (this.aux_piloto_selected == null) {
                         return false;
@@ -382,8 +382,9 @@ export default {
                     break;
                 case 7:
                 case 8:
+                case 16:
                     if (
-                        (this.reporte == 7 || this.reporte == 8) &&
+                        (this.reporte == 7 || this.reporte == 8 || this.reporte == 16) &&
                         this.aux_anno_selected == null
                     ) {
                         return false;
@@ -431,7 +432,6 @@ export default {
                         break;
 
                     case 5:
-                    case 16:
                         this.$router.push({
                             name: "Reporte 5",
                             params: {
@@ -456,7 +456,7 @@ export default {
                                 anno_sel: this.aux_anno_selected,
                             },
                         });
-                        breaks;
+                        break;
                     case 8:
                         this.$router.push({
                             name: "Reporte 7y8",
@@ -503,6 +503,13 @@ export default {
                             },
                         });
                         break;
+                    case 16:
+                        this.$router.push({
+                            name: "Reporte 16",
+                            params: {
+                                anno_sel: this.aux_anno_selected,
+                            },
+                        });
                     default:
                         break;
                 }

@@ -19,7 +19,7 @@
                 <!--Modelo Veh-->
                 <p>{{ datos.nombrevehiculo || datos.modelo }}</p>
                  <!--Motor Motor-->
-                <p>{{ datos.modelomotor }} {{ datos.cilindros }} {{ datos.cc }}cc</p>
+                <p v-if="datos.modelomotor">{{ datos.modelomotor }} {{ datos.cilindros }} {{ datos.cc }}cc</p>
                 <!-- Fabricantes-->
                 <p v-if="datos.fabneumatico">
                     Fab. neumáticos: {{datos.fabneumatico}} <br>

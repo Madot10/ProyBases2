@@ -414,6 +414,22 @@ class SimulacionReportesCont {
                 console.error(e.stack);
             });
     }
+
+    //16.2.  Datos de las participaciones
+    getDatosParticipacionMujeres(req, res) {
+        var anno = req.params.anno;
+        anno = verificar_int(anno);
+
+        database
+            .query(`SELECT * FROM reporte_datos_participacion_mujeres($1::smallint)`, [anno])
+            .then(function (data) {
+                res.status(200).json(data.rows);
+            })
+            .catch((e) => {
+                res.status(500).json(e);
+                console.error(e.stack);
+            });
+    }
 }
 
 module.exports = { SimulacionReportesCont };

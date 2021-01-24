@@ -64,6 +64,14 @@ export default {
         };
     },
     methods: {
+        retornar_error() {
+            this.$router.push({
+                name: "Reportes",
+                params: {
+                    error: 1,
+                },
+            });
+        },
         //check base64 encabezado
         check_base64(b64) {
             if (b64 && !b64.includes("data:image")) {
@@ -85,6 +93,10 @@ export default {
                 })
                 .then((ranking_data) => {
                     //this.generar_rank(ranking_data);
+
+                    //check error
+                    if (ranking_data.name == "error") this.retornar_error();
+
                     console.log(ranking_data);
                     this.data_parti = ranking_data;
                     this.is_loading = false;

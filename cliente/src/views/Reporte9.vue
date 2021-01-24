@@ -34,6 +34,14 @@ export default {
         };
     },
     methods: {
+        retornar_error() {
+            this.$router.push({
+                name: "Reportes",
+                params: {
+                    error: 1,
+                },
+            });
+        },
         //Obtener datos desde el MBD
         obtener_datos() {
             let urlApi = `http://localhost:3000/piloto_mayores_part`;
@@ -46,17 +54,16 @@ export default {
                 .then((ranking_data) => {
                     //this.generar_rank(ranking_data);
                     console.log(ranking_data);
+
+                    //check error
+                    if (ranking_data.name == "error") this.retornar_error();
+
                     this.data_parti = ranking_data;
                     this.is_loading = false;
                 })
                 .catch((err) => {
                     console.log("ERROR desde SV", err);
-                    this.$router.push({
-                        name: "Reportes",
-                        params: {
-                            error: 1,
-                        },
-                    });
+                    this.retornar_error();
                 });
         },
     },

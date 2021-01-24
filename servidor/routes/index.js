@@ -62,5 +62,7 @@ router.get("/abandonos", rep.getAbandonos);
 router.get("/victorias_marcas/:isfabauto", rep.getVictoriasMarca);
 //Reporte 16 - Mujeres piloto en Le Mans
 router.get("/mujeres_piloto/:anno", rep.getMujeresPiloto);
+//Reporte 16.1 - Mujeres piloto en Le Mans
+router.get("/participaciones_mujeres_piloto/:anno", rep.getDatosParticipacionMujeres);
 
 module.exports = router;

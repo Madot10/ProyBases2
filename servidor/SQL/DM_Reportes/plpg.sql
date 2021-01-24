@@ -462,7 +462,7 @@ CREATE OR REPLACE FUNCTION reporte_distancias_mas_largas(limit_num NUMERIC(3) DE
             INNER JOIN dim_piloto pilot ON parti.id_dim_piloto = pilot.id_piloto
             INNER JOIN dim_vehiculo veh ON parti.id_dim_vehiculo = veh.id_vehiculo
             INNER JOIN dim_tiempo t ON parti.id_dim_tiempo = t.id_tiempo
-        ORDER BY  DistRecorrida Desc LIMIT limit_num;
+        ORDER BY  DistRecorrida Desc LIMIT limit_num*3;
     END;
 $$;
 

@@ -43,7 +43,7 @@ export default {
     data() {
         return {
             datos_detallados: {},
-            datos_pilot: null,
+            datos_pilot: [],
             is_loading: true,
         };
     },

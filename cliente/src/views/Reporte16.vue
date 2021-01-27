@@ -23,6 +23,15 @@
                     <hr />
                 </div>
 
+                <!-- MENSAJE - DATOS VACIOS -->
+                <div
+                    v-show="datos_pilot.length == 0 && is_loading == false"
+                    class="mt-2 text-center  mx-auto"
+                >
+                    <h2>¡No hemos encontrado información!</h2>
+                    <b-icon class="h1" icon="emoji-frown"></b-icon>
+                </div>
+
                 <!-- MENSAJE - CARGA -->
                 <div v-show="is_loading == true" class="mt-2 text-center mx-auto">
                     <h3>Estamos solicitando la información al servidor, por favor espere</h3>
@@ -58,6 +67,7 @@ export default {
         },
         //Generar array agrupados
         generar_rank(datos, idParent) {
+            console.log("generar_rank", idParent, datos);
             let aux_rank = [];
             //Array nuevo de datos
             let aux_arr = [];
@@ -67,7 +77,7 @@ export default {
                 //Si no existe registro de equipo
 
                 //Si no existe registro de equipo
-                let c_anno = new Date(c.anno);
+                let c_anno = new Date(c.fechapartipacion);
 
                 if (aux_rank[c.nroequipo + c_anno.getFullYear()] == null) {
                     //Guardamos index de array original
@@ -99,7 +109,7 @@ export default {
                 }
             });
             //Guardamos
-            this.datos_detallados[idParent] = aux_arr;
+            this.$set(this.datos_detallados, idParent, aux_arr);
             this.is_loading = false;
         },
         //Obtener datos desde el MBD
@@ -116,6 +126,8 @@ export default {
                     //this.generar_rank(ranking_data);
                     console.log("pilot_data", pilot_data);
                     this.datos_pilot = pilot_data;
+
+                    if (this.datos_pilot.length == 0) this.is_loading = false;
 
                     this.datos_pilot.forEach((p) => {
                         //Datos de participacion

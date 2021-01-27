@@ -629,7 +629,7 @@ DB: Le Vams</note>
     </hop>
     <hop>
       <from>Database lookup DIM Piloto</from>
-      <to>Table output</to>
+      <to>Insert / update</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -1027,6 +1027,132 @@ FROM participaciones parti
         <stream_name>id_fk_piloto</stream_name>
       </field>
     </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>640</xloc>
+      <yloc>544</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Insert / update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>c_dw_le_vams</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>ft_participacion</table>
+      <key>
+        <name>id_fk_tiempo</name>
+        <field>id_dim_tiempo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_vehiculo</name>
+        <field>id_dim_vehiculo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_equipo</name>
+        <field>id_dim_equipo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_fk_piloto</name>
+        <field>id_dim_piloto</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>nro_equipo</name>
+        <rename>nro_equipo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>puesto_final_carrera</name>
+        <rename>puestofinalcarrera</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>puesto_final_ensayo</name>
+        <rename>puestofinalensayo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>total_km_pista</name>
+        <rename>total_km</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>velocidad_media_carrera</name>
+        <rename>velmediacarrera</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>velocidad_media_ensayo</name>
+        <rename>velmediaensayo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>tiempo_mejor_vuelta_carrera</name>
+        <rename>tiempomejorcarrera</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>tiempo_mejor_vuelta_ensayo</name>
+        <rename>tiempomejorensayo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>nro_vueltas_carrera_total</name>
+        <rename>nro_vueltas</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>estado</name>
+        <rename>estado</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_dim_tiempo</name>
+        <rename>id_fk_tiempo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_dim_vehiculo</name>
+        <rename>id_fk_vehiculo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_dim_equipo</name>
+        <rename>id_fk_equipo</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_dim_piloto</name>
+        <rename>id_fk_piloto</rename>
+        <update>N</update>
+      </value>
+    </lookup>
     <attributes/>
     <cluster_schema/>
     <remotesteps>

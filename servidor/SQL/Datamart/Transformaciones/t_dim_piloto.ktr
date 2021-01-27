@@ -430,7 +430,7 @@
     <created_date>2021/01/09 15:04:11.603</created_date>
     <modified_user>-</modified_user>
     <modified_date>2021/01/09 15:04:11.603</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -572,8 +572,8 @@ DB: Le Vams</note>
     </hop>
   </order>
   <step>
-    <name>Table input</name>
-    <type>TableInput</type>
+    <name>Insert / update</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -582,14 +582,71 @@ DB: Le Vams</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>c_le_vams</connection>
-    <sql>SELECT (identificacion).primer_nombre, (identificacion).primer_apellido, (identificacion).genero, img_piloto, fec_nacimiento, p.gentilicio, p.img_bandera, fec_fallecimiento FROM pilotos
-    INNER JOIN paises p on pilotos.id_pais = p.id_pais</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
+    <connection>c_dw_le_vams</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>dim_piloto</table>
+      <key>
+        <name>primer_nombre</name>
+        <field>nombre</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>primer_apellido</name>
+        <field>apellido</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fec_nacimiento</name>
+        <field>fec_nacimiento</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>nombre</name>
+        <rename>primer_nombre</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>apellido</name>
+        <rename>primer_apellido</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>genero</name>
+        <rename>genero</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>img_piloto</name>
+        <rename>img_piloto</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fec_nacimiento</name>
+        <rename>fec_nacimiento</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>gentilicio</name>
+        <rename>gentilicio</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>img_bandera</name>
+        <rename>img_bandera</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fec_fallecimiento</name>
+        <rename>fec_fallecimiento</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -599,7 +656,7 @@ DB: Le Vams</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>160</xloc>
+      <xloc>496</xloc>
       <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>
@@ -656,8 +713,8 @@ DB: Le Vams</note>
     </GUI>
   </step>
   <step>
-    <name>Insert / update</name>
-    <type>InsertUpdate</type>
+    <name>Table input</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -666,71 +723,14 @@ DB: Le Vams</note>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>c_dw_le_vams</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>dim_piloto</table>
-      <key>
-        <name>primer_nombre</name>
-        <field>nombre</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>primer_apellido</name>
-        <field>apellido</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>fec_fallecimiento</name>
-        <field>fec_nacimiento</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>nombre</name>
-        <rename>primer_nombre</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>apellido</name>
-        <rename>primer_apellido</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>genero</name>
-        <rename>genero</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>img_piloto</name>
-        <rename>img_piloto</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>fec_nacimiento</name>
-        <rename>fec_nacimiento</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>gentilicio</name>
-        <rename>gentilicio</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>img_bandera</name>
-        <rename>img_bandera</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>fec_fallecimiento</name>
-        <rename>fec_fallecimiento</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
+    <connection>c_le_vams</connection>
+    <sql>SELECT (identificacion).primer_nombre, (identificacion).primer_apellido, (identificacion).genero, img_piloto, fec_nacimiento, p.gentilicio, p.img_bandera, fec_fallecimiento FROM pilotos
+    INNER JOIN paises p on pilotos.id_pais = p.id_pais</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -740,7 +740,7 @@ DB: Le Vams</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>496</xloc>
+      <xloc>160</xloc>
       <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>

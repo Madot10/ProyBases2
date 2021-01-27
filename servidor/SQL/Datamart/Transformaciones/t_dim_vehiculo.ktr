@@ -562,10 +562,111 @@ DB: Le Vams</note>
   <order>
     <hop>
       <from>Table input</from>
-      <to>Table output</to>
+      <to>Insert / update</to>
       <enabled>Y</enabled>
     </hop>
   </order>
+  <step>
+    <name>Insert / update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>c_dw_le_vams</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>dim_vehiculo</table>
+      <key>
+        <name>modelo</name>
+        <field>modelo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>categoria</name>
+        <field>categoria</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>modelo_motor</name>
+        <field>modelo_motor</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>cilindros</name>
+        <field>cilindros</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>modelo</name>
+        <rename>modelo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>categoria</name>
+        <rename>categoria</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>img_vehiculo</name>
+        <rename>img_vehiculo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tipo</name>
+        <rename>tipo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>modelo_motor</name>
+        <rename>modelo_motor</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>cilindros</name>
+        <rename>cilindros</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>cc</name>
+        <rename>cc</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fabricante_auto</name>
+        <rename>fabricante_auto</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fabricante_neumatico</name>
+        <rename>fabricante_neumatico</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>400</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step>
     <name>Table input</name>
     <type>TableInput</type>
@@ -673,8 +774,8 @@ DB: Le Vams</note>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
-      <yloc>144</yloc>
+      <xloc>400</xloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

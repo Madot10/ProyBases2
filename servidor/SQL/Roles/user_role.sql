@@ -20,12 +20,9 @@ GRANT analista_negocios_3 to analista3;
 
 --Revocar todos los accesos por defecto
 --revocamos comportamiento por defecto
---ALTER default privileges revoke execute on functions from public;
---REVOKE ALL PRIVILEGES ON DATABASE le_vams_dw FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC;
 REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
---REVOKE ALL ON SCHEMA public FROM PUBLIC;
 --Revocar roles de CREATE a todos los usuarios menos al desarrollador
 REVOKE CREATE ON SCHEMA public FROM analista1;
 REVOKE CREATE ON SCHEMA public FROM analista2;
@@ -48,10 +45,9 @@ REVOKE EXECUTE ON FUNCTION reporte_victoria_por_marca(BOOLEAN) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION reporte_mujeres_pilotos(SMALLINT) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION reporte_datos_participacion_mujeres(SMALLINT) FROM PUBLIC;
 
-
 --definir roles
 --rol analista 1
---select * from dim_tiempo;
+select * from dim_tiempo;
 GRANT SELECT ON TABLE dim_equipo TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_piloto TO analista_negocios_1;
 GRANT SELECT ON TABLE dim_tiempo TO analista_negocios_1;
@@ -114,30 +110,24 @@ GRANT analista_negocios_2 to dev;
 GRANT analista_negocios_3 to dev;
 --Permiso de inserts
 GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO desarrollador;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO desarrollador;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO desarrollador;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO desarrollador;
+GRANT CREATE ON SCHEMA public TO desarrollador;
+GRANT TRIGGER ON ALL TABLES IN SCHEMA public TO desarrollador;
 ALTER ROLE desarrollador CREATEDB;
 ALTER ROLE desarrollador CREATEROLE;
---Esto sólo lo permite para usuarios
---Peeero no funciona
---ALTER USER desarrollador CREATEUSER;
-
-
---PROBAR
-GRANT INSERT ON TABLE dim_equipo TO desarrollador;
-GRANT INSERT ON TABLE dim_piloto TO desarrollador;
-GRANT INSERT ON TABLE dim_tiempo TO desarrollador;
-GRANT INSERT ON TABLE dim_vehiculo TO desarrollador;
-GRANT INSERT ON TABLE ft_participacion TO desarrollador;
-
-
+--No funciona este:
+ALTER ROLE desarrollador CREATEUSER;
 
 --Pruebas
---select * from dim_tiempo;
+SELECT * FROM dim_equipo;
 --Reporte 4
---SELECT * FROM reporte_rank_nro_equipo(1::SMALLINT, 2000);
+SELECT * FROM reporte_rank_nro_equipo(1::SMALLINT, 2000);
 --Reporte 15
---SELECT * FROM reporte_victoria_por_marca(FALSE);
---insert into dim_equipo(nombre, nombre_pais, img_bandera) VALUES ('Nuevo equipo2', 'Nuevo país2', 'Nueva imagen2');
-"""
+SELECT * FROM reporte_victoria_por_marca(FALSE);
+INSERT INTO dim_equipo(nombre, nombre_pais, img_bandera) VALUES ('Nuevo equipo2', 'Nuevo país2', 'Nueva imagen2');
+
 CREATE SEQUENCE sec_prueba
     AS SMALLINT
     MINVALUE 1
@@ -148,16 +138,29 @@ CREATE TABLE prueba(
   nombre VARCHAR(35) NOT NULL,
   id_pais SMALLINT
 );
-"""
+
+CREATE USER user_prueba;
+CREATE ROLE role_prueba1;
+DROP ROLE role_prueba;
+
+CREATE OR REPLACE FUNCTION trigger_prueba() RETURNS TRIGGER AS $$
+    BEGIN
+        INSERT INTO dim_equipo(nombre, nombre_pais, img_bandera) VALUES ('PRUEBA TRIGGER', 'PRUEBA TRIGGER', 'PRUEBA TRIGGER');
+        RETURN NEW;
+    END
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER exe_trigger AFTER INSERT ON dim_equipo FOR EACH ROW EXECUTE PROCEDURE trigger_prueba();
+
 
 --En caso de tener que borrar un rol:
 CREATE ROLE aux;
-REASSIGN OWNED BY analista_negocios_2 TO aux;
-DROP OWNED BY analista_negocios_2;
-DROP ROLE analista_negocios_2;
+REASSIGN OWNED BY desarrollador TO aux;
+DROP OWNED BY desarrollador;
+DROP ROLE desarrollador;
 
-drop user analista2;
-CREATE USER analista2 LOGIN PASSWORD '12345';
-CREATE ROLE analista_negocios_2;
-GRANT analista_negocios_2 TO analista2;
+DROP OWNED BY dev;
+drop user dev;
+CREATE USER dev LOGIN PASSWORD '12345';
+CREATE ROLE desarrollador;
+GRANT desarrollador TO dev;
 DROP ROLE aux;

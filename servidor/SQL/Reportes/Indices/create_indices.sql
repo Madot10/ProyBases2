@@ -1,7 +1,8 @@
 DROP INDEX index_pilotos_mujeres;
 DROP INDEX index_vict_marca;
+DROP INDEX index_ganador;
 
---Indice #1 Reporte #16 - Pilotos mujeres 
+--Indice#1
 --Probado Para la BD grupo 7
 --EJ: SELECT * FROM persona WHERE femenino is true; 
 --Solo para pruebas
@@ -15,12 +16,16 @@ CREATE INDEX index_pilotos_mujeres ON pilotos (identificacion) WHERE (pilotos.id
 
 
 
---Indice  Reporte #15 - Victorias por Marca
+--Indice#2
 --Probado para la BD le vams
 --EJ: explain select * from CARRERAS where puesto_final > 1 or puesto_final <= 3;
 
 CREATE INDEX index_vict_marca ON carreras (puesto_final) WHERE puesto_final > 1 or puesto_final <= 3;
 
+--Indice#3 
+--Probado para la BD le vams
+--EJ: EXPLAIN SELECT * FROM carreras WHERE puesto_final = 1;
 
+CREATE INDEX index_ganador ON carreras (puesto_final) WHERE puesto_final = 1;
 
 

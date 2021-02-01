@@ -2,6 +2,32 @@ DROP INDEX index_pilotos_mujeres;
 DROP INDEX index_vict_marca;
 DROP INDEX index_ganador;
 
+
+--Indice#1
+--Probado EN SISTEMA_LE_VAMS (dim_piloto)
+
+CREATE INDEX index_pilotos_mujeres ON dim_piloto (genero) WHERE genero = 'femenino';
+
+/*EXPLAIN SELECT DISTINCT
+                p.id_piloto,
+                --Año de primera participacion
+               (SELECT MIN(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto =  pilot.id_piloto) AnnoPrimeraParticipacion,
+               --Numero total de participaciones
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto) CantParticipaciones,
+                --Veces en el 1er puesto
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND parti.puesto_final_carrera = 1) CantPrimerLugar,
+               --Veces en el podium (1,2 y3er lugar)
+                (SELECT COUNT(t.anno) FROM ft_participacion parti INNER JOIN dim_piloto pilot on parti.id_dim_piloto = pilot.id_piloto INNER JOIN dim_tiempo t on parti.id_dim_tiempo = t.id_tiempo WHERE p.id_piloto = pilot.id_piloto AND( parti.puesto_final_carrera = 1 OR parti.puesto_final_carrera = 2 OR parti.puesto_final_carrera = 3)) CantPodium,
+                --Datos
+                p.nombre || ' ' || p.apellido NombrePiloto, p.fec_nacimiento, p.fec_fallecimiento,  EXTRACT(YEAR FROM age(p.fec_nacimiento)), p.img_piloto, p.gentilicio, p.img_bandera BanderaPiloto
+        FROM ft_participacion parti
+            INNER JOIN dim_piloto p on parti.id_dim_piloto = p.id_piloto and p.genero = 'femenino';
+*/
+
+
+
+
+
 --Indice#1
 --Probado Para la BD grupo 7
 --EJ: SELECT * FROM persona WHERE femenino is true; 

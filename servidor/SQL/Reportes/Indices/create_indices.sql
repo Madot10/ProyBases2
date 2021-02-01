@@ -1,6 +1,6 @@
 DROP INDEX index_pilotos_mujeres;
 DROP INDEX index_vict_marca;
-DROP INDEX index_ganador;
+DROP INDEX index_victorias_ensayo;
 
 
 --Indice#1
@@ -24,9 +24,17 @@ CREATE INDEX index_pilotos_mujeres ON dim_piloto (genero) WHERE genero = 'femeni
             INNER JOIN dim_piloto p on parti.id_dim_piloto = p.id_piloto and p.genero = 'femenino';
 */
 
+--Indice#2
+--Probado EN SISTEMA_LE_VAMS (ft_participacion)
+
+CREATE INDEX index_vict_carrera ON ft_participacion (puesto_final_carrera) 
+	WHERE puesto_final_carrera = 1 OR puesto_final_carrera = 2 OR puesto_final_carrera = 3;
+	
+CREATE INDEX index_vict_ensayo ON ft_participacion (puesto_final_ensayo)
+	WHERE puesto_final_ensayo = 1 OR puesto_final_ensayo = 2 OR puesto_final_ensayo = 3;
 
 
-
+/****************************************************************************************************/  
 
 --Indice#1
 --Probado Para la BD grupo 7

@@ -1,6 +1,6 @@
 DROP INDEX index_pilotos_mujeres;
 DROP INDEX index_vict_marca;
-DROP INDEX index_victorias_ensayo;
+DROP INDEX index_vict_ensayo;
 
 
 --Indice#1

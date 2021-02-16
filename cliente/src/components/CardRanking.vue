@@ -10,7 +10,11 @@
                 <!-- Nro equipo, Nombre y bandera de nac -->
                 <h3>
                     {{ datos.nroequipo }} - {{ datos.nombreequipo }}
-                    <b-img rounded :src="'data:image/png;base64,' + datos.imgbanderaequipo"></b-img>
+                    <b-img
+                        id="img-pais"
+                        rounded
+                        :src="'data:image/png;base64,' + datos.imgbanderaequipo"
+                    ></b-img>
                 </h3>
                 <!-- ANO DE PARTICIPACION -->
                 <p v-if="fecha">
@@ -107,8 +111,8 @@ export default {
     created() {
         //Limites de charts
         this.nro_v = this.limites.nro_v;
-        this.km = this.limites.km;
-        this.vel_media = this.limites.vel_media;
+        this.km = this.limites.km + 1;
+        this.vel_media = this.limites.vel_media + 1;
         this.dif_v = this.limites.dif_v;
 
         this.data_nro_v[0].value = Number(this.datos.nrovueltascarrera);
@@ -124,5 +128,9 @@ export default {
 <style>
 .card {
     width: 100%;
+}
+
+#img-pais {
+    max-width: 30px;
 }
 </style>

@@ -3,28 +3,28 @@
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
                 <h3 class="text-center mb-2 w-100">
-                    Ganadores - {{ $route.params.cat_sel }} -
-                    {{ $route.params.anno_sel == 0 ? "Década" : $route.params.anno_sel }}
+                    Logros del piloto
                 </h3>
 
-                <div v-for="(parti, i) in datos_rank" :key="i">
-                    <CardRaking
-                        :datos="parti"
-                        :hora="$route.params.hora_sel"
-                        :limites="limites"
-                        tipo_event="car"
-                        :fecha="parti.fechaevento"
-                    ></CardRaking>
+                <CardPiloto v-if="!is_loading" :datos="datos_pilot"></CardPiloto>
+                <hr />
+                <br />
+
+                <h3 v-show="!is_loading">PARTICIPACIONES</h3>
+                <div v-for="(parti, i) in datos_detallados" :key="i">
+                    <CardParticipacion :datos="parti"></CardParticipacion>
                     <br />
                 </div>
+
                 <!-- MENSAJE - DATOS VACIOS -->
                 <div
-                    v-show="datos_rank.length == 0 && is_loading == false"
-                    class="mt-2 text-center mx-auto"
+                    v-show="datos_detallados.length == 0 && is_loading == false"
+                    class="mt-2 text-center  mx-auto"
                 >
                     <h2>¡No hemos encontrado información!</h2>
                     <b-icon class="h1" icon="emoji-frown"></b-icon>
                 </div>
+
                 <!-- MENSAJE - CARGA -->
                 <div v-show="is_loading == true" class="mt-2 text-center mx-auto">
                     <h3>Estamos solicitando la información al servidor, por favor espere</h3>
@@ -37,28 +37,25 @@
 
 <script>
 import ScreenWindow from "../components/ScreenWindow.vue";
-import CardRaking from "../components/CardRanking.vue";
+import CardPiloto from "../components/CardPiloto.vue";
+import CardParticipacion from "../components/CardParticipacion.vue";
 
 export default {
-    components: { ScreenWindow, CardRaking },
+    components: { ScreenWindow, CardPiloto, CardParticipacion },
     data() {
         return {
-            datos_rank: [],
-            limites: {
-                nro_v: 0,
-                km: 0,
-                vel_media: 0,
-                dif_v: 0,
-            },
+            datos_detallados: [],
+            datos_pilot: null,
             is_loading: true,
         };
     },
     methods: {
-        //Guardar mayor valor
-        guardar_valor_alto(valor, tipo) {
-            if (this.limites[tipo] < Number(valor)) {
-                //guardamos nuevo
-                this.limites[tipo] = Number(valor);
+        //check base64 encabezado
+        check_base64(b64) {
+            if (!b64.includes("data:image")) {
+                return "data:image/jpeg;base64," + b64;
+            } else {
+                return b64;
             }
         },
         //Generar array agrupados
@@ -69,15 +66,11 @@ export default {
 
             //Agrupemos por pilotos
             datos.forEach((c, i) => {
-                //Verificamos valores de limites
-                this.guardar_valor_alto(c.nrovueltascarrera, "nro_v");
-                this.guardar_valor_alto(c.distrecorrida, "km");
-                this.guardar_valor_alto(c.velmediacarrera, "vel_media");
-                this.guardar_valor_alto(c.difvueltas, "dif_v");
+                //Si no existe registro de equipo
 
                 //Si no existe registro de equipo
-                let c_anno = new Date(c.fechaevento);
-                //console.log(c);
+                let c_anno = new Date(c.anno);
+
                 if (aux_rank[c.nroequipo + c_anno.getFullYear()] == null) {
                     //Guardamos index de array original
                     aux_rank[c.nroequipo + c_anno.getFullYear()] = i;
@@ -87,9 +80,13 @@ export default {
                     c.pilotos.push({
                         gentilicio: c.gentilicio,
                         imgbanderapiloto: c.imgbanderapiloto,
-                        imgpiloto: c.imgpiloto,
+                        imgpiloto: this.check_base64(c.imgpiloto),
                         nombrepiloto: c.nombrepiloto,
                     });
+
+                    c.imgbanderapais = this.check_base64(c.imgbanderapais);
+
+                    c.imgvehiculo = this.check_base64(c.imgvehiculo);
 
                     aux_arr.push(c);
                 } else {
@@ -98,27 +95,48 @@ export default {
                         datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.push({
                             gentilicio: c.gentilicio,
                             imgbanderapiloto: c.imgbanderapiloto,
-                            imgpiloto: c.imgpiloto,
+                            imgpiloto: this.check_base64(c.imgpiloto),
                             nombrepiloto: c.nombrepiloto,
                         });
                 }
             });
             //Guardamos
-            this.datos_rank = aux_arr;
+            this.datos_detallados = aux_arr;
             this.is_loading = false;
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000/ganadores/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}`;
+            let urlApiLogros = `http://localhost:3000/logros_datos/${this.$route.params.pilot_sel}`;
+            let urlApiParti = `http://localhost:3000/logros_part/${this.$route.params.pilot_sel}`;
 
-            //Solicitamos datos
-            fetch(urlApi)
+            //Solicitamos datos del piloto
+            fetch(urlApiLogros)
                 .then((response) => {
                     return response.json();
                 })
-                .then((ranking_data) => {
-                    this.generar_rank(ranking_data);
-                    console.log("DATOS OBTENIDOS", ranking_data);
+                .then((pilot_data) => {
+                    //this.generar_rank(ranking_data);
+                    console.log(pilot_data);
+                    this.datos_pilot = pilot_data[0];
+                })
+                .catch((err) => {
+                    console.log("ERROR desde SV", err);
+                    this.$router.push({
+                        name: "Reportes",
+                        params: {
+                            error: 1,
+                        },
+                    });
+                });
+
+            //Datos de participacion
+            fetch(urlApiParti)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((parti_data) => {
+                    this.generar_rank(parti_data);
+                    console.log(parti_data);
                 })
                 .catch((err) => {
                     console.log("ERROR desde SV", err);

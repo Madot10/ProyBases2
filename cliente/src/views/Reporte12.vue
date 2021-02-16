@@ -3,25 +3,21 @@
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
                 <h3 class="text-center mb-2 w-100">
-                    Ranking por año - {{ $route.params.anno_sel }}
+                    Distancias más largas recorridas en Le Mans
                 </h3>
+
                 <div v-for="(parti, i) in datos_rank" :key="i">
-                    <CardRaking
-                        :datos="parti"
-                        :tipo_event="$route.params.event_sel"
-                        :limites="limites"
-                    ></CardRaking>
+                    <CardRaking :datos="parti" :limites="limites" tipo_event="car"></CardRaking>
                     <br />
                 </div>
                 <!-- MENSAJE - DATOS VACIOS -->
                 <div
                     v-show="datos_rank.length == 0 && is_loading == false"
-                    class="mt-2 text-center  mx-auto"
+                    class="mt-2 text-center mx-auto"
                 >
                     <h2>¡No hemos encontrado información!</h2>
                     <b-icon class="h1" icon="emoji-frown"></b-icon>
                 </div>
-
                 <!-- MENSAJE - CARGA -->
                 <div v-show="is_loading == true" class="mt-2 text-center mx-auto">
                     <h3>Estamos solicitando la información al servidor, por favor espere</h3>
@@ -51,11 +47,21 @@ export default {
         };
     },
     methods: {
+        //check base64 encabezado
+        check_base64(b64) {
+            if (b64 && !b64.includes("data:image")) {
+                return "data:image/jpeg;base64," + b64;
+            } else if (b64) {
+                return b64;
+            } else {
+                return null;
+            }
+        },
         //Guardar mayor valor
         guardar_valor_alto(valor, tipo) {
-            if (this.limites[tipo] < Number(valor)) {
+            if (this.limites[tipo] < Number(valor) + 1) {
                 //guardamos nuevo
-                this.limites[tipo] = Number(valor);
+                this.limites[tipo] = Number(valor) + 1;
             }
         },
         //Generar array agrupados
@@ -66,34 +72,36 @@ export default {
 
             //Agrupemos por pilotos
             datos.forEach((c, i) => {
-                //Si no existe registro de equipo
                 //Verificamos valores de limites
                 this.guardar_valor_alto(c.nrovueltascarrera, "nro_v");
                 this.guardar_valor_alto(c.distrecorrida, "km");
                 this.guardar_valor_alto(c.velmediacarrera, "vel_media");
                 this.guardar_valor_alto(c.difvueltas, "dif_v");
 
-                if (aux_rank[c.nroequipo] == null) {
+                //Si no existe registro de equipo
+                let c_anno = new Date(c.fechaevento);
+                //console.log(c);
+                if (aux_rank[c.nroequipo + c_anno.getFullYear()] == null) {
                     //Guardamos index de array original
-                    aux_rank[c.nroequipo] = i;
+                    aux_rank[c.nroequipo + c_anno.getFullYear()] = i;
 
                     c.pilotos = [];
 
                     c.pilotos.push({
                         gentilicio: c.gentilicio,
                         imgbanderapiloto: c.imgbanderapiloto,
-                        imgpiloto: c.imgpiloto,
+                        imgpiloto: this.check_base64(c.imgpiloto),
                         nombrepiloto: c.nombrepiloto,
                     });
 
                     aux_arr.push(c);
                 } else {
                     //Tenemos registro, guardamos
-                    if (datos[aux_rank[c.nroequipo]].pilotos.length < 3)
-                        datos[aux_rank[c.nroequipo]].pilotos.push({
+                    if (datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.length < 3)
+                        datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.push({
                             gentilicio: c.gentilicio,
                             imgbanderapiloto: c.imgbanderapiloto,
-                            imgpiloto: c.imgpiloto,
+                            imgpiloto: this.check_base64(c.imgpiloto),
                             nombrepiloto: c.nombrepiloto,
                         });
                 }
@@ -102,9 +110,17 @@ export default {
             this.datos_rank = aux_arr;
             this.is_loading = false;
         },
+        retornar_error() {
+            this.$router.push({
+                name: "Reportes",
+                params: {
+                    error: 1,
+                },
+            });
+        },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000/ranking_anno/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}/${this.$route.params.event_sel}`;
+            let urlApi = `http://localhost:3000/mejores_dist/${this.$route.params.limit_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)
@@ -112,8 +128,12 @@ export default {
                     return response.json();
                 })
                 .then((ranking_data) => {
-                    this.generar_rank(ranking_data);
                     console.log("DATOS OBTENIDOS", ranking_data);
+
+                    //check error
+                    if (ranking_data.name == "error") this.retornar_error();
+
+                    this.generar_rank(ranking_data);
                 })
                 .catch((err) => {
                     console.log("ERROR desde SV", err);

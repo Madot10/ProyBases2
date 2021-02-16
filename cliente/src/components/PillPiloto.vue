@@ -28,6 +28,6 @@ export default {
 
 <style>
 #img-pais {
-    width: 30%;
+    max-width: 30px;
 }
 </style>

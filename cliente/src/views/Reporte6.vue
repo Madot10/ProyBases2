@@ -3,19 +3,16 @@
         <b-container class="h-100 ">
             <b-row class="h-100" align-v="center">
                 <h3 class="text-center mb-2 w-100">
-                    Ranking por año - {{ $route.params.anno_sel }}
+                    Ranking marca y modelo
                 </h3>
-                <div v-for="(parti, i) in datos_rank" :key="i">
-                    <CardRaking
-                        :datos="parti"
-                        :tipo_event="$route.params.event_sel"
-                        :limites="limites"
-                    ></CardRaking>
+                <div v-for="(parti, i) in datos_detallados" :key="i">
+                    <CardParticipacion :datos="parti"></CardParticipacion>
                     <br />
                 </div>
+
                 <!-- MENSAJE - DATOS VACIOS -->
                 <div
-                    v-show="datos_rank.length == 0 && is_loading == false"
+                    v-show="datos_detallados.length == 0 && is_loading == false"
                     class="mt-2 text-center  mx-auto"
                 >
                     <h2>¡No hemos encontrado información!</h2>
@@ -34,28 +31,25 @@
 
 <script>
 import ScreenWindow from "../components/ScreenWindow.vue";
-import CardRaking from "../components/CardRanking.vue";
+import CardParticipacion from "../components/CardParticipacion.vue";
 
 export default {
-    components: { ScreenWindow, CardRaking },
+    components: { ScreenWindow, CardParticipacion },
     data() {
         return {
-            datos_rank: [],
-            limites: {
-                nro_v: 0,
-                km: 0,
-                vel_media: 0,
-                dif_v: 0,
-            },
+            datos_detallados: [],
             is_loading: true,
         };
     },
     methods: {
-        //Guardar mayor valor
-        guardar_valor_alto(valor, tipo) {
-            if (this.limites[tipo] < Number(valor)) {
-                //guardamos nuevo
-                this.limites[tipo] = Number(valor);
+        //check base64 encabezado
+        check_base64(b64) {
+            if (b64 && !b64.includes("data:image")) {
+                return "data:image/jpeg;base64," + b64;
+            } else if (b64) {
+                return b64;
+            } else {
+                return null;
             }
         },
         //Generar array agrupados
@@ -67,44 +61,46 @@ export default {
             //Agrupemos por pilotos
             datos.forEach((c, i) => {
                 //Si no existe registro de equipo
-                //Verificamos valores de limites
-                this.guardar_valor_alto(c.nrovueltascarrera, "nro_v");
-                this.guardar_valor_alto(c.distrecorrida, "km");
-                this.guardar_valor_alto(c.velmediacarrera, "vel_media");
-                this.guardar_valor_alto(c.difvueltas, "dif_v");
 
-                if (aux_rank[c.nroequipo] == null) {
+                //Si no existe registro de equipo
+                let c_anno = new Date(c.anno);
+
+                if (aux_rank[c.nroequipo + c_anno.getFullYear()] == null) {
                     //Guardamos index de array original
-                    aux_rank[c.nroequipo] = i;
+                    aux_rank[c.nroequipo + c_anno.getFullYear()] = i;
 
                     c.pilotos = [];
 
                     c.pilotos.push({
                         gentilicio: c.gentilicio,
                         imgbanderapiloto: c.imgbanderapiloto,
-                        imgpiloto: c.imgpiloto,
+                        imgpiloto: this.check_base64(c.imgpiloto),
                         nombrepiloto: c.nombrepiloto,
                     });
+
+                    c.imgbanderapais = this.check_base64(c.imgbanderapais);
+
+                    c.imgvehiculo = this.check_base64(c.imgvehiculo);
 
                     aux_arr.push(c);
                 } else {
                     //Tenemos registro, guardamos
-                    if (datos[aux_rank[c.nroequipo]].pilotos.length < 3)
-                        datos[aux_rank[c.nroequipo]].pilotos.push({
+                    if (datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.length < 3)
+                        datos[aux_rank[c.nroequipo + c_anno.getFullYear()]].pilotos.push({
                             gentilicio: c.gentilicio,
                             imgbanderapiloto: c.imgbanderapiloto,
-                            imgpiloto: c.imgpiloto,
+                            imgpiloto: this.check_base64(c.imgpiloto),
                             nombrepiloto: c.nombrepiloto,
                         });
                 }
             });
             //Guardamos
-            this.datos_rank = aux_arr;
+            this.datos_detallados = aux_arr;
             this.is_loading = false;
         },
         //Obtener datos desde el MBD
         obtener_datos() {
-            let urlApi = `http://localhost:3000/ranking_anno/${this.$route.params.anno_sel}/${this.$route.params.cat_sel}/${this.$route.params.event_sel}`;
+            let urlApi = `http://localhost:3000/part_marca_modelo/${this.$route.params.fab_sel}/${this.$route.params.model_sel}`;
 
             //Solicitamos datos
             fetch(urlApi)
